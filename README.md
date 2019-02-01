@@ -1,7 +1,8 @@
 # Build APIs You Won't Hate #2: This Time It's Serious!
 
-
 ## Theory
+
+- APIs, Services, and Microservices
 
 - RPC, REST and GraphQL
   - Technical Differences
@@ -16,6 +17,12 @@
   - HTTP/2 is a real world thing today use it
   - Lets Stop Building Around a Network Hack
 
+- Asynchronous Methodologies
+  - Long Polling
+  - Web Hooks (a.k.a Callbacks)
+  - WebSockets
+  - Message Brokers (AMQP, Kafka, etc.)
+
 - API Specifications
   - Design First vs Code First
 
@@ -23,7 +30,7 @@
 
 - Style Guides
   - http://apistylebook.com/design/guidelines/
-- Mocking
+- Mocking & Sandboxes
 - Documentation
 - Collections
   - Pagination
@@ -35,11 +42,13 @@
 - Error Formats
 
 ## Testing & Monitoring
+- Traffic Inspection
 - Integration Testing
 - Contract Testing
 - End to End / Acceptance Testing
 - Health Checks
-- Testing in Production
+- Load Testing
+- Testing in ProductionS
 
 ## Deployment
 
@@ -52,6 +61,7 @@ Maybe Kubernetes httpGet /health
 - API Gateways
 - Gateway Validation
 - Rate Limiting
+- Analytics
 - Governance (Speccy / Specteral / Stoplight)
 
 ## Retiring & Deprecating
@@ -62,3 +72,4 @@ Maybe Kubernetes httpGet /health
 ## Not Sure Where To Place
 
 - Backend for Frontends (BFF)
+- Debugging
