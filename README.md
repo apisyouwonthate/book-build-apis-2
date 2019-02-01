@@ -12,6 +12,10 @@
   - Next available actions
   - Standards (JSON:API, HAL, etc.)
 
+- HTTP/1, HTTP/2 and HTTP/3
+  - HTTP/2 is a real world thing today use it
+  - Lets Stop Building Around a Network Hack
+
 - API Specifications
   - Design First vs Code First
 
@@ -33,11 +37,14 @@
 ## Testing & Monitoring
 - Integration Testing
 - Contract Testing
-- End to End / Acceptance Testing`
+- End to End / Acceptance Testing
+- Health Checks
+- Testing in Production
 
 ## Deployment
 
-Ugh do I have to?
+Ugh do I have to? It's just like deploying any other application no?
+
 Maybe Kubernetes httpGet /health
 
 ## Management
@@ -51,3 +58,7 @@ Maybe Kubernetes httpGet /health
 
 - Deprecation
 - Versioning & Evolution
+
+## Not Sure Where To Place
+
+- Backend for Frontends (BFF)
