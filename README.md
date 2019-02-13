@@ -9,6 +9,20 @@
   - [x] REST
   - [ ] Query Languages
 
+- [ ] API Contracts
+  - [ ] Service Model
+  - [ ] Data Model
+  - [ ] Design First vs Code First
+
+- [ ] Design Theory
+  - [ ] Resources
+  - [ ] Collections
+  - [ ] Pagination
+  - [ ] Filtering
+  - [ ] Caching
+
+- [ ] Authentication
+
 - [ ] Hypermedia Controls (HATEOAS)
   - [ ] Layers of abstaction on top of RPC
   - [ ] Next available actions
@@ -24,25 +38,16 @@
   - [ ] WebSockets
   - [ ] Message Brokers (AMQP, Kafka, etc.)
 
-- [ ] API Specifications
-  - [ ] Design First vs Code First
-
 ## Planning & Design
 
+- [ ] API Specifciations
+  - [ ] Documentation
+  - [ ] Mocking & Sandboxes
 - [ ] Style Guides
-  - [ ] http://apistylebook.com/design/guidelines/
-- [ ] Mocking & Sandboxes
-- [ ] Documentation
-- [ ] Collections
-  - [ ] Pagination
-  - [ ] Filtering
-- [ ] PUT & PATCH
-  - [ ] Why both are useful
-- [ ] Caching
-- [ ] Authentication
+  - http://apistylebook.com/design/guidelines/
+- [ ] Error Formats
 - [ ] Validation
   - [ ] JSON Schema Validation
-- [ ] Error Formats
 
 ## Testing & Monitoring
 
