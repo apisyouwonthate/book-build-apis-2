@@ -1,0 +1,213 @@
+= APIs, Services, and Microservices
+
+Before we get too stuck into things we should probably get some terminology
+agreed upon, otherwise we are throwing around these terms interchangeably like
+the majority of developers, and talking about different things.
+
+== API
+
+The acronym API stands for “Application Program Interface”, and that’s what it
+says on the tin: an interface for programmatically interacting with an
+application. This is a rather generic term in the world of computer science and
+programming, as a Linux command-line utility would consider its command names
+and options to be an API, whilst a Java library would also consider the method
+names and arguments to be an API.
+
+Essentially it’s all the same concept, but this book will be talking about Web
+APIs. Frustratingly there are a few different meanings of the term Web API too.
+Some folks will use this term to describe things like various JavaScipt
+libraries baked into browsers, like the Local Storage API, Audio API, etc.
+
+Not that. This book will be talking about the utilization of network protocols
+such as HTTP, AMQP, etc., combined with URLs, and chunks of data (often JSON),
+to make an API which operates over the web.
+
+The goal of a Web API is to provide other applications with access to specific
+subset of functionality and data that this application owns. Some APIs are
+public (anyone can get the weather from api.weather.gov), some are private (it’s
+probably tough to get access to JPMorgan Chase’s Enterprise Customers API), and
+some are a mixture.
+
+APIs can provide data for a single-page JavaScript application, handle payment
+information to avoid clients needing to worry about storing credit card details,
+post Facebook statuses on a users timeline, or share the same data across a
+myriad of different devices; Watch that Netflix show on your Xbox, it’s all
+good, APIs have you covered.
+
+APIs are built by all sorts of folks; maybe another company, some large like
+Google or Facebook, startups, governments, or charity organizations. The API you
+build might be for another company, another department within your company, or a
+backdoor for the US government.
+
+== Service
+
+A "service" is another very overloaded term in computer science, and programming
+in general. A lot of developers are used to MVC (Model, View, Controller) and a
+service is just "any code that didn't fit into a model, view, or controller".
+
+When folks talk about services in API-land, they are usually talking about
+"Service-oriented Architecture".
+
+[quote,Wikipedia,https://wikipedia.org/wiki/Service-oriented_architecture]
+____
+Service-oriented architecture (SOA) is a style of software design where services
+are provided to the other components by application components, through a
+communication protocol over a network. The basic principles of service-oriented
+architecture are independent of vendors, products and technologies. A service is
+a discrete unit of functionality that can be accessed remotely and acted upon
+and updated independently, such as retrieving a credit card statement online.
+
+A service has four properties according to one of many definitions of SOA:
+
+- It logically represents a business activity with a specified outcome.
+- It is self-contained.
+- It is a black box for its consumers.
+- It may consist of other underlying services.
+
+SOA was first termed Service-Based Architecture in 1998 by a team developing
+integrated foundational management services and then business process-type
+services based upon units of work ...
+____
+
+Service-orientated architecture is essentially the idea of taking various
+modules out of your application, and putting them on a different server, with a
+network protocol in the way.
+
+For example, instead of having one application that handles user directories,
+billing, messaging, shipping, inventories, etc., you have multiple applications
+which handle one of those things independently.
+
+// TODO Diagram of example SoA, with a web app, mobile app, billing, user service, messaging service, etc.
+
+When talking about services you will often hear the term "monolith" pop up. Some
+people use monolith to describe a mega application that includes the frontend
+and the backend, including all the presentation logic, business logic, etc.
+Others just mean that there is a giant API, or a few giant APIs...
+
+Essentially the term monolith is pretty subjective and mostly just means an
+application which does too many things (or the developer calling it a monolith
+thinks it does too many things). For example a service which was intended to handle
+"users" functionality like profiles, but ended up handling authentication,
+permissions, groups, messaging, friends, mail routing, etc. will probably be
+called a monolith by somebody.
+
+There are a few benefits to SoA over creating one single giant application, so
+long as your team is qualified in handling the complications that come with it.
+
+One commonly cited benefit is the ability to write services in all sorts of
+different languages and frameworks, using the network and standardized protocols
+as glue. Instead of using the same language for everything, teams can use the
+right tool for the job, selecting a programming language based on its strengths
+and weakniesses when applied to the task at hand.
+
+WARNING: One thing to be wary of here is that some developers get a little giddy
+when told they can "use whatever language you like", finally giving
+CoolNewLanguage™ a try, even though the are not very experienced with it. Not
+only will that make it hard to maintain for that developer, it might also make
+it hard to find other developers who can help maintain it. If management are not
+careful, a company just getting into SoA can have 20 services in 20 different
+languages, and this increases the danger of "Bus Factor" more than a New York
+City bike commute.
+
+Another benefit is reducing the effects of certain compliance restrictions.
+Financial standards like PCI might impose a lot of ruling around applications
+that store credit cards, so if the entire application has access to this data
+directly the whole application will need to be PCI compliant. Splitting out the
+billing logic to its own service potentially means that only the billing service
+has to worry about being compliant.
+
+Other compliance standards like SOX can impose strict rules on how deployments
+happen, multi-step review processes with multiple stakeholders signing off, who
+has access to what, etc. I've worked at companies where SOX really slowed down
+deployments, meaning that even when code is finished and confirmed working, it
+might take a week or two to get it deployed. Other teams were happily cranking
+along, deploying multiple times a day, because the infection of SOX had not
+spread to their services.
+
+The positives are fairly clear, but an often overlooked problem with
+service-orientated architecture is the complexity of managing multiple services,
+and not just the complications of handling "more servers". Managing two services
+is not twice as hard as managing a single application, it is infinitely more
+complex, and you need people who know how to handle these issues.
+
+With a monolith if the code is local, unless your tests were garbage and the
+code you are trying to call does not actually exist, there is zero problem with
+calling it. SoA means going over the network to another server, and that server
+might have changed its IP or domain name. It could be out of capacity, or have
+crashed entirely. Maybe the team who manages it deployed some changes and didn't
+tell you, and the test suite for your API is not aware of their changes
+either...
+
+The pros usually outweigh the cons so long as there is a good devops culture, or
+dedicated sysops people, but SoA is not a merry world of unicorns as some would
+have you believe.
+
+Anyway, these services need to interact with each other, and their clients need
+to interact with them. The interaction could happen in a bunch of different ways
+over the network, but these days it is usually over HTTP, AMQP, or some other
+messaging protocol. The interaction is by definition a form of API.
+
+*An API and a service are not different things. A service will always have
+some form of API, but not all APIs are a service.*
+
+Some APIs could have a more descriptive name than service: like function, or
+database.
+
+.https://twitter.com/adamralph[Adam Ralph] at https://ndcporto.com/[NDC Porto 2019]. Photo credit https://twitter.com/dhelper[Dror Helper].
+image::./images/service-is-not.jpg[Adam Ralph points out that a service with the only functionality bering a function is not a service, its a function. A service which nly exposes data is a database. Adding some HTTP in front does not change its name.]
+
+Throughout the book we will use the terms service, function and database
+accordingly. Attempts will be made to disambiguate if it gets confusing.
+
+== Microservice
+
+Microservices as a term was coined around 2011. It is meant to be an off-shoot
+of SoA, with more emphasis on isolation and autonomy, but
+https://martinfowler.com/bliki/SemanticDiffusion.html[semantic diffusion] has
+caused a lot of confusion.
+
+Some folks define microservice by some objective metric, like number of
+endpoints or methods - which is essentially confusing them with functions.
+Others consider the number of conceptual resources.
+
+It is understandable, as hearing service and microservice makes you think one is
+meant to be "smaller", but size in this context is not counted by the surface
+area of the interface, or even the size of the entire dependency chart.
+
+[quote,Martin Fowler & James Lewis,https://martinfowler.com/articles/microservices.html]
+____
+In short, the microservice architectural style [1] is an approach to developing a single application as a suite of small services, each running in its own process and communicating with lightweight mechanisms, often an HTTP resource API. These services are built around business capabilities and independently deployable by fully automated deployment machinery. There is a bare minimum of centralized management of these services, which may be written in different programming languages and use different data storage technologies.
+____
+
+Microservices are meant to be autonomous, so avoiding have a shitload of
+dependencies will certainly help with that autonomy, but not guarantee it.
+Dependencies come in two flavours, much like a Brexit: hard and soft. Hard
+dependencies will cause clients to crash and burn if the dependency is not
+working as expected, and soft dependencies mean code can continue to work in a
+degraded way.
+
+[quote,Domain Modeling Made Functional,Scott Wlaschin]
+____
+If you switch one of the microservices off and anything else breaks, you don't really have a microservice architecture, you just have a distributed monolith!
+____
+
+I've worked in that architecture. The Rooms Booking service goes down, the
+customer-facing social network crashes, the messaging system goes down, all of a
+sudden the user application is down and sparks come flying out of terminals
+throughout the entire building like the Starship Enterprise is under attack.
+Tools like "service mesh", "service discovery", "circuit breakers" and more
+exist to help with these problems, and we will talk about that a bit.
+
+Without these things, a microservice architecture is likely to be a distributed
+monolith, which has all of the downsides of a regular monolith and a whole lot more
+complications added on top thanks to the joys of networking.
+
+As microservices are meant to be a small part of the full picture, it is pretty
+common to use them internally to a team/department/some sort of context, then
+have larger APIs act as an "aggregate" for these services. That also will be
+written about later.
+
+Seeing as microservices are meant to be services done right, there is not much
+need to talk about them as different things. We will just talk about services,
+monoliths, and when we tell horror stories of octopus orgy-like intertwined
+architectures we will talk about "distributed monoliths".
