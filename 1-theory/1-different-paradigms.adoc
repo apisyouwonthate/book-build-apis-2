@@ -1,0 +1,264 @@
+If APIs are the interface for some sort of service, it should not come as a surprise that not all the interfaces in the world are going to have the same needs and requirements.
+
+There are two key types of requiremen for an API:
+
+- RPC (Remote Procedure Call)
+- RDA (Remote Data Access)
+
+RPC allows a client to say "I would like to initiate this procedure/command/function".
+RDA allows a client to say "I would like to access this data".
+
+Pretty much every API in the world does one of these two things. Now, how they go about doing that can vary wildly, and this is where paradigms come in.
+
+== Paradigm
+
+There are a few known paradigms floating around that cover the requirements of "execute a thing" and "interact with data". To oversimplify things a bit, it’s reasonably fair to say that all APIs conform to one of these paradigms:
+
+- RPC
+- REST
+- Query Language
+
+NOTE: Yep, RPC shows up in both lists, because "do a thing" is simple enough it's both a vague concept and a paradigm.
+
+These are general approaches to building APIs, but not a specific tool or specification. They are merely an idea or set of ideas, not a tangible thing. For that, we need to look at implementations.
+
+*Implementations* are something you can actually download, install, and use to build an API, that conforms to whatever rules the implementors picked, from whichever paradigms they wanted to use at the time.
+
+*Specifications* (or standards, recommendations, etc.) are often drafted up by various working groups, to help implementations share functionality in the same way. An API and a client in different languages can work together perfectly if they’re all following the specification correctly. The difference between a standard and a specification is usually just down to who made it. When a working group like the IETF or W3C create something, it's a standard, but when Google knock something out on their own, it's a specification.
+
+For example:
+
+- SOAP is a W3C recommendation, following the RPC paradigm, with implementations like gSOAP
+- gRPC is a implementation, following the RPC paradigm, which has no standard or specification by any working group, but authors Google Inc. did document the protocol
+- REST is a paradigm, which has never been turned into a specification, and has no official implementations, but building a REST API is usually just a case of picking appropriate standards and tooling
+
+Making direct comparisons between any of these things is tough because it should be possible to see that paradigms, implemntations and specifications are all rather different, but let's try and truck on regardless. First, let us try and figure out the main conceptual differences between the paradigms, then we can get stuck into implementations and such later.
+
+== Understanding Different API Paradigms
+
+=== Remote Procedure Call (RPC)
+
+RPC is the earliest, simplest form of API interaction. It is about executing a block of code on another server, and when implemented in HTTP or AMQP it can become a Web API. There is a method and some arguments, and that is pretty much it. Think of it like calling a function in JavaScript, taking a method name and arguments.
+
+For example:
+
+----
+POST /sayHello HTTP/1.1
+HOST: api.example.com
+Content-Type: application/json
+
+{"name": "Racey McRacerson"}
+----
+
+In JavaScript, the equivilent concept is defining a function, and calling it elsewhere:
+
+----
+/* Signature */
+function sayHello(name) {
+  // ...
+}
+
+/* Usage */
+sayHello("Racey McRacerson");
+----
+
+The idea is the same. An API is built by defining public methods; then, the methods are called with arguments. RPC is just a bunch of functions, but in the context of an HTTP API, that entails putting the method in the URL and the arguments in the query string or body.
+
+When used for CRUD ("Create, Read, Update, Delete"), RPC is just a case of sending up and down data fields, which is fine, but one downside is that the client is entirely in charge of pretty much everything. The client must know which methods (endpoints) to hit at what time, in order to construct its own workflow out of otherwise naive and non-descriptive endpoints.
+
+RPC is without doubt the most prominent paradigm used in API land, possibly because it feels so natural to many programmers. Calling a function locally and calling a function remotely feel so similar, that it just clicks with a lot of developers.
+
+That said, there are a few other things to figure out, like should the method name go in the URL, or should it be passed in the body. Should it be entirely POST or a combination or GET and POST? Should we use metadata to describe what the payload data ias? To answer questions like this, RPC has a whoole bunch of specifications, all of which have concrete implementations:
+
+.Older poular RPC Standards
+- XML-RPC
+- JSON-RPC
+- SOAP (Simple Object Access Protocol)
+
+XML-RPC and JSON-RPC are not used all that much other than by a minority of entrenched fanatics, but SOAP is still kicking around for a lot of financial services and corporate systems like Salesforce.
+
+XML-RPC was problematic, because ensuring data types of XML payloads is tough. In XML, a lot of things are just strings, which JSON does improve, but has trouble differentiating different data formats like integers and decimals.
+
+You need to layer metadata on top in order to describe things such as which fields correspond to which data types. This became part of the basis for SOAP, which used XML Schema and a WSDL (Web Services Description Language) to explain what went where and what it contained.
+
+This metadata is essentially what most science teachers drill into you from a young age: "label your units!" The sort of thing that stops people paying $100 for something that should have been $1 but was just marked as `price: 100` which was meant to be cents...
+
+All three of these specifications had implementations created by various people, mostly as open-source projects. Occasionally the folks who put the standard together created an official implementation in their favourite language, and the community built their own in other languages they wanted to use.
+
+A modern RPC specification is gRPC, which can easily be considered modern SOAP. It uses a data format called Protobuf, which requires a schema file as well as the data instance, much like the WSDL in SOAP. This Protobuf file is shared with both the client and the server, and then messages can be verified, and messages can be passed bewteen the server and client in binary, which leads to smaller messages than passing around big chunks JSON.
+
+gRPC focuses on making single RPC interactions, and it aims to achieve this as quickly as possible, thanks to the afore mentioned binary benefits, and its other huge benefit: HTTP/2. All of the gRPC implementations are HTTP/2 by default, and usually handle this with their own built in web server to make sure the HTTP/2 works the whole way through the transaction.
+
+=== Representational State Transfer (REST)
+
+REST is a network paradigm described by Roy Fielding in a dissertation in 2000. REST is all about a client-server relationship, where server-side data are made available through representations of data in simple formats. This format is usually JSON or XML but could be anything (including Protobuf).
+
+These representations portray data from various sources as simple "resources", or "collections" of resources, which are then potentially modifiable with actions and relationships being made discoverable via a concept known as hypermedia controls (HATEOAS).
+
+Hypermedia controls are fundamental to REST, and is merely the concept of providing "next available actions", which could be related data, or more often it's actions available for that resource in its current state, like having a "pay" option for an invoice that has not yet been paid.
+
+These actions are just links, but the idea is the client knows that an invoice is payable by the presence of a "pay" link, and if that link is not there it should not show that option to the end user.
+
+{
+  "data"": {
+    "type": "invoice",
+    "id": "093b941d",
+    "attributes": {
+      "created_at": "2017–06–15 12:31:01Z",
+      "sent_at": "2017–06–15 12:34:29Z",
+      "paid_at": "2017–06–16 09:05:00Z",
+      "status": "published"
+    }
+  },
+  "links": {
+    "pay": "https://api.acme.com/invoices/093b941d/payment_attempts"
+  }
+}
+
+This is quite different to RPC. Imagine the two approaches were humans answering the phones for a doctors office:
+
+*Client:* Hi, I would like to speak to Dr Watson, is he there?
+
+*RPC:* No. *click*
+
+_Client calls back_
+
+*Client:* I found his calendar and luckily I know how to interact with the Google Calander API. I have checked his availability, and it looks like he is off for the day. I would like to visit another doctor, and it looks like Dr Jones is available at 3pm, can I see her then?
+
+*RPC:* Yes
+
+The burden of knowing what to do is entirely on the client, and this can lead to "fat clients" (i.e: the client contains a lot of business logic). It needs to know all the data, come to the appropriate conclusion itself, then has to figure out what to do next.
+
+REST however presents you with the next available options:
+
+*Client:* Hi, I would like to speak to Dr Watson, is he there?
+
+*REST:* Doctor Watson is not currently in the office, he’ll be back tomorrow, but you have a few options. If it’s not urgent you could leave a message and I’ll get it to him tomorrow, or I can book you with another doctor, would you like to hear who is available today?
+
+*Client:* Yes, please let me know who is there!
+
+*REST:* Doctors Smith and Jones, here are links to their profiles.
+
+*Client:* Ok, Doctor Jones looks like my sort of Doctor, I would like to see them, let’s make that appointment.
+
+*REST:* Appointment created, here’s a link to the appointment details.
+
+REST provided all of the relevant information with the response, and the client was able to pick through the options to resolve the situation.
+
+None of this is magic, no client is going to know exactly what to do without being trained, but the client of a REST API can be told to follow the `"alternative_doctors": "https://api.example.com/available_doctors?available_at=2017-01-01 03:00:00 GMT"`` link. That is far less of a burden on the client than expecting it to check the calendar itself, seek for availability, etc.
+
+This centralization of state into the server has benefits for systems with multiple different clients who offer similar workflows. Instead of distributing all the logic, checking data fields, showing lists of "Actions", etc. around various clients — who might come to different conclusions — REST keeps it all in one place.
+
+This book wil get more in depth on hypermedia controls later. There are a few other important things to understand about REST APIs first:
+
+- REST must be stateless: not persisting sessions between requests
+- Responses should declare cacheablility: helps your API scale if clients respect the rules
+- REST focuses on uniformity: if you’re using HTTP you should utilize HTTP features whenever possible, instead of inventing conventions
+
+These constraints of REST when applied to HTTP APIs can help the API last for decades, which is a whole lot more complex without these concepts.
+
+REST does not require the use of schema metadata (like WSDL or similar), but does allow it. In fact REST has no opinions either way: it does not explicitly demand it, nor disallow it. the metadata is something many API developers hated about SOAP, and these days it is once again all the rage in gRPC and GraphQL, but REST has a few type systems available for optional use, the main one these days being: JSON Schema.
+
+JSON Schema is inspired by XML Schema — but not functionally identical — and is one of the most important things to happen to HTTP APIs in years, and will be discussed a lot throughout the book.
+
+Unfortunately, REST become a marketing buzzword for most of 2006–2014. It became a metric of quality that developers would aspire to, fail to understand, then label as REST anyway. Most systems saying they are REST are little more than RPC with HTTP verbs and pretty URLs. As such, you might not get cacheability provided, it might have a bunch of wacky conventions, and there might not be any links for you to use to discover next available actions. These APIs are jokingly called REST__ish__ by people aware of the difference.
+
+Whilst REST is actually a series of layers of abstraction on top of RPC, it is primarily an RDA. You are interacting with resources, creating things and modifying things, so instead of "sending an email" you would "create an email" with all the information it needs and it would send once it is created. Or you would create an "send email attempt" resource. Basically instead of executing a thing, you are manipulating domain models into doing what you want, and the next available actions are provided to continue making other manipulations later. These next available actions can be entirely ignored, and clients can work with it in a standard RPC-style approach, but that is usually not a fantastic idea.
+
+A huge source of confusion for people with REST is that they do not understand "all the extra faffing about", such as hypermedia controls and HTTP caching. They do not see the point, and many consider RPC to be the almighty. To them, it is all about executing the remote code as fast possible, but REST (which can still absolutely be performant) focuses far more on longevity and reduced client-coupling.
+
+REST can theoretically work in any transportation protocol that provides it the ability to fulfill the constraints, but no transportation protocol other than HTTP has the functionality. To fit REST into AMQP you would need to define hypermedia controls somehow (potentially an array of messages you could call next), a standard for declaring cacheability of the AMQP messages, etc., and create a lot of tooling that does not exist. As such it is generally implemented only in HTTP.
+
+REST has no specification which is what leads to some of this confusion, nor does it have concrete implementations. That said, there are two large popular specifications which provide a whole lot of standardization for various aspects of REST APIs that chose to use them:
+
+- JSON:API
+- OData
+
+If the API advertises itself as using one of these, you will be able to find a whole bunch of tooling that will work out of the box with this API, meaning you can get going quicker. Otherwise you will have to go at it yourself with a common HTTP client, which is fine with a little bit of elbow grease.
+
+This book will look more at these two formats and others, as they are hugely important for avoiding bike shedding over the implementation of trivial features and already solved problems.
+
+=== Query Language
+
+TODO Examples of FIQL SPARQL
+
+None of the previous attempts to create query languages have really made it into the mainstream, with their usage (to my knowledge) being restricted to academic purposes, like TODO Alex help.
+
+That all changed in 2015, at which point GraphQL started popping up in more and more places. GraphQL is a specification relesed by Facebook, which has a few official and community open-source implementations. The paradigms it uses are basically RPC, with a default procedure providing a sort of query language, that feels like a combination of SQL and JSON:API — if either are something you are familiar with.
+
+The client is required to ask for specific resources, and beyond that the client must also list the specific fields they are interested in receiving back. The GraphQL API will then return only those fields in the response.
+
+TODO get image from https://blog.apisyouwonthate.com/understanding-rpc-rest-and-graphql-2f959aadebe7
+GraphQL Request (left) and the corresponding response (right)
+
+Any sort of RPC action which is intended to cause modifications is done with a "Mutation". SO to handle creates, updates, deletes, etc. you would create a mutation.
+
+TODO copy image
+Definition of a mutation (top left), the mutation request (bottom left), and the response (right).
+
+GraphQL has many fantastic features and benefits, which are all bundled in one package, with a nice marketing site. If you are trying to learn how to make calls to a GraphQL API, the http://graphql.org/learn/[Learn GraphQL] documentation will help, and their site has a bunch of other resources.
+
+Seeing as GraphQL was built by Facebook, who had previously built a REST__ish__ API, they’re familiar with various REST/HTTP API concepts. Many of those existing concepts were used as inspiration for GraphQL functionality, or carbon copied straight into GraphQL. Sadly a few of the most powerful REST concepts were completely ignored.
+
+The backstory to GraphQL, is an interesting one. Facebook has experimented with various different approaches to sharing all their data between apps over the years; remember FQL? Executing SQL-like syntax over a GET endpoint was a bit odd.
+
+----
+GET /fql?q=SELECT uid2 FROM friend WHERE uid1=me()&access_token=abc123
+----
+
+Facebook got a bit fed up with having a RESTish approach to get data, and then having the FQL approach for more targeted queries as well, as they both require different code. As such, GraphQL was created as a middle-ground between "endpoint-based APIs" (a term they use to group REST, RESTish, and some RPC APIs) and FQL, the latter being an approach most API developers would never consider - or want.
+
+In the end, they developed this RPC-style query language system, to ignore most of the transportation layer, meaning they had full control over the concepts. Endpoints are gone, resources declaring their own cacheability is gone, the concept of the uniform interface (as REST defines it) is obliterated, which has the supposed benefit of making GraphQL so incredibly simple it could fit into AMQP or any other transportation protocol.
+
+The main selling point of GraphQL is that it defaults to providing the very smallest response from an API, as you are requesting only the specific bits of data that you want, which minimizes the Content Download portion of the HTTP request.
+
+It also reduces the number of HTTP requests necessary to retrieve data for multiple resources, known as the "HTTP N+1 Problem" that has been a problem for API developers through the lifetime of HTTP/1.1, but thankfully was solved quite nicely in HTTP/2.
+
+== I'm Lost!
+
+Yep, fair comment. This has been a whirlwind tour of a whole bunch of different paradigms and implementations, and we briefly touched on a few topics which we will circle back to later. Come back to this chapter at the end of the book and you'll be nodding and ahhhing. This had to be done first, but if we delved into every topic completely the whole book would have just been this one massive chapter!
+
+
+== PICKING
+
+TODO This should probably go at the end of the book?
+
+During my time at WeWork it became important for folks to figure out which paradigm they should use for a specific API being planned. Initially the plan was to create a diagram purely point folks to the appropriate paradigm, but that gets really open-ended. For example, you might want to ask if having a type-system is important for the messages, but some implementations and standards from all three mentioned paradigms use types, and some do not.
+
+Making the decision between paradigms alone was so vague it was useless, and trying to consider all implementations just sounded awful (XML-RPC, JSON-RPC, SOAP, SPARQL, FIQL, Micro, … 😴).
+
+Instead we went with gRPC, REST, and GraphQL.
+A quick guide to picking an approach for your next API, in the form of a decision flow diagram.
+
+Wait, what is that "context boundary" thing all about?! Basically, it’s the idea that whenever a the line is crossed between any imaginary boundary, a few more layers of abstraction should be used to help with the longevity of the system. REST provides those layers of abstraction, and GraphQL provides a few too.
+
+That boundary could be as simple as another team/department/company, or a group of systems that just shouldn’t know about each other. Things within the context can treat their own APIs like "private classes" in programming languages, they can change whenever they want, spin up and down, delete, evolve, change, who cares. When going to another context… probably use things like REST (with Hypermedia and JSON Schema) to help those clients last longer without needing developer involvement for most change.
+
+This bounded context bit is really the crux of a lot of the deciding between when to use gRPC, and when to use something else. Internally you can do whatever you want, but when there’s a chance that the developers involved in clients and servers not in close communication (when they have other priorities in the sprint, are on a work retreat, or literally don’t know each other or have any way to communicate), these layers of abstraction become a lot more useful.
+
+Pushing client-side validation to JSON Schema, for instance, is a layer of abstraction that REST allows (and you could totally do in your own RPC APIs if not using gRPC).
+
+Another example would be pushing workflows and resource state to the API instead of having your RPC clients have to try and figure it out by looking at random properties.
+
+The when here is important, because should every API be REST or RESTish? Hell no! But REST is very important for more use-cases than folks seem to think these days.
+
+GraphQL fits in here when the more important parts of REST are not relevant, and the shape of clients is super different from each other. We’ve not been recommending it actively at WeWork, and one of the two teams using it has ditched the thing, but I do expect to see it pop up after making this diagram part of our API design guide.
+Implementations
+
+gRPC and GraphQL have officially approved implementations for a wide array of languages, so use those as a starting point.
+
+    gRPC
+    GraphQL
+
+For those of you not working at WeWork (we’re hiring, get in touch!), there is a bunch of REST tooling floating around that’s not awful.
+
+    API Platform
+    Apigility
+    Flask-Potion
+    Fusio
+    Go has a bunch of frameworks
+    Silkapp
+    VertX
+    jsonapi-rb
+
+It certainly would be lovely if there was a go-to REST implementation, like gRPC + HTTP URLs + with JSON Schema for client+server-side validation and discovery through HATEOAS… that’d be dope.
