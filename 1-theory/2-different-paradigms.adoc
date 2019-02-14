@@ -71,7 +71,7 @@ This metadata is essentially what most science teachers drill into you from a yo
 
 All three of these specifications had implementations created by various people, mostly as open-source projects. Occasionally the folks who put the standard together created an official implementation in their favourite language, and the community built their own in other languages they wanted to use.
 
-A modern RPC specification is gRPC, which can easily be considered modern SOAP. It uses a data format called Protobuf, which requires a schema file as well as the data instance, much like the WSDL in SOAP. This Protobuf file is shared with both the client and the server, and then messages can be verified, and messages can be passed bewteen the server and client in binary, which leads to smaller messages than passing around big chunks JSON.
+A modern RPC specification is gRPC, which can easily be considered modern SOAP. It uses a data format called Protobuf, which requires a schema file as well as the data instance, much like the WSDL in SOAP. This Protobuf file is shared with both the client and the server, and then messages can be verified and passed between the server and client in binary, which leads to smaller messages than passing around big chunks of JSON.
 
 gRPC focuses on making single RPC interactions, and it aims to achieve this as quickly as possible, thanks to the afore mentioned binary benefits, and its other huge benefit: HTTP/2. All of the gRPC implementations are HTTP/2 by default, and usually handle this with their own built in web server to make sure the HTTP/2 works the whole way through the transaction.
 
