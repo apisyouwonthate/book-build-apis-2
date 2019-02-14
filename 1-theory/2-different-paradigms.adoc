@@ -81,7 +81,7 @@ REST is a network paradigm described by Roy Fielding in a dissertation in 2000. 
 
 These representations portray data from various sources as simple "resources", or "collections" of resources, which are then potentially modifiable with actions and relationships being made discoverable via a concept known as hypermedia controls (HATEOAS).
 
-Hypermedia controls are fundamental to REST, and is merely the concept of providing "next available actions", which could be related data, or more often it's actions available for that resource in its current state, like having a "pay" option for an invoice that has not yet been paid.
+Hypermedia controls are fundamental to REST. It is merely the concept of providing "next available actions", which could be related data, or more often it's actions available for that resource in its current state, like having a "pay" option for an invoice that has not yet been paid.
 
 These actions are just links, but the idea is the client knows that an invoice is payable by the presence of a "pay" link, and if that link is not there it should not show that option to the end user.
 
