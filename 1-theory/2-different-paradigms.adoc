@@ -24,7 +24,7 @@ First, let us try and figure out the main conceptual differences between the par
 
 == Remote Procedure Call (RPC)
 
-RPC is the earliest, simplest form of API interaction. It is about executing a block of code on another server, and when implemented in HTTP or AMQP it can become a Web API. There is a method and some arguments, and that is pretty much it. Think of it like calling a function in JavaScript, taking a method name and arguments.
+RPC is the earliest, simplest form of API interaction. It is about executing a block of code on another server, and when implemented in HyperText Transfer Protocol (HTTP) or Advanced Message Queuing Protocol (AMQP) it can become a Web API. There is a method and some arguments, and that is pretty much it. Think of it like calling a function in JavaScript, taking a method name and arguments.
 
 For example:
 
