@@ -36,7 +36,7 @@ Content-Type: application/json
 {"name": "Racey McRacerson"}
 ----
 
-In JavaScript, the equivilent concept is defining a function, and calling it elsewhere:
+In JavaScript, the equivalent concept is defining a function, and calling it elsewhere:
 
 ----
 /* Signature */
