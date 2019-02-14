@@ -56,7 +56,7 @@ RPC is without doubt the most prominent paradigm used in API land, possibly beca
 
 That said, there are a few other things to figure out, like should the method name go in the URL, or should it be passed in the body. Should it be entirely POST or a combination or GET and POST? Should we use metadata to describe what the payload data is? To answer questions like this, RPC has a whole bunch of specifications, all of which have concrete implementations:
 
-.Older poular RPC Standards
+.Older popular RPC standards
 - XML-RPC
 - JSON-RPC
 - SOAP (Simple Object Access Protocol)
