@@ -67,7 +67,7 @@ XML-RPC was problematic, because ensuring data types of XML payloads is tough. I
 
 You need to layer metadata on top in order to describe things such as which fields correspond to which data types. This became part of the basis for SOAP, which used XML Schema and a WSDL (Web Services Description Language) to explain what went where and what it contained.
 
-This metadata is essentially what most science teachers drill into you from a young age: "label your units!" The sort of thing that stops people paying $100 for something that should have been $1 but was just marked as `price: 100` which was meant to be cents...
+This metadata is essentially what most science teachers drill into you from a young age: "label your units!". The sort of thing that stops people paying $100 for something that should have been $1 but was just marked as `price: 100` which was meant to be cents...
 
 All three of these specifications had implementations created by various people, mostly as open-source projects. Occasionally the folks who put the standard together created an official implementation in their favourite language, and the community built their own in other languages they wanted to use.
 
