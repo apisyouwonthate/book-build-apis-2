@@ -15,10 +15,10 @@ These paradigms are general approaches to building APIs, not a specific tool or 
 For example:
 
 - SOAP is a W3C recommendation, following the RPC paradigm, with implementations like gSOAP
-- gRPC is a implementation, following the RPC paradigm, which has no standard defined by any working group, but authors Google Inc. did document the protocol in a specification
+- gRPC is an implementation, following the RPC paradigm, which has no standard defined by any working group, but authors Google Inc. did document the protocol in a specification
 - REST is a paradigm, which has never been turned into a specification, and has no official implementations, but building a REST API is usually just a case of picking appropriate standards and tooling
 
-Making direct comparisons between any of these things is tough because it should be possible to see that paradigms, implementations and specifications are all rather different, but people love to make armchair expert comentary on them all the same. We'll be covering all the paradigms, and a few of the more popular implementations and specifications throughout the book.
+Making direct comparisons between any of these things is tough because it should be possible to see that paradigms, implementations and specifications are all rather different. We'll be covering all the paradigms, and we will be looking at how things work in a few of the more popular implementations throughout the book.
 
 First, let us try and figure out the main conceptual differences between the paradigms.
 

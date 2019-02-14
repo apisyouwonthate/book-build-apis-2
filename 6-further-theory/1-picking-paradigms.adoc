@@ -1,12 +1,12 @@
 = Picking Paradigms
-
-TODO This should probably go at the end of the book?
+Status: IGNORE!
 
 During my time at WeWork it became important for folks to figure out which paradigm they should use for a specific API being planned. Initially the plan was to create a diagram purely point folks to the appropriate paradigm, but that gets really open-ended. For example, you might want to ask if having a type-system is important for the messages, but some implementations and standards from all three mentioned paradigms use types, and some do not.
 
 Making the decision between paradigms alone was so vague it was useless, and trying to consider all implementations just sounded awful (XML-RPC, JSON-RPC, SOAP, SPARQL, FIQL, Micro, … 😴).
 
 Instead we went with gRPC, REST, and GraphQL.
+
 A quick guide to picking an approach for your next API, in the form of a decision flow diagram.
 
 Wait, what is that "context boundary" thing all about?! Basically, it’s the idea that whenever a the line is crossed between any imaginary boundary, a few more layers of abstraction should be used to help with the longevity of the system. REST provides those layers of abstraction, and GraphQL provides a few too.
@@ -21,15 +21,16 @@ Another example would be pushing workflows and resource state to the API instead
 
 The when here is important, because should every API be REST or RESTish? Hell no! But REST is very important for more use-cases than folks seem to think these days.
 
-GraphQL fits in here when the more important parts of REST are not relevant, and the shape of clients is super different from each other. We’ve not been recommending it actively at WeWork, and one of the two teams using it has ditched the thing, but I do expect to see it pop up after making this diagram part of our API design guide.
-Implementations
+GraphQL fits in here when the more important parts of REST are not relevant, and the shape of clients is super different from each other. We’ve not been recommending it actively at WeWork, and one of the two teams using it has ditched the thing, but I do expect to see it pop up after making this diagram part of the API design guide.
+
+== Implementations
 
 gRPC and GraphQL have officially approved implementations for a wide array of languages, so use those as a starting point.
 
     gRPC
     GraphQL
 
-For those of you not working at WeWork (we’re hiring, get in touch!), there is a bunch of REST tooling floating around that’s not awful.
+When it comes to picking a REST implementation, there is a bunch of REST tooling floating around that’s not awful.
 
     API Platform
     Apigility
