@@ -1,9 +1,22 @@
 = Build APIs You Won't Hate
-
+Philip Sturgeon <phil@apisyouwonthate.com>
+:toc:
 :leveloffset: +1
+
+include::0-stuff/author.adoc[]
 
 include::0-stuff/introduction.adoc[]
 
+= Part One: Theory
+
 include::1-theory/2-different-paradigms.adoc[]
 
-:leveloffset: -1
+= Part One: Theory
+
+= Part Two: Planning & Design
+
+= Part Three: Testing & Monitoring
+
+= Part Four: Management
+
+= Part Five: Further Theory

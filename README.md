@@ -61,12 +61,10 @@ So far, this feels like how the book is gonna play out:
   - [ ] Rate Limiting
   - [ ] Analytics
   - [ ] Governance (Speccy / Specteral / Stoplight)
-
-- [ ] Part Five: Retiring & Deprecating
   - [ ] Deprecation
   - [ ] Versioning & Evolution
 
-- [ ] Part Six: Further Theory
+- [ ] Part Five: Further Theory
   - [ ] Picking Paradigms
   - [ ] Common Architectures
     - [ ] REST wrapping Microservices
