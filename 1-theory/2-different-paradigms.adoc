@@ -2,7 +2,7 @@ If APIs are the interface for some sort of service, it should not come as a surp
 
 There are three distinct types of Web API which handles these common needs, and these different types are known as paradigms. To oversimplify things a bit, it’s reasonably fair to say that all APIs conform to one of these paradigms:
 
-- RPC (Remote Proceedure Call)
+- RPC (Remote Procedure Call)
 - REST (Representational State Transfer)
 - Query Languages
 
@@ -50,11 +50,11 @@ sayHello("Racey McRacerson");
 
 The idea is the same. An API is built by defining public methods; then, the methods are called with arguments. RPC is just a bunch of functions, but in the context of an HTTP API, that entails putting the method in the URL and the arguments in the query string or body.
 
-When used for CRUD ("Create, Read, Update, Delete"), RPC is just a case of sending up and down data fields, which is fine, but one downside is that the client is entirely in charge of pretty much everything. The client must know which methods to hit, and at what time, in order to construct its own workflow out of a bevy of methods, with only human interaction or written interactions to help the client application developer figure out what to do and in which order.
+When used for CRUD ("Create, Read, Update, Delete"), RPC is just a case of sending up and down data fields. This can be fine, but it also means the client is in charge of pretty much everything. The client must know which methods to hit, and at what time, in order to construct its own workflow out of a bevy of methods, with only human interaction or written interactions to help the client application developer figure out what to do and in which order. That might be a positive, or a negative, depending on what sort of relationship you want your clients and servers to have.
 
 RPC is without doubt the most prominent paradigm used in API land, possibly because it feels so natural to many programmers. Calling a function locally and calling a function remotely feel so similar, that it just clicks with a lot of developers.
 
-That said, there are a few other things to figure out, like should the method name go in the URL, or should it be passed in the body. Should it be entirely POST or a combination or GET and POST? Should we use metadata to describe what the payload data is? To answer questions like this, RPC has a whole bunch of specifications, all of which have concrete implementations:
+That said, there are a few other things to figure out, like should the method name go in the URL, or should it be passed in the body. Should it be entirely POST or a combination of GET and POST? Should we use metadata to describe what the payload data is? To answer questions like this, RPC has a whole bunch of specifications, all of which have concrete implementations:
 
 .Older popular RPC standards
 - XML-RPC
@@ -118,7 +118,7 @@ _Client calls back_
 
 The burden of knowing what to do is entirely on the client, and this can lead to "fat clients" (i.e: the client contains a lot of business logic). It needs to know all the data, come to the appropriate conclusion itself, then has to figure out what to do next.
 
-REST however presents you with the next available options:
+REST, however, presents you with the next available options:
 
 *Client:* Hi, I would like to speak to Dr Watson, is he there?
 
@@ -138,7 +138,7 @@ None of this is magic, no client is going to know exactly what to do without bei
 
 This centralization of state into the server has benefits for systems with multiple different clients who offer similar workflows. Instead of distributing all the logic, checking data fields, showing lists of "Actions", etc. around various clients — who might come to different conclusions — REST keeps it all in one place.
 
-This book wil get more in depth on hypermedia controls later. There are a few other important things to understand about REST APIs first:
+This book will get more in-depth on hypermedia controls later. There are a few other important things to understand about REST APIs first:
 
 - REST must be stateless: not persisting sessions between requests
 - Responses should declare cacheablility: helps your API scale if clients respect the rules
@@ -152,7 +152,7 @@ Another interesting thing about REST is that it does not require the use of sche
 
 JSON Schema is inspired by XML Schema — but not functionally identical — and is one of the most important things to happen to HTTP APIs in years, and will be discussed a lot throughout the book.
 
-Unfortunately, REST become a marketing buzzword for most of 2006–2014. It became a metric of quality that developers would aspire to, fail to understand, then label as REST anyway. Most systems saying they are REST are little more than RPC with HTTP verbs and pretty URLs. As such, you might not get cacheability provided, it might have a bunch of wacky conventions, and there might not be any links for you to use to discover next available actions. These APIs are jovially called REST__ish__ by people aware of the difference.
+Unfortunately, REST became a marketing buzzword for most of 2006–2014. It became a metric of quality that developers would aspire to, fail to understand, then label as REST anyway. Most systems saying they are REST are little more than RPC with HTTP verbs and pretty URLs. As such, you might not get cacheability provided, it might have a bunch of wacky conventions, and there might not be any links for you to use to discover next available actions. These APIs are jovially called REST__ish__ by people aware of the difference.
 
 REST has no specification which is what leads to some of this confusion, nor does it have concrete implementations. That said, there are two large popular specifications which provide a whole lot of standardization for various aspects of REST APIs that chose to use them:
 
@@ -161,7 +161,7 @@ REST has no specification which is what leads to some of this confusion, nor doe
 
 If the API advertises itself as using one of these, you will be able to find a whole bunch of tooling that will work out of the box with this API, meaning you can get going quicker. Otherwise you will have to go at it yourself with a common HTTP client, which is fine with a little bit of elbow grease.
 
-This book will look more at these two formats and others, as they are hugely important for avoiding bike shedding over the implementation of trivial features and already solved problems.
+This book will look more at these two formats and others, as they are hugely important for avoiding bikeshedding over the implementation of trivial features and already solved problems.
 
 == Query Languages
 
@@ -169,7 +169,7 @@ Query languages are designed to give huge flexibility to the client, to make ver
 
 A good query language lets the client treat the API like a data store, and do whatever it wants -within its permissions.
 
-There are more query languages out there than there are amature food bloggers at a NYC restauraunt opening, but only some of them specifical aim to solve things for Web APIs.
+There are more query languages out there than there are amateur food bloggers at a NYC restaurant opening, but only some of them specifical aim to solve things for Web APIs.
 
 For example, you could probably take some standard SQL, pipe it over an HTTP endpoint `POST /sql` and call it an API, but you probably don't want to do that for a few thousand reasons.
 
@@ -211,7 +211,7 @@ There was one exception to that, and Facebook actually did have a lesser-known q
 GET /fql?q=SELECT uid2 FROM friend WHERE uid1=me()&access_token=abc123
 ----
 
-Facebook got a bit fed up with having a RESTish approach to get data, and then having the FQL approach for more targeted queries as well, as they both require different code. As such, they ended up creating a middle-ground between "endpoint-based APIs" (a term they use to group REST/RESTish) and FQL. This middle-ground solution was known as GraphQL, which was released publically as a specificaiton with a few official implementations in 2015.
+Facebook got a bit fed up with having a RESTish approach to get data, and then having the FQL approach for more targeted queries as well, as they both require different code. As such, they ended up creating a middle-ground between "endpoint-based APIs" (a term they use to group REST/RESTish) and FQL. This middle-ground solution was known as GraphQL, which was released publically as a specification with a few official implementations in 2015.
 
 GraphQL is essentially a RPC-based query language system, where the client is required to ask for specific resources, and also list the specific fields they are interested in receiving back. The GraphQL API will then return only those fields in the response.
 
@@ -223,7 +223,7 @@ Any sort of RPC action which is intended to cause modifications is done with a "
 .Definition of a mutation (top left), the mutation request (bottom left), and the response (right).
 image::images/graphql-mutation-example.png[Example of a GraphQL Mutation definition, then being called with arguments]
 
-Facebook chose to ignore most of the conventions of the transportation layer (HTTP), meaning they had full control over the concepts. Endpoints are gone, resources are gone, HTTP methods are gone (everything is just a POST to a single endpoint), resources declaring their own cacheability is gone, the concept of the uniform interface (as REST defines it) is obliterated. All of this has the advertised benefit of making GraphQL portable enough that it could fit into AMQP, or any other transportation protocol which is something REST could theoretically do but nobody ever bothers with due to the amount of crowbaring it would take.
+Facebook chose to ignore most of the conventions of the transportation layer (HTTP), meaning they had full control over the concepts. Endpoints are gone, resources are gone, HTTP methods are gone (everything is just a POST to a single endpoint), resources declaring their own cacheability is gone, the concept of the uniform interface (as REST defines it) is obliterated. All of this has the advertised benefit of making GraphQL portable enough that it could fit into AMQP, or any other transportation protocol which is something REST could theoretically do but nobody ever bothers with due to the amount of crowbarring it would take.
 
 GraphQL has many fantastic features and benefits, which are all bundled in one package, with a nice marketing site. If you are trying to learn how to make calls to a GraphQL API, the http://graphql.org/learn/[Learn GraphQL] documentation will help, and their site has a bunch of other resources.
 
@@ -239,4 +239,4 @@ Let's learn some stuff about GraphQL, and see when its useful, and when its not!
 
 == I'm Lost!
 
-Fair comment. This has been a whirlwind tour of a whole bunch of different topics which will be covered more in depth later. If you are nodding and smiling already then you are going to enjoy this book as we delve deeper, and if you have no idea whats going on then you are in the right place too. There's lots to learn!
+Fair comment. This has been a whirlwind tour of a whole bunch of different topics which will be covered more in depth later. If you are nodding and smiling already then you are going to enjoy this book as we delve deeper, and if you have no idea what's going on then you are in the right place too. There are lots to learn!
