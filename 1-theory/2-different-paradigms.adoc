@@ -79,7 +79,7 @@ gRPC focuses on making single RPC interactions, and it aims to achieve this as q
 
 REST is a network paradigm described by Roy Fielding in a dissertation in 2000. REST is all about a client-server relationship, where server-side data are made available through representations of data in simple formats. This format is usually JSON or XML but could be anything (including Protobuf).
 
-These representations portray data from various sources as simple "resources", or "collections" of resources, which are then potentially modifiable with actions and relationships being made discoverable via a concept known as hypermedia controls (HATEOAS).
+These representations portray data from various sources as simple "resources", or "collections" of resources, which are then potentially modifiable with actions and relationships being made discoverable via a concept known as HATEOAS (Hypermedia as the Engine of Application State). That's a rough acronym that confuses folks, so many API people just use the term "Hypermedia Controls" to mean the same thing.
 
 Hypermedia controls are fundamental to REST. It is merely the concept of providing "next available actions", which could be related data, or more often it's actions available for that resource in its current state, like having a "pay" option for an invoice that has not yet been paid.
 
@@ -169,7 +169,7 @@ Query languages are designed to give huge flexibility to the client, to make ver
 
 A good query language lets the client treat the API like a data store, and do whatever it wants -within its permissions.
 
-There are more query languages out there than there are amateur food bloggers at a NYC restaurant opening, but only some of them specifical aim to solve things for Web APIs.
+There are more query languages out there than there are amateur food bloggers at a NYC restaurant opening, but only some of them specifically aim to solve things for Web APIs.
 
 For example, you could probably take some standard SQL, pipe it over an HTTP endpoint `POST /sql` and call it an API, but you probably don't want to do that for a few thousand reasons.
 
@@ -211,7 +211,7 @@ There was one exception to that, and Facebook actually did have a lesser-known q
 GET /fql?q=SELECT uid2 FROM friend WHERE uid1=me()&access_token=abc123
 ----
 
-Facebook got a bit fed up with having a RESTish approach to get data, and then having the FQL approach for more targeted queries as well, as they both require different code. As such, they ended up creating a middle-ground between "endpoint-based APIs" (a term they use to group REST/RESTish) and FQL. This middle-ground solution was known as GraphQL, which was released publically as a specification with a few official implementations in 2015.
+Facebook got a bit fed up with having a RESTish approach to get data, and then having the FQL approach for more targeted queries as well, as they both require different code. As such, they ended up creating a middle-ground between "endpoint-based APIs" (a term they use to group REST/RESTish) and FQL. This middle-ground solution was known as GraphQL, which was released publicly as a specification with a few official implementations in 2015.
 
 GraphQL is essentially a RPC-based query language system, where the client is required to ask for specific resources, and also list the specific fields they are interested in receiving back. The GraphQL API will then return only those fields in the response.
 
@@ -231,7 +231,7 @@ Seeing as GraphQL was built by Facebook, who had previously built a REST__ish__ 
 
 The main selling point of GraphQL is that it defaults to providing the very smallest response from an API, as you are requesting only the specific bits of data that you want, which minimizes the Content Download portion of the HTTP request.
 
-It also reduces the number of HTTP requests necessary to retrieve data for multiple resources, known as the "HTTP N+1 Problem" that has been a problem for API developers through the lifetime of HTTP/1.1. Basically a lot of RPC APIs - and poorly designed REST APIs - would give you a list of resources in the first request, but then to get further information clients would need to make another request for each resource. This means for a list with 10 resources, the client would need to make 11 (1+10) requests to fetch everything it needed. This has been the bane of HTTP/1.1 developers for years, but GraphQL has provided one consistent solution to this via fetching multiple resourses in a single request, very similar to how JSON:API and OData have done in the past.
+It also reduces the number of HTTP requests necessary to retrieve data for multiple resources, known as the "HTTP N+1 Problem" that has been a problem for API developers through the lifetime of HTTP/1.1. Basically a lot of RPC APIs - and poorly designed REST APIs - would give you a list of resources in the first request, but then to get further information clients would need to make another request for each resource. This means for a list with 10 resources, the client would need to make 11 (1+10) requests to fetch everything it needed. This has been the bane of HTTP/1.1 developers for years, but GraphQL has provided one consistent solution to this via fetching multiple resources in a single request, very similar to how JSON:API and OData have done in the past.
 
 GraphQL is a strong and relatively simple solution to the majority of issues that Web API developers ran into in a HTTP/1.1 world, with clients who do not care about Hypermedia Controls. Their optimizations and the way they've built their own conventions inside HTTP mean they're kinda stuck unable to leverage HTTP/2 fully, and comically when folks design their APIs with HTTP/2 in mind, most of what GraphQL is aiming to do actually hurts the clients, and makes things slower. A lot of folks see it as REST 2.0, but that is probably down to the marketing hype machine, and not down to education.
 
