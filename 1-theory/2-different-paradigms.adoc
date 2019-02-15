@@ -73,7 +73,7 @@ All three of these specifications had implementations created by various people,
 
 A modern RPC specification is gRPC, which can easily be considered modern SOAP. It uses a data format called Protobuf, which requires a schema file as well as the data instance, much like the WSDL in SOAP. This Protobuf file is shared with both the client and the server, and then messages can be verified and passed between the server and client in binary, which leads to smaller messages than passing around big chunks of JSON.
 
-gRPC focuses on making single RPC interactions, and it aims to achieve this as quickly as possible, thanks to the afore mentioned binary benefits, and its other huge benefit: HTTP/2. All of the gRPC implementations are HTTP/2 by default, and usually handle this with their own built in web server to make sure the HTTP/2 works the whole way through the transaction.
+gRPC focuses on making single RPC interactions, and it aims to achieve this as quickly as possible, thanks to the aforementioned binary benefits, and its other huge benefit: HTTP/2. All of the gRPC implementations are HTTP/2 by default, and usually handle this with their own built-in web server to make sure HTTP/2 works the whole way through the transaction.
 
 == Representational State Transfer (REST)
 
@@ -113,7 +113,7 @@ _Client calls back_
 
 *Client:* I found his calendar and luckily I know how to interact with the Google Calander API. I have checked his availability, and it looks like he is off for the day. I would like to visit another doctor, and it looks like Dr Jones is available at 3pm, can I see her then?
 
-*RPC:* Yes
+*RPC:* Yes.
 
 The burden of knowing what to do is entirely on the client, and this can lead to "fat clients" (i.e: the client contains a lot of business logic). It needs to know all the data, come to the appropriate conclusion itself, then has to figure out what to do next.
 
