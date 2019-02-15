@@ -1,0 +1,9 @@
+= Build APIs You Won't Hate
+
+:leveloffset: +1
+
+include::0-stuff/introduction.adoc[]
+
+include::1-theory/2-different-paradigms.adoc[]
+
+:leveloffset: -1

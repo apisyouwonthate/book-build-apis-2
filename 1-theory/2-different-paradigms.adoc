@@ -1,3 +1,5 @@
+= Understanding Different Paradigms
+
 If APIs are the interface for some sort of service, it should not come as a surprise that not all the interfaces in the world are going to have the same needs and requirements. Most of them are a case of "execute a command", "interact with data", or a combination of both.
 
 There are three distinct types of Web API which handles these common needs, and these different types are known as paradigms. To oversimplify things a bit, it’s reasonably fair to say that all APIs conform to one of these paradigms:
