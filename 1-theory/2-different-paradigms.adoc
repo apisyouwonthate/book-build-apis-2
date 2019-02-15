@@ -85,6 +85,7 @@ Hypermedia controls are fundamental to REST. It is merely the concept of providi
 
 These actions are just links, but the idea is the client knows that an invoice is payable by the presence of a "pay" link, and if that link is not there it should not show that option to the end user.
 
+[source,javascript]
 ----
 {
   "data": {
@@ -214,14 +215,13 @@ Facebook got a bit fed up with having a RESTish approach to get data, and then h
 
 GraphQL is essentially a RPC-based query language system, where the client is required to ask for specific resources, and also list the specific fields they are interested in receiving back. The GraphQL API will then return only those fields in the response.
 
-
-TODO get image from https://blog.apisyouwonthate.com/understanding-rpc-rest-and-graphql-2f959aadebe7
-GraphQL Request (left) and the corresponding response (right)
+.GraphQL Request (left) and the corresponding response (right).
+image::images/graphql-query-example.png[Example of a GraphQL query being made, requesting first the hero (this is a Star Wars example), then the names of the friends for that hero.]
 
 Any sort of RPC action which is intended to cause modifications is done with a "Mutation". SO to handle creates, updates, deletes, etc. you would create a mutation.
 
-TODO copy image
-Definition of a mutation (top left), the mutation request (bottom left), and the response (right).
+.Definition of a mutation (top left), the mutation request (bottom left), and the response (right).
+image::images/graphql-mutation-example.png[Example of a GraphQL Mutation definition, then being called with arguments]
 
 Facebook chose to ignore most of the conventions of the transportation layer (HTTP), meaning they had full control over the concepts. Endpoints are gone, resources are gone, HTTP methods are gone (everything is just a POST to a single endpoint), resources declaring their own cacheability is gone, the concept of the uniform interface (as REST defines it) is obliterated. All of this has the advertised benefit of making GraphQL portable enough that it could fit into AMQP, or any other transportation protocol which is something REST could theoretically do but nobody ever bothers with due to the amount of crowbaring it would take.
 
