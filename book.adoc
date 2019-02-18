@@ -10,6 +10,7 @@ include::0-stuff/introduction.adoc[]
 = Part One: Theory
 
 include::1-theory/2-different-paradigms.adoc[]
+include::1-theory/3-api-contracts.adoc[]
 
 = Part One: Theory
 
