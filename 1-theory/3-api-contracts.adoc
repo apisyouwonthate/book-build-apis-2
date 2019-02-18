@@ -1,6 +1,31 @@
 = API Contracts
 
-The "I" means interface, and so writing a contract for that interface is the act of writing down what that interface is going to look like.
+The "I" means interface, and so writing a contract for that interface is the act of writing down what that interface is going to look like, to avoid folks having to guess, or go and hunt for some documentation somewhere.
+
+Let's use the fantastic https://pokeapi.co/[PokeAPI] as an example.
+
+[source,javascript]
+----
+{
+  "id": 12,
+  "name": "butterfree",
+  "base_experience": 178,
+  "height": 11,
+  "is_default": true,
+  "order": 16,
+  "weight": 320,
+  "abilities": [{
+    "is_hidden": true,
+    "slot": 3
+  }]
+}
+----
+
+If we look just at the data, we can deduce that sure, ID is probably an auto-incrementing identifier, the name seems to be a lower-cased English string, but after that it starts getting a bit odd.
+
+Height and weight, I guess there is no imperial and metric in the game just units, but what is order all about? The order that pokemon is sat in my current party? That Ash bumped into in the cartoon? In order of cuteness? What?!
+
+An API contract can help answer most of the questions and more for anyone wanting to understand how an API is meant to work.
 
 - Which resources or methods are available and how do you interact with them?
 - Which HTTP endpoints are required for that endpoint, for things like authentication?
@@ -14,7 +39,9 @@ ____
 A contract is an agreement between two or more parties, especially one that is written and enforceable by law.
 ____
 
-That might sound a bit odd if you just think about an API as sharing some data or as a convenient way to trigger commands on another server, but think about it: people need to know what that data is, or what arguments they should send to those commands. The enforceable bit fits too. We cn use our contracts in our test suite to confirm that our actual APIs are following the rules of the contract.
+Thinking about writing an API contract might sound a bit odd if you just think about an API as sharing some data or as a convenient way to trigger commands on another server, but people need to know what that data is, or what arguments they should send to those commands.
+
+The enforceable bit is important too. We can use our contracts in our test suite to confirm that our actual APIs are following the rules of the contract.
 
 NOTE: Some people use the term "API Specifications" to describe all this, but the word "specification" is used to mean a lot of different things. We just used it in the last chapter for something totally different, so let's stick to API Contracts to avoid confusion.
 
@@ -27,17 +54,17 @@ Having a good contract means that API developers can be confident that:
 3. The interface is understood well by client developers
 4. The interface is not changing accidentally when code changes
 
-this confidence will save a lot of time and money for whoever is building this API, as a lack of confidence in those things leads to slower rollout of the initial version, loads more time spent testing subsequent deployments, and wasted developer time having loads of meetings to explain things that could have been written down and clear to everyone already.
+This confidence will save a lot of time and money for whoever is building this API, as a lack of confidence in those things leads to slower rollout of the initial version, loads more time spent testing subsequent deployments, and wasted developer time having loads of meetings to explain things that could have been written down and clear to everyone already.
 
 == What forms can an API Contract take?
 
-Some folks might think "That sounds like documentation", others might think "That sounds like tests", and the answer is both, and more.
+Some folks might think "That sounds like documentation", others might think "That sounds like tests". The answer is both, and more.
 
-An API Contract can exist in a few forms.
+An API Contract can exist in several forms, some more useful than others.
 
 === The Dreaded Verbal Contract
 
-A common case is the verbal contract, where the API developers discuss it with the frontend or other client application developers as they go. The client developers write their code, the backend developers write theirs, and as they go the various fields in the requests and responses are explained somehow: either literally saying them out loud over the conference room tables, shouting them over a hail of nerf gun pellets, DMed over Slack chats, etc.
+A common case is the verbal contract, where the API developers discuss it with the frontend or other client application developers as they go. The backend developers write their code, the client developers write theirs, and as various endpoints or propereties are conceived, they are explained somehow: literally explained out loud over the conference room table, shouted over a hail of nerf gun pellets and ping pong, or DMed over Slack chats.
 
 ----
 Fred: Hey Sarah, there’s a new "fudge" field and it can be "blah" or "whatever"
@@ -45,11 +72,11 @@ Fred: Hey Sarah, there’s a new "fudge" field and it can be "blah" or "whatever
 Sarah: Great! Thanks I’ll chuck that in now.
 ----
 
-After-all, why bother keeping them up to date? The code works, the app runs fine, we're making money, and we’re onto the next thing!
+This works for a while. The API works, the app runs fine, we're making money, and we’re onto the next thing!
 
 This method has a huge number, the main being that communication is hard. You never really know if somebody understood what you meant even if they say they did. Beyond that, not having things written down means people can forget. If another client team also needs the information and they ask another client team, they are getting a copy of a copy which might be slightly wrong.
 
-Another outcome is the author of the original code does not remember the exact rules and has to waste time checking the code. An even worse scenario is that the author(s) of the code in question are not reachable for some reason. Maybe the whole team of developers who worked on that API are all on a flight together from New York to Uruguay, and for that entire 9 hour flight nobody can get any answers about how the API is supposed to work, so they're stuck not being able to fix a production issue that relates to it...
+Another outcome is the original author(s) cannot remember the exact rules, leading to time wasted checking the code. An even worse scenario is that the original author(s) are not reachable for some reason. Maybe the whole team of developers who worked on that API are all on a flight together from New York to Uruguay, and for that entire 9 hour flight nobody can get any answers about how the API is supposed to work, so they're stuck not being able to fix a production issue...
 
 In this instance two common things happen.
 
@@ -57,19 +84,28 @@ Developers waste time writing a new endpoint out of fear of using the old one
 
 Developers waste time trying to guess the contract, and might guess wrong
 
-=== Useless Human Contracts
+=== Shoddy Human Contracts
 
-when folks first start thinking about contracts, it often takes the form of rudimentary API documentation, and this is usually dumped into a Google Doc, shoved in a wiki, or written up in finger blistering HTML. These formats are usually fairly painstaking to create, because you are focusing on formatting _and_ content, shuffling things around whenver you remember that you should list headers too, and copying and pasting examples of JSON which might change over time. API Developers would not settle for writing software like this, but apparently when it comes to documentation it's accepted as the norm.
+When folks first start thinking about contracts, it often takes the form of rudimentary API Reference Documentation. This might be dumped into a Google Doc, shoved in a wiki, or written up in finger blistering HTML. These formats are usually fairly painstaking to create, because you are focusing on formatting _and_ content, shuffling things around whenever you remember that you should list headers too, and copying and pasting examples of JSON which might change over time. API Developers would not settle for writing software like this, but apparently when it comes to documentation it's accepted as the norm.
 
-This whole slow, manual approach is probably why many people forgo writing contracts this way, and opt for verbal contracts instead.It probably would not be a huge jump to say the "startup mindset" (nd "agile") are one of a few potential driving factors in this "just get on with it" approach. There are many technical leaders inexperienced in this area telling their team "we'll write lovely docs later when we've got more time!" , without realizing their lack of clarity is slowing down initial development, client integrations, increasing testing efforts, and causing bizarre production issues and throughout their ecosystem.
+This whole slow, manual approach is probably why many people forgo writing contracts this way, and opt for verbal contracts instead.It probably would not be a huge jump to say the "startup mindset" (and "agile") are one of a few potential driving factors in this "just get on with it" approach. There are many technical leaders inexperienced in this area telling their team "We'll write lovely docs later when we've got more time!" , without realizing their lack of clarity is slowing down initial development, client integrations, increasing testing efforts, and causing bizarre production issues and throughout their ecosystem.
 
-Anyway, despite being this medium of API contracts being slow and time consuming, it is also impossible to enforce. You write the docs up in Google Docs, HTML, Wiki, and... well that's it. You just have a Google Doc, HTML or a Wiki now, and nothing else. You can't exactly jam that Google Doc into a test suite and have it confirm that the API is conforming to whatever is written in there.
+Anyway, despite being this medium of API contracts being time consuming, it is also impossible to enforce. After you have spent the time writing up a Google Docs/HTML/Wiki, the only output of that is going to be... a Google Doc/HTML/Wiki and maybe a PDF if you want to go wild. You can't exactly jam that Google Doc into an API test suite and have it confirm that the API is conforming to whatever is written in there.
 
-What other options do we have?
+There is another way.
 
 === Description Languages
 
-A description language can be a programming language based, or text based format which lets you describe an API in a reusable format.
+A description language can be a programming language based, or text based format which lets you describe an API in a reusable format. This reusable format means you can do a whole bunch of stuff:
+
+- Documentation
+- Client-side validation
+- Server-side validation
+- Client-library Generation (SDKs)
+- UI Generation
+- Server/Application generation
+- Mock servers
+- Contract testing
 
 SOAP as been mentioned as one system that used to have meta-data which described its methods and messages using something called a WSDL:
 
@@ -78,7 +114,11 @@ SOAP as been mentioned as one system that used to have meta-data which described
 The Web Services Description Language is an XML-based interface definition language that is used for describing the functionality offered by a web service. The acronym is also used for any specific WSDL description of a web service, which provides a machine-readable description of how the service can be called, what parameters it expects, and what data structures it returns. Therefore, its purpose is roughly similar to that of a type signature in a programming language.
 ----
 
-WSDLs were only used for SOAP, and not many paradigms or implementations seemed to bother with this sort of description language for a long time. In the REST world there were a few such as API Blueprint, RAML, and Swagger, but for years the tooling was a bit lacking, and mostly only allowed for outputting as documentation. In 2018 one description language settled the mainstream favourite, and that was OpenAPI v3.0.
+WSDLs were only used for SOAP, and not many paradigms or implementations seemed to bother with this sort of description language for a long time. Luckily that has all changed over the last few years.
+
+=== Endpoint-based APIs
+
+In the endpoint-based API world there were a few such as API Blueprint, RAML, and Swagger, but for years the tooling was a bit lacking, and mostly only allowed for outputting as documentation. In 2018 one description language settled the mainstream favourite, and that was OpenAPI v3.0.
 
 ----
 The OpenAPI Specification (OAS) defines a standard, programming language-agnostic interface description for REST APIs, which allows both humans and computers to discover and understand the capabilities of a service without requiring access to source code, additional documentation, or inspection of network traffic.
@@ -87,6 +127,59 @@ The OpenAPI Specification (OAS) defines a standard, programming language-agnosti
 OpenAPI is slowly becoming the go-to description language for writing "endpoint-based API" contracts, and you will come to see why as OpenAPI pops up in pretty much every part of this book. Planning, design, testing, management, you name it, OpenAPI can help out.
 
 Another popular language is JSON Schema, which parts of OpenAPI are based on, and mostly compatible with.
+
+.An overly simplified example of a basic API which lists collections and resources of hats.
+[source,yaml]
+----
+openapi: 3.0.2
+info:
+  title: Cat on the Hat API
+  version: 1.0.0
+  description: The API for selling hats with pictures of cats.
+servers:
+  - url: "https://hats.example.com"
+    description: Production server
+  - url: "https://hats-staging.example.com"
+    description: Staging server
+
+paths:
+  /hats:
+    get:
+      description: Returns all hats from the system that the user has access to
+      responses:
+        '200':
+          description: A list of hats.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/hats'
+
+components:
+  schemas:
+    hats:
+      type: array
+      items:
+        $ref: "#/components/schemas/hat"
+
+    hat:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: enum
+          enum:
+            - bowler
+            - top
+            - fedora
+----
+
+OpenAPI is a YAML or JSON based descriptive language which covers endpoints, headers, requests and responses, allows for examples in different mime types, outlines errors, and even lets developers write in potential values, validation rules, etc.
+
+You can imagine this growing to be rather unwieldy once its got 50+ endpoints and more complex examples, but have no fear you can spread things around in multiple files to make it a lot more DRY (Don't Repeat Yourself) and useful.
+
+These OpenAPI contract files are usually static, and sometimes hosted online. In my experience some managers want to treat these like business secrets and hide them under lock and key, which makes absolutely no damned sense as they are meta-data. Most "hackers" could probably figure out that you keep your list of companies under `GET /companies`, so just don't make that a publicly available endpoint and you're gonna be ok. PayPal, Microsoft, and other companies make these OpenAPI contracts available to anyone who wants to download them, and this can help folks integrate with your APIs.
 
 ==== GraphQL
 
