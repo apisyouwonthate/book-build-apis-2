@@ -116,7 +116,7 @@ The Web Services Description Language is an XML-based interface definition langu
 
 WSDLs were only used for SOAP, and not many paradigms or implementations seemed to bother with this sort of description language for a long time. Luckily that has all changed over the last few years.
 
-=== Endpoint-based APIs
+==== Endpoint-based APIs
 
 In the endpoint-based API world there were a few such as API Blueprint, RAML, and Swagger, but for years the tooling was a bit lacking, and mostly only allowed for outputting as documentation. In 2018 one description language settled the mainstream favourite, and that was OpenAPI v3.0.
 
@@ -179,17 +179,49 @@ OpenAPI is a YAML or JSON based descriptive language which covers endpoints, hea
 
 You can imagine this growing to be rather unwieldy once its got 50+ endpoints and more complex examples, but have no fear you can spread things around in multiple files to make it a lot more DRY (Don't Repeat Yourself) and useful.
 
-These OpenAPI contract files are usually static, and sometimes hosted online. In my experience some managers want to treat these like business secrets and hide them under lock and key, which makes absolutely no damned sense as they are meta-data. Most "hackers" could probably figure out that you keep your list of companies under `GET /companies`, so just don't make that a publicly available endpoint and you're gonna be ok. PayPal, Microsoft, and other companies make these OpenAPI contracts available to anyone who wants to download them, and this can help folks integrate with your APIs.
+These OpenAPI contract files are usually static, usually written down along with the source code, then sometimes deployed to a file hosting like S3 for folks to use. Some managers want to treat these like business secrets and hide them under lock and key, which makes absolutely no damned sense as they are meta-data only. Most "hackers" could probably figure out that you keep your list of companies under `GET /companies`, so just don't make that a publicly available endpoint and you're gonna be ok. PayPal, Microsoft, and other companies make these OpenAPI contracts available to anyone who wants to download them, and this can help folks integrate with your APIs.
 
 ==== GraphQL
 
-GraphQL as an implementation does not require you to pick or chose a type system, as it comes bundled with its own: GraphQL Types.
+GraphQL as an implementation comes bundled with its own type system, which acts as its source of truth for API contracts: GraphQL Schemas.
 
-TODO More on GraphQL Types
+All the GraphQL documentation examples are Star Wars. Sure, it's obviously inferiror to Stargate SG-1, but let's reuse their examples for simplicity:
+
+.An example of GraphQL schemas implementing interfaces and sharing properties across different types.
+[source,graphql]
+----
+interface Character {
+  id: ID!
+  name: String!
+  friends: [Character]
+  appearsIn: [Episode]!
+}
+
+type Human implements Character {
+  id: ID!
+  name: String!
+  friends: [Character]
+  appearsIn: [Episode]!
+  starships: [Starship]
+  totalCredits: Int
+}
+
+type Droid implements Character {
+  id: ID!
+  name: String!
+  friends: [Character]
+  appearsIn: [Episode]!
+  primaryFunction: String
+}
+----
+
+These schemas can be defined in whatever programming language the API is built in: JavaScript, PHP, Go, whatever, but they are usually not written in one definitive format. That makes portability a little funky (you couldn't give a Go defined schema to a JavaScript client), but not impossible.
+
+GraphQL schema does not support validation being defined as part of the contract like OpenAPI and JSON Schema do, but it can be added with extensions. More on all of that later.
 
 ==== gRPC
 
-gRPC as an implementation does not require you to pick or chose a type system, as it comes bundled with its own: Protobuf.
+gRPC as a Google open-source project, uses another Google open-source project for its type system: Protobuf.
 
 TODO More on
 
