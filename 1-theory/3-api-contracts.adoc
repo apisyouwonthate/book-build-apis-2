@@ -60,11 +60,11 @@ This confidence will save a lot of time and money for whoever is building this A
 
 Some folks might think "That sounds like documentation", others might think "That sounds like tests". The answer is both, and more.
 
-An API Contract can exist in several forms, some more useful than others.
+An API contract can exist in several forms, some more useful than others.
 
 === The Dreaded Verbal Contract
 
-A common case is the verbal contract, where the API developers discuss it with the frontend or other client application developers as they go. The backend developers write their code, the client developers write theirs, and as various endpoints or propereties are conceived, they are explained somehow: literally explained out loud over the conference room table, shouted over a hail of nerf gun pellets and ping pong, or DMed over Slack chats.
+A common case is the verbal contract, where the API developers discuss it with the frontend or other client application developers as they go. The backend developers write their code, the client developers write theirs, and as various endpoints or properties are conceived, they are explained somehow: literally explained out loud over the conference room table, shouted over a hail of nerf gun pellets and ping pong, or DMed over Slack chats.
 
 ----
 Fred: Hey Sarah, there’s a new "fudge" field and it can be "blah" or "whatever"
@@ -80,15 +80,17 @@ Another outcome is the original author(s) cannot remember the exact rules, leadi
 
 In this instance two common things happen.
 
-Developers waste time writing a new endpoint out of fear of using the old one
-
-Developers waste time trying to guess the contract, and might guess wrong
+1. Developers waste time writing a new endpoint out of fear of using the old one
+2. Developers waste time trying to guess the contract, and might guess wrong
 
 === Shoddy Human Contracts
 
 When folks first start thinking about contracts, it often takes the form of rudimentary API Reference Documentation. This might be dumped into a Google Doc, shoved in a wiki, or written up in finger blistering HTML. These formats are usually fairly painstaking to create, because you are focusing on formatting _and_ content, shuffling things around whenever you remember that you should list headers too, and copying and pasting examples of JSON which might change over time. API Developers would not settle for writing software like this, but apparently when it comes to documentation it's accepted as the norm.
 
 This whole slow, manual approach is probably why many people forgo writing contracts this way, and opt for verbal contracts instead.It probably would not be a huge jump to say the "startup mindset" (and "agile") are one of a few potential driving factors in this "just get on with it" approach. There are many technical leaders inexperienced in this area telling their team "We'll write lovely docs later when we've got more time!" , without realizing their lack of clarity is slowing down initial development, client integrations, increasing testing efforts, and causing bizarre production issues and throughout their ecosystem.
+
+.It's pretty common to blame REST for not forcing a type system onto everyone involved in the API, but they're absolutely useable. Don't blame a paradigm for implementation level decisions.
+image::./images/contracts-unspecified-json.jpeg[A cyclist jams a stick into hisi spokes then complains about it. A pretty accurate metaphor for using unspecified JSON in a REST API then blaming REST for it.]
 
 Anyway, despite being this medium of API contracts being time consuming, it is also impossible to enforce. After you have spent the time writing up a Google Docs/HTML/Wiki, the only output of that is going to be... a Google Doc/HTML/Wiki and maybe a PDF if you want to go wild. You can't exactly jam that Google Doc into an API test suite and have it confirm that the API is conforming to whatever is written in there.
 
@@ -118,7 +120,7 @@ WSDLs were only used for SOAP, and not many paradigms or implementations seemed 
 
 ==== Endpoint-based APIs
 
-In the endpoint-based API world there were a few such as API Blueprint, RAML, and Swagger, but for years the tooling was a bit lacking, and mostly only allowed for outputting as documentation. In 2018 one description language settled the mainstream favourite, and that was OpenAPI v3.0.
+In the endpoint-based API world there were a few such as https://apiblueprint.org/[API Blueprint], https://raml.org/[RAML], and Swagger, but for years the tooling was a bit lacking, and mostly only allowed for outputting as documentation. In 2018 one description language settled the mainstream favourite, and that was OpenAPI v3.0.
 
 ----
 The OpenAPI Specification (OAS) defines a standard, programming language-agnostic interface description for REST APIs, which allows both humans and computers to discover and understand the capabilities of a service without requiring access to source code, additional documentation, or inspection of network traffic.
@@ -126,7 +128,7 @@ The OpenAPI Specification (OAS) defines a standard, programming language-agnosti
 
 OpenAPI is slowly becoming the go-to description language for writing "endpoint-based API" contracts, and you will come to see why as OpenAPI pops up in pretty much every part of this book. Planning, design, testing, management, you name it, OpenAPI can help out.
 
-Another popular language is JSON Schema, which parts of OpenAPI are based on, and mostly compatible with.
+Another popular language is http://json-schema.org/[JSON Schema], which parts of OpenAPI are based on, and mostly compatible with.
 
 .An overly simplified example of a basic API which lists collections and resources of hats.
 [source,yaml]
@@ -217,13 +219,11 @@ type Droid implements Character {
 
 These schemas can be defined in whatever programming language the API is built in: JavaScript, PHP, Go, whatever, but they are usually not written in one definitive format. That makes portability a little funky (you couldn't give a Go defined schema to a JavaScript client), but not impossible.
 
-GraphQL schema does not support validation being defined as part of the contract like OpenAPI and JSON Schema do, but it can be added with extensions. More on all of that later.
+GraphQL schema does not support validation being defined in the contract like OpenAPI and JSON Schema, but there are some extensions floating around which can help. More on all of that later.
 
 ==== gRPC
 
-gRPC as a Google open-source project, uses another Google open-source project for its type system: Protobuf.
-
-TODO More on
+gRPC uses another Google tool for its API contract: https://developers.google.com/protocol-buffers/[Protobuf]. Protobuf is basically a serializer for data going over the wire. Much like GraphQL and its schemas, Protobuf is integral to gRPC.
 
 == Service Model
 
