@@ -179,15 +179,17 @@ components:
 
 OpenAPI is a YAML or JSON based descriptive language which covers endpoints, headers, requests and responses, allows for examples in different mime types, outlines errors, and even lets developers write in potential values, validation rules, etc.
 
-You can imagine this growing to be rather unwieldy once its got 50+ endpoints and more complex examples, but have no fear you can spread things around in multiple files to make it a lot more DRY (Don't Repeat Yourself) and useful.
-
 These OpenAPI contract files are usually static, usually written down along with the source code, then sometimes deployed to a file hosting like S3 for folks to use. Some managers want to treat these like business secrets and hide them under lock and key, which makes absolutely no damned sense as they are meta-data only. Most "hackers" could probably figure out that you keep your list of companies under `GET /companies`, so just don't make that a publicly available endpoint and you're gonna be ok. PayPal, Microsoft, and other companies make these OpenAPI contracts available to anyone who wants to download them, and this can help folks integrate with your APIs.
+
+You can imagine an OpenAPI file growing to be rather unwieldy once its got 50+ endpoints and more complex examples, but have no fear you can spread things around in multiple files to make it a lot more DRY (Don't Repeat Yourself) and useful. The first thing to go is usually the `components.schema` definitions, which can be moved to their own files. These files are essentially JSON Schema, so you can have the best of both worlds using both OpenAPI and JSON Schema for various things.
+
+It's quite common to then also make the JSON Schema files available over the wire, by putting links to the static .json files in a HTTP response header. This can provide more information about the object to the API client without needing to figure out how to distribute the files to them ahead of time.
 
 ==== GraphQL
 
 GraphQL as an implementation comes bundled with its own type system, which acts as its source of truth for API contracts: GraphQL Schemas.
 
-All the GraphQL documentation examples are Star Wars. Sure, it's obviously inferiror to Stargate SG-1, but let's reuse their examples for simplicity:
+All the GraphQL documentation examples are Star Wars. Sure, it's obviously inferior to Stargate SG-1, but let's reuse their examples for simplicity:
 
 .An example of GraphQL schemas implementing interfaces and sharing properties across different types.
 [source,graphql]
@@ -223,10 +225,24 @@ GraphQL schema does not support validation being defined in the contract like Op
 
 ==== gRPC
 
-gRPC uses another Google tool for its API contract: https://developers.google.com/protocol-buffers/[Protobuf]. Protobuf is basically a serializer for data going over the wire. Much like GraphQL and its schemas, Protobuf is integral to gRPC.
+gRPC uses another Google tool for its API contract: https://developers.google.com/protocol-buffers/[Protobuf]. Protobuf is basically a serializer for data going over the wire. Much like GraphQL and its schemas, Protobuf is integral to gRPC. Instead of schemas they call them "Message Types", but it's all the same sort of idea.
 
-== Service Model
+Instead of writing them in whatever language the API is written in (like GraphQL), a new  `.proto` file is written using https://developers.google.com/protocol-buffers/docs/proto[Protocol Buffer Language Syntax]. This C-family/Java style language exists solely for writing these files. It might be a bit of a pain to figure out a brand new syntax, ut it has the benefit of being fairly portable as you can read them in multiple languages. Finding a JavaScript, Ruby, Python, Go, etc. tool that can read a `.proto` file is a whole lot easier than trying to get Python to read something written in  - for example - JavaScript.
 
+Rarely are `.proto` files made available over a URL, they are usually bundled and distributed with client code. Then usually things are kept backwards compatible until the clients have upgraded whatever client code brought the `.proto` files their way.
 
+== Service Model & Data Model
 
-== Data Model
+Two terms that pop up from time to time as "service model" and "data model". These are two ways to specify which part of the API contract you are talking about.
+
+image::images/data-model-service-model.png[]
+
+The service model is the language used to describe things like the URL, HTTP method, headers like content type, authentication strategy, etc. It is used to explain all the things outside of the actual content of the message, the peripheral stuff to the actual data.
+
+The data model is used to describe the contents of the message, which is probably what you find in the HTTP body.
+
+GraphQL does not really have a service model. All interactions operate under a single HTTP endpoint (usually `POST /graphql`) so you wouldn't bother writing a contract around that in great detail. It would just be mentioned in passing as an implementation detail, and the majority of the effort would go into explaining the data model.
+
+gRPC sort of has a service model. It is just a web server you hit with methods and arguments. So there might not be different endpoints,::footnote[Without getting the "REST Bridge" involved anyway], but the different method names are essentially the service model.
+
+==
