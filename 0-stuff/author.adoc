@@ -1,0 +1,5 @@
+= About the Author
+
+You can contact {author} at {email}.
+
+Some sort of bio in here. Bikes bikes bikes. Turtles.

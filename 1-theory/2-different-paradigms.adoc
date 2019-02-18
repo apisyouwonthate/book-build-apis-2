@@ -40,6 +40,7 @@ Content-Type: application/json
 
 In JavaScript, the equivalent concept is defining a function, and calling it elsewhere:
 
+[source,javascript]
 ----
 /* Signature */
 function sayHello(name) {
