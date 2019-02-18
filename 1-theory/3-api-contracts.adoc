@@ -1,6 +1,6 @@
 = API Contracts
 
-The "I" means interface, and so writing a contract for that interface is the act of writing down what that interface is going to look like, to avoid folks having to guess, or go and hunt for some documentation somewhere.
+The "I" in "API" means interface, and so writing a contract for that interface is the act of writing down what that interface is going to look like, to avoid folks having to guess, or go and hunt for some documentation somewhere.
 
 Let's use the fantastic https://pokeapi.co/[PokeAPI] as an example.
 
@@ -41,7 +41,7 @@ ____
 
 Thinking about writing an API contract might sound a bit odd if you just think about an API as sharing some data or as a convenient way to trigger commands on another server, but people need to know what that data is, or what arguments they should send to those commands.
 
-The enforceable bit is important too. We can use our contracts in our test suite to confirm that our actual APIs are following the rules of the contract.
+The enforceable bit is important too. We can use those contracts in our test suite to confirm that our actual APIs are following the rules of the contract.
 
 NOTE: Some people use the term "API Specifications" to describe all this, but the word "specification" is used to mean a lot of different things. We just used it in the last chapter for something totally different, so let's stick to API Contracts to avoid confusion.
 
@@ -54,7 +54,7 @@ Having a good contract means that API developers can be confident that:
 3. The interface is understood well by client developers
 4. The interface is not changing accidentally when code changes
 
-This confidence will save a lot of time and money for whoever is building this API, as a lack of confidence in those things leads to slower rollout of the initial version, loads more time spent testing subsequent deployments, and wasted developer time having loads of meetings to explain things that could have been written down and clear to everyone already.
+This confidence will save everyone a lot of time, money and frustration. Having no contract in place leads to slower rollout of the initial version, loads more time spent testing subsequent deployments, and wasted developer time having loads of meetings to explain things that could have been written down and clear to everyone already.
 
 == What forms can an API Contract take?
 
@@ -67,7 +67,7 @@ An API contract can exist in several forms, some more useful than others.
 A common case is the verbal contract, where the API developers discuss it with the frontend or other client application developers as they go. The backend developers write their code, the client developers write theirs, and as various endpoints or properties are conceived, they are explained somehow: literally explained out loud over the conference room table, shouted over a hail of nerf gun pellets and ping pong, or DMed over Slack chats.
 
 ----
-Fred: Hey Sarah, there’s a new "fudge" field and it can be "blah" or "whatever"
+Fred: Hey Sarah, there’s a new "fudge" field and it can be "blah" or "whatever".
 
 Sarah: Great! Thanks I’ll chuck that in now.
 ----
