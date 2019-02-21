@@ -78,27 +78,27 @@ This method has a huge number, the main being that communication is hard. You ne
 
 Another outcome is the original author(s) cannot remember the exact rules, leading to time wasted checking the code. An even worse scenario is that the original author(s) are not reachable for some reason. Maybe the whole team of developers who worked on that API are all on a flight together from New York to Uruguay, and for that entire 9 hour flight nobody can get any answers about how the API is supposed to work, so they're stuck not being able to fix a production issue...
 
-In this instance two common things happen.
+When folks rely on a verbal contract, two common things happen.
 
 1. Developers waste time writing a new endpoint out of fear of using the old one
 2. Developers waste time trying to guess the contract, and might guess wrong
 
 === Shoddy Human Contracts
 
-When folks first start thinking about contracts, it often takes the form of rudimentary API Reference Documentation. This might be dumped into a Google Doc, shoved in a wiki, or written up in finger blistering HTML. These formats are usually fairly painstaking to create, because you are focusing on formatting _and_ content, shuffling things around whenever you remember that you should list headers too, and copying and pasting examples of JSON which might change over time. API Developers would not settle for writing software like this, but apparently when it comes to documentation it's accepted as the norm.
+When folks first start thinking about contracts, it often takes the form of rudimentary API Reference Documentation. This might be dumped into a Google Doc, shoved in a wiki, or written up in finger blistering HTML. These formats are usually fairly painstaking to create, because you are focusing on formatting _and_ content, shuffling things around whenever you remember that you should list headers too, and copying and pasting examples of JSON which might change over time. API developers would not settle for writing software like this, but apparently when it comes to documentation it's accepted as the norm.
 
 This whole slow, manual approach is probably why many people forgo writing contracts this way, and opt for verbal contracts instead.It probably would not be a huge jump to say the "startup mindset" (and "agile") are one of a few potential driving factors in this "just get on with it" approach. There are many technical leaders inexperienced in this area telling their team "We'll write lovely docs later when we've got more time!" , without realizing their lack of clarity is slowing down initial development, client integrations, increasing testing efforts, and causing bizarre production issues and throughout their ecosystem.
 
 .It's pretty common to blame REST for not forcing a type system onto everyone involved in the API, but they're absolutely useable. Don't blame a paradigm for implementation level decisions.
 image::./images/contracts-unspecified-json.jpeg[A cyclist jams a stick into hisi spokes then complains about it. A pretty accurate metaphor for using unspecified JSON in a REST API then blaming REST for it.]
 
-Anyway, despite being this medium of API contracts being time consuming, it is also impossible to enforce. After you have spent the time writing up a Google Docs/HTML/Wiki, the only output of that is going to be... a Google Doc/HTML/Wiki and maybe a PDF if you want to go wild. You can't exactly jam that Google Doc into an API test suite and have it confirm that the API is conforming to whatever is written in there.
+Anyway, aside from this medium of API contracts being time consuming, it is also impossible to enforce. After you have spent the time writing up a Google Docs/HTML/Wiki, the only output of that is going to be... a Google Doc/HTML/Wiki and maybe a PDF if you want to go wild. You can't exactly jam that Google Doc into an API test suite and have it confirm that the API is conforming to whatever is written in there.
 
 There is another way.
 
 === Description Languages
 
-A description language can be a programming language based, or text based format which lets you describe an API in a reusable format. This reusable format means you can do a whole bunch of stuff:
+A description language can be text based or look a bit like a programming language. This format lets you describe an API in a reusable way, which means you can do a whole bunch of stuff:
 
 - Documentation
 - Client-side validation
@@ -126,7 +126,7 @@ In the endpoint-based API world there were a few such as https://apiblueprint.or
 The OpenAPI Specification (OAS) defines a standard, programming language-agnostic interface description for REST APIs, which allows both humans and computers to discover and understand the capabilities of a service without requiring access to source code, additional documentation, or inspection of network traffic.
 ----
 
-OpenAPI is slowly becoming the go-to description language for writing "endpoint-based API" contracts, and you will come to see why as OpenAPI pops up in pretty much every part of this book. Planning, design, testing, management, you name it, OpenAPI can help out.
+OpenAPI is slowly becoming the go-to description language for writing "endpoint-based API" contracts, and you will come to see why as it pops up in pretty much every part of this book. Planning, design, testing, management, you name it, OpenAPI can help out.
 
 Another popular language is http://json-schema.org/[JSON Schema], which parts of OpenAPI are based on, and mostly compatible with.
 
@@ -179,11 +179,11 @@ components:
 
 OpenAPI is a YAML or JSON based descriptive language which covers endpoints, headers, requests and responses, allows for examples in different mime types, outlines errors, and even lets developers write in potential values, validation rules, etc.
 
-These OpenAPI contract files are usually static, usually written down along with the source code, then sometimes deployed to a file hosting like S3 for folks to use. Some managers want to treat these like business secrets and hide them under lock and key, which makes absolutely no damned sense as they are meta-data only. Most "hackers" could probably figure out that you keep your list of companies under `GET /companies`, so just don't make that a publicly available endpoint and you're gonna be ok. PayPal, Microsoft, and other companies make these OpenAPI contracts available to anyone who wants to download them, and this can help folks integrate with your APIs.
+OpenAPI contract files are usually static. They're usually written down along with the source code, then sometimes deployed to a file hosting service like S3 for folks to use. Some managers want to treat these like business secrets and hide them under lock and key, which makes absolutely no damned sense as they are meta-data only. Most "hackers" could probably figure out that you keep your list of companies under `GET /companies`, so just don't make that a publicly available endpoint and you're gonna be ok. PayPal, Microsoft, and other companies make their OpenAPI contracts available to anyone who wants to download them, and this approach can help folks integrate with your APIs.
 
 You can imagine an OpenAPI file growing to be rather unwieldy once its got 50+ endpoints and more complex examples, but have no fear you can spread things around in multiple files to make it a lot more DRY (Don't Repeat Yourself) and useful. The first thing to go is usually the `components.schema` definitions, which can be moved to their own files. These files are essentially JSON Schema, so you can have the best of both worlds using both OpenAPI and JSON Schema for various things.
 
-It's quite common to then also make the JSON Schema files available over the wire, by putting links to the static .json files in a HTTP response header. This can provide more information about the object to the API client without needing to figure out how to distribute the files to them ahead of time.
+It's quite common to then also make the JSON Schema files available over the wire, by putting links to the static .json files in an HTTP response header. This can provide more information about the object to the API client without needing to figure out how to distribute the files to them ahead of time.
 
 ==== GraphQL
 
@@ -233,7 +233,7 @@ Rarely are `.proto` files made available over a URL, they are usually bundled an
 
 == Service Model & Data Model
 
-Two terms that pop up from time to time as "service model" and "data model". These are two ways to specify which part of the API contract you are talking about.
+Two terms that pop up from time to time are "service model" and "data model". These are two ways to specify which part of the API contract you are talking about.
 
 image::images/data-model-service-model.png[]
 
