@@ -89,9 +89,6 @@ When folks first start thinking about contracts, it often takes the form of rudi
 
 This whole slow, manual approach is probably why many people forgo writing contracts this way, and opt for verbal contracts instead.It probably would not be a huge jump to say the "startup mindset" (and "agile") are one of a few potential driving factors in this "just get on with it" approach. There are many technical leaders inexperienced in this area telling their team "We'll write lovely docs later when we've got more time!" , without realizing their lack of clarity is slowing down initial development, client integrations, increasing testing efforts, and causing bizarre production issues and throughout their ecosystem.
 
-.It's pretty common to blame REST for not forcing a type system onto everyone involved in the API, but they're absolutely useable. Don't blame a paradigm for implementation level decisions.
-image::./images/contracts-unspecified-json.jpeg[A cyclist jams a stick into hisi spokes then complains about it. A pretty accurate metaphor for using unspecified JSON in a REST API then blaming REST for it.]
-
 Anyway, aside from this medium of API contracts being time consuming, it is also impossible to enforce. After you have spent the time writing up a Google Docs/HTML/Wiki, the only output of that is going to be... a Google Doc/HTML/Wiki and maybe a PDF if you want to go wild. You can't exactly jam that Google Doc into an API test suite and have it confirm that the API is conforming to whatever is written in there.
 
 There is another way.
@@ -239,10 +236,56 @@ image::images/data-model-service-model.png[]
 
 The service model is the language used to describe things like the URL, HTTP method, headers like content type, authentication strategy, etc. It is used to explain all the things outside of the actual content of the message, the peripheral stuff to the actual data.
 
-The data model is used to describe the contents of the message, which is probably what you find in the HTTP body.
+In the previous OpenAPI example, this would be the service model:
 
-GraphQL does not really have a service model. All interactions operate under a single HTTP endpoint (usually `POST /graphql`) so you wouldn't bother writing a contract around that in great detail. It would just be mentioned in passing as an implementation detail, and the majority of the effort would go into explaining the data model.
+[source,yaml]
+----
+paths:
+  /hats:
+    get:
+      description: Returns all hats from the system that the user has access to
+      responses:
+        '200':
+          description: A list of hats.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/hats'
+----
 
-gRPC sort of has a service model. It is just a web server you hit with methods and arguments. So there might not be different endpoints,::footnote[Without getting the "REST Bridge" involved anyway], but the different method names are essentially the service model.
+The data model is used to describe the contents of the message, which is probably what you find in the HTTP body. The word "schema" is often associated with the data model.
 
-==
+Continuing on from the above example, the following lines would be added to include the data model defined in another file:
+
+.An example of a data model, showing which properties are likely to be found.
+[source,yaml]
+----
+type: object
+properties:
+  id:
+    type: string
+    format: uuid
+  name:
+    type: enum
+    enum:
+      - bowler
+      - top
+      - fedora
+----
+
+GraphQL does not really have a service model, as it does not need one. All interactions operate under a single HTTP endpoint - usually `POST /graphql` - so there is no real need to bother writing a contract around that in great detail. It would just be mentioned in passing as an implementation detail, and the majority of the effort would go into describing the data model.
+
+gRPC sort of has a service model. It is just a web server you hit with methods and arguments. So there might not be different endpoints,footnote:[Without getting the gRPC JSON Gateway involved: https://github.com/grpc-ecosystem/grpc-gateway] but the different method names are essentially the service model.
+
+
+== Summary
+
+The terms "API Contract" and "API Specifications" often mean the same thing depending on the context, but the term specification is used to describe a lot of other things in this space too. If you are talking about planning, building, or documenting an API and somebody mentions "API specifications", then they are talking about this stuff.
+
+The terms "schema", and "data model", are usually closely related. In the terms of an HTTP API, the data model describes the body of the HTTP message, and that description is often referred to as a schema.
+
+Ask a bunch of different people and you will get a lot of difference answers, but these terms will be used throughout the book just so there is one standard way of talking.
+
+Writing down contracts might seem like a lot of work, but should no longer be considered as an optional step by API developers. It's reckless, selfish, and actually makes work considerably more mundane. API contracts are not just for creating documentation. Writing them will increase productivity throughout the life-cycle of the API (and its clients), and give you reference documentation for free when it is needed.
+
+Later chapters will cover exactly how contracts can get involved at various points. This introduction will most likely have left you with questions, and they will be answered throughout the rest of the book.

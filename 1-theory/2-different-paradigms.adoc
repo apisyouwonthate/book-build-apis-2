@@ -151,13 +151,16 @@ These constraints of REST when applied to HTTP APIs can help the API last for de
 
 Some folks look at all this and do not understand why REST requires "all the extra faffing about". There are many who just do not quite get the point of any of it, and consider RPC to be the almighty. To them, it is all about executing the remote code as fast possible, but REST (which can still absolutely be performant) focuses far more on longevity and reduced client-coupling instead. Knowing when to have a fat client and when to have a skinny client is a powerful decision making process to have in your arsenal, so definitely do not be one of those people who things it should always be A, or always be B.
 
-Another interesting thing about REST is that it does not require the use of schema metadata (like WSDL or similar), but does allow it. In fact, REST has no opinions either way: it does not explicitly demand it, nor disallow it. the metadata is something many API developers hated about SOAP, and from 2015 to current day, it has become more and more of a growing trend once again, thanks to gRPC and GraphQL including and requiring type systems in their implementations. the HTTP community (building REST or whatever) has a few type systems available for optional use, the main one these days being: JSON Schema.
+Another interesting thing about REST is that it does not require the use of schema metadata (like WSDL or similar), but does allow it. In fact, REST has no opinions either way: it does not explicitly demand it, nor disallow it. The metadata is something many API developers hated about SOAP, and from 2015 to current day, it has become more and more of a growing trend once again, thanks to gRPC and GraphQL including and requiring type systems in their implementations.
 
-JSON Schema is inspired by XML Schema — but not functionally identical — and is one of the most important things to happen to HTTP APIs in years, and will be discussed a lot throughout the book.
+.It's pretty common to blame REST for not forcing a type system onto everyone involved in the API, but they're absolutely useable. Don't blame a paradigm for implementation level decisions.
+image::./images/contracts-unspecified-json.jpeg[A cyclist jams a stick into hisi spokes then complains about it. A pretty accurate metaphor for using unspecified JSON in a REST API then blaming REST for it.]
+
+The HTTP community (building REST or whatever) has a few type systems available for optional use, the main one these days being: JSON Schema. JSON Schema is inspired by XML Schema — but not functionally identical — and is one of the most important things to happen to HTTP APIs in years, and will be discussed a lot throughout the book.
 
 Unfortunately, REST became a marketing buzzword for most of 2006–2014. It became a metric of quality that developers would aspire to, fail to understand, then label as REST anyway. Most systems saying they are REST are little more than RPC with HTTP verbs and pretty URLs. As such, you might not get cacheability provided, it might have a bunch of wacky conventions, and there might not be any links for you to use to discover next available actions. These APIs are jovially called REST__ish__ by people aware of the difference.
 
-REST has no specification which is what leads to some of this confusion, nor does it have concrete implementations. That said, there are two large popular specifications which provide a whole lot of standardization for various aspects of REST APIs that chose to use them:
+REST has no specification which is what leads to some of this confusion, nor does it have concrete implementations. That said, there are two large popular API standards designed to standardize certain aspects of REST APIs that chose to use them:
 
 - JSON:API
 - OData
