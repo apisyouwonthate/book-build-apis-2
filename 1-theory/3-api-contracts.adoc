@@ -105,6 +105,7 @@ A description language can be text based or look a bit like a programming langua
 - Server/Application generation
 - Mock servers
 - Contract testing
+- Automated Postman/Paw Collections
 
 SOAP as been mentioned as one system that used to have meta-data which described its methods and messages using something called a WSDL:
 
@@ -282,10 +283,10 @@ gRPC sort of has a service model. It is just a web server you hit with methods a
 
 The terms "API Contract" and "API Specifications" often mean the same thing depending on the context, but the term specification is used to describe a lot of other things in this space too. If you are talking about planning, building, or documenting an API and somebody mentions "API specifications", then they are talking about this stuff.
 
-The terms "schema", and "data model", are usually closely related. In the terms of an HTTP API, the data model describes the body of the HTTP message, and that description is often referred to as a schema.
+The terms "schema", and "data model", are usually closely related. In the terms of an HTTP API, the data model describes the body of the HTTP message, and the technical document or actual file which provides that description is often referred to as a schema.
 
 Ask a bunch of different people and you will get a lot of difference answers, but these terms will be used throughout the book just so there is one standard way of talking.
 
-Writing down contracts might seem like a lot of work, but should no longer be considered as an optional step by API developers. It's reckless, selfish, and actually makes work considerably more mundane. API contracts are not just for creating documentation. Writing them will increase productivity throughout the life-cycle of the API (and its clients), and give you reference documentation for free when it is needed.
+Writing down contracts might seem like a lot of work, but these days it should no longer be considered as an optional step. Flinging around arbitrary JSON and hoping people and other applications are all using it properly over time is just reckless, selfish, and actually makes work considerably more mundane. Seeing as API contracts are not just for creating documentation, writing the contract down with a decent description language increases productivity throughout the life-cycle of the API. Then reference documentation appears for free as one of many outputs of the description language using documentation generators.
 
 Later chapters will cover exactly how contracts can get involved at various points. This introduction will most likely have left you with questions, and they will be answered throughout the rest of the book.
