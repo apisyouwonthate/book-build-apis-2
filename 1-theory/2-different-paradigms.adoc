@@ -1,3 +1,4 @@
+[#theory-paradigms]
 = Understanding Different Paradigms
 
 If APIs are the interface for some sort of service, it should not come as a surprise that not all the interfaces in the world are going to have the same needs and requirements. Most of them are a case of "execute a command", "interact with data", or a combination of both.

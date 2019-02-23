@@ -1,3 +1,4 @@
+[#theory-contracts]
 = API Contracts
 
 The "I" in "API" means interface, and so writing a contract for that interface is the act of writing down what that interface is going to look like, to avoid folks having to guess, or go and hunt for some documentation somewhere.
@@ -28,7 +29,7 @@ Height and weight, I guess there is no imperial and metric in the game just unit
 An API contract can help answer most of the questions and more for anyone wanting to understand how an API is meant to work.
 
 - Which resources or methods are available and how do you interact with them?
-- Which HTTP endpoints are required for that endpoint, for things like authentication?
+- Which HTTP headers are required for that endpoint, for things like authentication?
 - Which properties are available in the request and response?
 - What are those various properties data types?
 - Which of those properties are required or optional?
@@ -45,7 +46,7 @@ The enforceable bit is important too. We can use those contracts in our test sui
 
 NOTE: Some people use the term "API Specifications" to describe all this, but the word "specification" is used to mean a lot of different things. We just used it in the last chapter for something totally different, so let's stick to API Contracts to avoid confusion.
 
-Written down exactly from an early point (and agreed upon) means that there are far fewer surprises throughout the API lifecycle, from planning, through development, and into usage by clients.
+Written down exactly from an early point (and agreed upon) means that there are far fewer surprises throughout the API life-cycle, from planning, through development, and into usage by clients.
 
 Having a good contract means that API developers can be confident that:
 
@@ -72,9 +73,11 @@ Fred: Hey Sarah, there’s a new "fudge" field and it can be "blah" or "whatever
 Sarah: Great! Thanks I’ll chuck that in now.
 ----
 
-This works for a while. The API works, the app runs fine, we're making money, and we’re onto the next thing!
+This might seem good enough as the API works API works, the app runs fine, we're making money, and may even be making money. Sadly this method has a bunch of downsides
 
-This method has a huge number, the main being that communication is hard. You never really know if somebody understood what you meant even if they say they did. Beyond that, not having things written down means people can forget. If another client team also needs the information and they ask another client team, they are getting a copy of a copy which might be slightly wrong.
+The primary issue is that communication is hard. You never really know if somebody understood what you meant even if they say they did.
+
+Beyond that, not having things written down means people can forget. If another client team also needs the information and they ask another client team, they are getting a copy of a copy which might be slightly wrong.
 
 Another outcome is the original author(s) cannot remember the exact rules, leading to time wasted checking the code. An even worse scenario is that the original author(s) are not reachable for some reason. Maybe the whole team of developers who worked on that API are all on a flight together from New York to Uruguay, and for that entire 9 hour flight nobody can get any answers about how the API is supposed to work, so they're stuck not being able to fix a production issue...
 
@@ -87,7 +90,7 @@ When folks rely on a verbal contract, two common things happen.
 
 When folks first start thinking about contracts, it often takes the form of rudimentary API Reference Documentation. This might be dumped into a Google Doc, shoved in a wiki, or written up in finger blistering HTML. These formats are usually fairly painstaking to create, because you are focusing on formatting _and_ content, shuffling things around whenever you remember that you should list headers too, and copying and pasting examples of JSON which might change over time. API developers would not settle for writing software like this, but apparently when it comes to documentation it's accepted as the norm.
 
-This whole slow, manual approach is probably why many people forgo writing contracts this way, and opt for verbal contracts instead.It probably would not be a huge jump to say the "startup mindset" (and "agile") are one of a few potential driving factors in this "just get on with it" approach. There are many technical leaders inexperienced in this area telling their team "We'll write lovely docs later when we've got more time!" , without realizing their lack of clarity is slowing down initial development, client integrations, increasing testing efforts, and causing bizarre production issues and throughout their ecosystem.
+This whole slow, manual approach is probably why many people forgo writing contracts this way, and opt for verbal contracts instead.It probably would not be a huge jump to say the "startup mindset" (and "agile") are one of a few potential driving factors in this "just get on with it" approach. There are many technical leaders inexperienced in this area telling their team "We'll write lovely docs later when we've got more time!", without realizing their lack of clarity is slowing down initial development, client integrations, increasing testing efforts, and causing bizarre production issues and throughout their ecosystem.
 
 Anyway, aside from this medium of API contracts being time consuming, it is also impossible to enforce. After you have spent the time writing up a Google Docs/HTML/Wiki, the only output of that is going to be... a Google Doc/HTML/Wiki and maybe a PDF if you want to go wild. You can't exactly jam that Google Doc into an API test suite and have it confirm that the API is conforming to whatever is written in there.
 
@@ -107,7 +110,7 @@ A description language can be text based or look a bit like a programming langua
 - Contract testing
 - Automated Postman/Paw Collections
 
-SOAP as been mentioned as one system that used to have meta-data which described its methods and messages using something called a WSDL:
+An early example of that would be SOAP, which used something called a WSDL, something discussed in <<theory-paradigms,the previous chapter>>.
 
 [quote, Wikipedia]
 ----
@@ -116,19 +119,31 @@ The Web Services Description Language is an XML-based interface definition langu
 
 WSDLs were only used for SOAP, and not many paradigms or implementations seemed to bother with this sort of description language for a long time. Luckily that has all changed over the last few years.
 
-==== Endpoint-based APIs
+Before we look at how various description languages are used today, lets learn another bit of theory.
 
-In the endpoint-based API world there were a few such as https://apiblueprint.org/[API Blueprint], https://raml.org/[RAML], and Swagger, but for years the tooling was a bit lacking, and mostly only allowed for outputting as documentation. In 2018 one description language settled the mainstream favourite, and that was OpenAPI v3.0.
+== Service Model & Data Model
+
+Two terms that pop up from time to time are "service model" and "data model". These are two ways to specify which part of the API contract you are talking about.
+
+image::images/data-model-service-model.png[]
+
+The service model is the language used to describe things like the URL, HTTP method, headers like content type, authentication strategy, etc. It is used to explain all the things outside of the message, the stuff peripheral to the actual data. In a programming language this would be class names, method names, possible exceptions, but would not cover anything about the arguments: type hints, possible validations, etc.
+
+The data model is used to describe the contents of the message, which is probably what you find in the HTTP body. The word "schema" is often associated with the data model too. They are often just two different terms describing the same concept, but often the term "schema" is used to represent the actual technical file containing the description language, and the term data model is more theoretical.
+
+With this in mind, lets go look at how contracts are written for endpoint-based APIs (REST, RESTish, some RPC), GraphQL and gRPC.
+
+==== Endpoint-based APIs: OpenAPI & JSON Schema
+
+In the endpoint-based API world there were a few such as https://apiblueprint.org/[API Blueprint], https://raml.org/[RAML], and Swagger, but for years the tooling was a bit lacking, and mostly only allowed for outputting as documentation. Around 2018 one description language settled the mainstream favourite, and that was OpenAPI v3.0. Another popular language is http://json-schema.org/[JSON Schema], which parts of OpenAPI are based on, and mostly compatible with.
 
 ----
 The OpenAPI Specification (OAS) defines a standard, programming language-agnostic interface description for REST APIs, which allows both humans and computers to discover and understand the capabilities of a service without requiring access to source code, additional documentation, or inspection of network traffic.
 ----
 
-OpenAPI is slowly becoming the go-to description language for writing "endpoint-based API" contracts, and you will come to see why as it pops up in pretty much every part of this book. Planning, design, testing, management, you name it, OpenAPI can help out.
+OpenAPI (formerly known as Swagger) has become the go-to description language for writing "endpoint-based API" contracts, and you will come to see why as it pops up in pretty much every part of this book. Planning, design, testing, management, you name it, OpenAPI can help out.
 
-Another popular language is http://json-schema.org/[JSON Schema], which parts of OpenAPI are based on, and mostly compatible with.
-
-.An overly simplified example of a basic API which lists collections and resources of hats.
+.An overly simplified example of OpenAPI describing an API which lists collections and resources of hats.
 [source,yaml]
 ----
 openapi: 3.0.2
@@ -177,15 +192,24 @@ components:
 
 OpenAPI is a YAML or JSON based descriptive language which covers endpoints, headers, requests and responses, allows for examples in different mime types, outlines errors, and even lets developers write in potential values, validation rules, etc.
 
+OpenAPI can describe both service and data model. In the example above, everything under `paths` is describing the service model, then everything under `components.schema` is describing data model. The schema keywords that OpenAPI v3.0 uses are based on JSON Schema, and there is a bit of a tangent we should look into here about compatibility.
+
+WARNING: OpenAPI v3.0 schema objects are a subset/superset/sideset implementation of _JSON Schema draft 05_. Most JSON Schema keywords as expected, a few extra OpenAPI-only keywords were added, and some JSON Schema keywords are not supported. There is also the tricky situation where JSON Schema has continued to progress quickly since draft 4 (draft 8 is almost complete at time of writing). This does cause a bit of confusion for new developers, but interoperability amongst standards is always a tricky one. Thankfully, future versions of OpenAPI (probably v3.1) aim to solve this, so we won't get too stuck in the weeds here. For those who want to learn more, https://blog.apisyouwonthate.com/openapi-and-json-schema-divergence-part-1-1daf6678d86e[this first article] fully explains the situation, and https://blog.apisyouwonthate.com/openapi-and-json-schema-divergence-part-2-52e282e06a05[this second article] explains workarounds and longer term solutions.
+
 OpenAPI contract files are usually static. They're usually written down along with the source code, then sometimes deployed to a file hosting service like S3 for folks to use. Some managers want to treat these like business secrets and hide them under lock and key, which makes absolutely no damned sense as they are meta-data only. Most "hackers" could probably figure out that you keep your list of companies under `GET /companies`, so just don't make that a publicly available endpoint and you're gonna be ok. PayPal, Microsoft, and other companies make their OpenAPI contracts available to anyone who wants to download them, and this approach can help folks integrate with your APIs.
 
-You can imagine an OpenAPI file growing to be rather unwieldy once its got 50+ endpoints and more complex examples, but have no fear you can spread things around in multiple files to make it a lot more DRY (Don't Repeat Yourself) and useful. The first thing to go is usually the `components.schema` definitions, which can be moved to their own files. These files are essentially JSON Schema, so you can have the best of both worlds using both OpenAPI and JSON Schema for various things.
+You can imagine an OpenAPI file growing to be rather unwieldy once its got 50+ endpoints and more complex examples, but have no fear you can spread things around in multiple files to make it a lot more DRY (Don't Repeat Yourself) and useful. The first thing to go is usually the `components.schema` definitions, which can be moved to their own files. Once these are split into their own files, an extra step can be taken to turn them into proper JSON Schema files. Once they are split out they can be referenced in a HTTP response header.
 
-It's quite common to then also make the JSON Schema files available over the wire, by putting links to the static .json files in an HTTP response header. This can provide more information about the object to the API client without needing to figure out how to distribute the files to them ahead of time.
+[source]
+----
+Link: <http://example.com/schemas/hat.json#>; rel="describedby"
+----
 
-==== GraphQL
+When a client sees this they can use it for all sorts of things - like form generation and client-side validation - all without needing to figure out how to distribute the files to them ahead of time.
 
-GraphQL as an implementation comes bundled with its own type system, which acts as its source of truth for API contracts: GraphQL Schemas.
+==== GraphQL Schemas
+
+GraphQL as an implementation comes bundled with https://graphql.org/learn/schema/[GraphQL Schemas]. GraphQL does not really have a service model, as it does not need one. All interactions operate under a single HTTP endpoint - usually `POST /graphql` - so there is no real need to bother writing a contract around that in great detail. It would just be mentioned in passing as an implementation detail, and the majority of the effort would go into describing the data model.
 
 All the GraphQL documentation examples are Star Wars. Sure, it's obviously inferior to Stargate SG-1, but let's reuse their examples for simplicity:
 
@@ -221,63 +245,13 @@ These schemas can be defined in whatever programming language the API is built i
 
 GraphQL schema does not support validation being defined in the contract like OpenAPI and JSON Schema, but there are some extensions floating around which can help. More on all of that later.
 
-==== gRPC
+==== gRPC: Protobuf
 
 gRPC uses another Google tool for its API contract: https://developers.google.com/protocol-buffers/[Protobuf]. Protobuf is basically a serializer for data going over the wire. Much like GraphQL and its schemas, Protobuf is integral to gRPC. Instead of schemas they call them "Message Types", but it's all the same sort of idea.
 
 Instead of writing them in whatever language the API is written in (like GraphQL), a new  `.proto` file is written using https://developers.google.com/protocol-buffers/docs/proto[Protocol Buffer Language Syntax]. This C-family/Java style language exists solely for writing these files. It might be a bit of a pain to figure out a brand new syntax, ut it has the benefit of being fairly portable as you can read them in multiple languages. Finding a JavaScript, Ruby, Python, Go, etc. tool that can read a `.proto` file is a whole lot easier than trying to get Python to read something written in  - for example - JavaScript.
 
 Rarely are `.proto` files made available over a URL, they are usually bundled and distributed with client code. Then usually things are kept backwards compatible until the clients have upgraded whatever client code brought the `.proto` files their way.
-
-== Service Model & Data Model
-
-Two terms that pop up from time to time are "service model" and "data model". These are two ways to specify which part of the API contract you are talking about.
-
-image::images/data-model-service-model.png[]
-
-The service model is the language used to describe things like the URL, HTTP method, headers like content type, authentication strategy, etc. It is used to explain all the things outside of the actual content of the message, the peripheral stuff to the actual data.
-
-In the previous OpenAPI example, this would be the service model:
-
-[source,yaml]
-----
-paths:
-  /hats:
-    get:
-      description: Returns all hats from the system that the user has access to
-      responses:
-        '200':
-          description: A list of hats.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/hats'
-----
-
-The data model is used to describe the contents of the message, which is probably what you find in the HTTP body. The word "schema" is often associated with the data model.
-
-Continuing on from the above example, the following lines would be added to include the data model defined in another file:
-
-.An example of a data model, showing which properties are likely to be found.
-[source,yaml]
-----
-type: object
-properties:
-  id:
-    type: string
-    format: uuid
-  name:
-    type: enum
-    enum:
-      - bowler
-      - top
-      - fedora
-----
-
-GraphQL does not really have a service model, as it does not need one. All interactions operate under a single HTTP endpoint - usually `POST /graphql` - so there is no real need to bother writing a contract around that in great detail. It would just be mentioned in passing as an implementation detail, and the majority of the effort would go into describing the data model.
-
-gRPC sort of has a service model. It is just a web server you hit with methods and arguments. So there might not be different endpoints,footnote:[Without getting the gRPC JSON Gateway involved: https://github.com/grpc-ecosystem/grpc-gateway] but the different method names are essentially the service model.
-
 
 == Summary
 
