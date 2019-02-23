@@ -12,9 +12,10 @@ include::0-stuff/introduction.adoc[]
 include::1-theory/2-different-paradigms.adoc[]
 include::1-theory/3-api-contracts.adoc[]
 
-= Part One: Theory
-
 = Part Two: Planning & Design
+
+include::2-planning/0-introduction.adoc[]
+include::2-planning/1-editors.adoc[]
 
 = Part Three: Testing & Monitoring
 

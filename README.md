@@ -9,13 +9,7 @@ So far, this feels like how the book is gonna play out:
 - [ ] Part One: Theory
   - [ ] APIs, Services, and Microservices
   - [x] Understanding Different Paradigms
-    - [x] RPC
-    - [x] REST
-    - [x] Query Languages
   - [x] API Contracts
-    - [x] Service Model
-    - [x] Data Model
-    - [ ] Design First vs Code First
   - [ ] Design Theory
     - [ ] Resources
     - [ ] Collections
@@ -39,11 +33,12 @@ So far, this feels like how the book is gonna play out:
     - [ ] Web Hooks (a.k.a Callbacks)
     - [ ] WebSockets
     - [ ] Message Brokers (AMQP, Kafka, etc.)
+  - [ ] Authentication
 
 - [ ] Part Two: Planning & Design
-  - [ ] API Specifications
-    - [ ] Documentation
-    - [ ] Mocking & Sandboxes
+  - [x] Editors
+  - [ ] Mocking
+  - [ ] Documentation
   - [ ] Style Guides
 
 - [ ] Part Three: Testing & Monitoring
