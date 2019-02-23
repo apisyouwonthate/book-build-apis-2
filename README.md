@@ -9,20 +9,13 @@ So far, this feels like how the book is gonna play out:
 - [ ] Part One: Theory
   - [ ] APIs, Services, and Microservices
   - [x] Understanding Different Paradigms
-    - [x] RPC
-    - [x] REST
-    - [x] Query Languages
-  - [ ] API Contracts
-    - [ ] Service Model
-    - [ ] Data Model
-    - [ ] Design First vs Code First
+  - [x] API Contracts
   - [ ] Design Theory
     - [ ] Resources
     - [ ] Collections
     - [ ] Pagination
     - [ ] Filtering
     - [ ] Caching
-  - [ ] Authentication
   - [ ] Hypermedia Controls (HATEOAS)
     - [ ] Layers of abstraction on top of RPC
     - [ ] Next available actions
@@ -36,11 +29,11 @@ So far, this feels like how the book is gonna play out:
     - [ ] Web Hooks (a.k.a Callbacks)
     - [ ] WebSockets
     - [ ] Message Brokers (AMQP, Kafka, etc.)
+  - [ ] Authentication
 
 - [ ] Part Two: Planning & Design
-  - [ ] API Specifications
-    - [ ] Documentation
-    - [ ] Mocking & Sandboxes
+  - [x] Documentation
+  - [ ] Mocking & Sandboxes
   - [ ] Style Guides
 
 - [ ] Part Three: Testing & Monitoring

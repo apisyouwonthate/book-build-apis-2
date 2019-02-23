@@ -1,0 +1,18 @@
+When I was younger and dumber, the planning stage for APIs was pretty much "think of a list of endpoints then start coding" which is wildly insufficient. As the <<theory-contracts,API Contracts>> chapter explained, contracts are incredibly important throughout the life-cycle of an API. We are going to look into how they can be used in the planning and design stage.
+
+Most of the planning and design phase is intended to do two things:
+
+1. Make developers think really hard about the requirements for their API
+2. Gather feedback from clients application developers
+
+Poorly planned APIs waste a lot of time and money for a lot of people. I've seen APIs go from v1 to v2 in the first few months after the clients noticed it didn't actually work properly.
+
+You need that feedback early on, with minimal effort from the API developers, and description languages let that happen. The least effort with most reward is to write some OpenAPI/JSON Schema/Protobuf/etc files, turn those into documentation, mock servers, or even sandbox servers, then get feedback on those interfaces.
+
+Feedback is then a simple case of tweaking those files, with no need to change a bunch of code, fix a bunch of tests, etc. Once the interface is agreed upon, the code can then just be written to make that interface work as explained in the contract.
+
+This is much closer to the Agile workflow, instead of the Waterfall model. Waterfall is junk for API development.
+
+TODO: Diagram of waterfall model showing API development, two clients development, feedback.
+
+So, how do we create documentation from our contracts, and what the hell are mock servers anyway?
