@@ -452,8 +452,13 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <li><a href="#_im_lost">I&#8217;m Lost!</a></li>
 </ul>
 </li>
-<li><a href="#_part_one_theory_2">Part One: Theory</a></li>
-<li><a href="#_part_two_planning_design">Part Two: Planning &amp; Design</a></li>
+<li><a href="#_part_two_planning_design">Part Two: Planning &amp; Design</a>
+<ul class="sectlevel2">
+<li><a href="#_endpoint_based_apis">Endpoint-based APIs</a></li>
+<li><a href="#_graphql">GraphQL</a></li>
+<li><a href="#_grpc">gRPC</a></li>
+</ul>
+</li>
 <li><a href="#_part_three_testing_monitoring">Part Three: Testing &amp; Monitoring</a></li>
 <li><a href="#_part_four_management">Part Four: Management</a></li>
 <li><a href="#_part_five_further_theory">Part Five: Further Theory</a></li>
@@ -591,13 +596,13 @@ Content-Type: application/json
 </div>
 <div class="listingblock">
 <div class="content">
-<pre>/* Signature */
+<pre class="highlight"><code class="language-javascript" data-lang="javascript">/* Signature */
 function sayHello(name) {
   // ...
 }
 
 /* Usage */
-sayHello("Racey McRacerson");</pre>
+sayHello("Racey McRacerson");</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -899,15 +904,150 @@ WHERE
 </div>
 </div>
 <div class="sect1">
-<h2 id="_part_one_theory_2">Part One: Theory</h2>
-<div class="sectionbody">
-
-</div>
-</div>
-<div class="sect1">
 <h2 id="_part_two_planning_design">Part Two: Planning &amp; Design</h2>
 <div class="sectionbody">
-
+<div class="paragraph">
+<p>When I was younger and dumber, the planning stage for APIs was pretty much "think of a list of endpoints then start coding" which is wildly insufficient. As the <a href="#theory-contracts">API Contracts</a> chapter explained, contracts are incredibly important throughout the life-cycle of an API. We are going to look into how they can be used in the planning and design stage.</p>
+</div>
+<div class="paragraph">
+<p>Most of the planning and design phase is intended to do two things:</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>Make developers think really hard about the requirements for their API</p>
+</li>
+<li>
+<p>Gather feedback from clients application developers</p>
+</li>
+</ol>
+</div>
+<div class="paragraph">
+<p>Poorly planned APIs waste a lot of time and money for a lot of people. I&#8217;ve seen APIs go from v1 to v2 in the first few months after the clients noticed it didn&#8217;t actually work properly.</p>
+</div>
+<div class="paragraph">
+<p>You need that feedback early on, with minimal effort from the API developers, and description languages let that happen. The least effort with most reward is to write some OpenAPI/JSON Schema/Protobuf/etc files, turn those into documentation, mock servers, or even sandbox servers, then get feedback on those interfaces.</p>
+</div>
+<div class="paragraph">
+<p>Feedback is then a simple case of tweaking those files, with no need to change a bunch of code, fix a bunch of tests, etc. Once the interface is agreed upon, the code can then just be written to make that interface work as explained in the contract.</p>
+</div>
+<div class="paragraph">
+<p>This is much closer to the Agile workflow, instead of the Waterfall model. Waterfall is junk for API development.</p>
+</div>
+<div class="paragraph">
+<p>TODO: Diagram of waterfall model showing API development, two clients development, feedback.</p>
+</div>
+<div class="paragraph">
+<p>So, how do we create documentation from our contracts, and what the hell are mock servers anyway?
+= Editors</p>
+</div>
+<div class="paragraph">
+<p>SwaggerHub &amp; Swagger Editor
+Stoplight
+= Documentation</p>
+</div>
+<div class="paragraph">
+<p>Throughout the planning phase, all the API developers involved, other folks on your team, and potential clients are going to want to see how this API is going to work. Thankfully you have chosen to write down how it all works with contracts, so this will be easy.</p>
+</div>
+<div class="paragraph">
+<p>All we need to do is turn those contract files (probably <code>.json</code>, <code>.yaml</code>, <code>.proto</code>, .etc) into some human-readable documentation for them to point their faces at. Usually HTML to be thrown on a web server, or questionably PDF files for emailing around.</p>
+</div>
+<div class="sect2">
+<h3 id="_endpoint_based_apis">Endpoint-based APIs</h3>
+<div class="sect3">
+<h4 id="_openapi">OpenAPI</h4>
+<div class="paragraph">
+<p>OpenAPI has some amazing tools, and a really ugly one: <a href="https://swagger.io/swagger-ui/">Swagger UI</a>.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_swagger_ui">Swagger UI</h4>
+<div class="paragraph">
+<p>This tool is hard to recommend for a bunch of reasons, first and foremost is its appearance.</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="images/docs-swagger-ui.png" alt="docs swagger ui">
+</div>
+<div class="title">Figure 3. A screenshot of Swagger UI, which looks like it was designed by not just a developer, but one who was a big fan of RPC.</div>
+</div>
+<div class="paragraph">
+<p>Swagger UI used to be the only option, and it was a major contributor to me completely ignoring Swagger for years. It not only looks pretty rough, but it hides the data model under a few unclear options, meaning the most important data can hardly be seen.</p>
+</div>
+<div class="paragraph">
+<p>For REST APIs this can cause a problem; Documenting an API as purely HTTP requests with the actual objects being hidden away as an afterthought leads to them being used like an RPC API, even when they have hypermedia controls available.</p>
+</div>
+<div class="paragraph">
+<p>I would recommend you skip this one, and give ReDoc a try.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_redoc">ReDoc</h4>
+<div class="paragraph">
+<p>By far my favourite of the lot, ReDoc just looks absolutely stunning. You can add a logo with the <code>x-logo</code> vendor extension, tweak colors, and you get that awesome three-column style popularized by docs like the <a href="https://stripe.com/docs/api">Stripe API Documentation</a>.</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="images/docs-redoc.png" alt="docs redoc">
+</div>
+<div class="title">Figure 4. Fancy/modern looking three-col API documentation using ReDoc.</div>
+</div>
+<div class="paragraph">
+<p>Beyond the looks, ReDoc focuses a lot of elevating the data model (a.k.a schema) to the documentation viewer. It outlines data types, possible enum values, and all sorts of other handy stuff.</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="images/docs-redoc-data-struct.png" alt="docs redoc data struct">
+</div>
+<div class="title">Figure 5. Down arrows let you expand nested objects to avoid initial clutter.</div>
+</div>
+<div class="paragraph">
+<p>ReDoc can be used as a React command or embedded in HTML, but the most common approach to use it is via the command line. Look at their documentation for instructions, but one way is to install as a node module.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code>npm install -g redoc-cli</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>To see how the documentation looks locally, you can run a local web server using the ReDoc CLI tool.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code>$ redoc-cli serve openapi.yaml --watch
+TODO update example when ubuntu NodeJS stops cocking about</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>This will run a local HTTP server, and you can load up in your local browser. The <code>--watch</code> switch means changes to the local files will be automatically detected, and should show up when you refresh the browser.</p>
+</div>
+<div class="paragraph">
+<p>When somebody else asks for a look, you can then do a few things, but a common thing to do is ask the documentation generator to create HTML for sharing around.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code>$ redoc-cli bundle openapi.yaml</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>This will create a single HTML file with embedded CSS and JavaScript, which means there are no dependencies other than the one file it creates. You can chuck this up on Amazon S3 or wherever you like to host your static files, then people can take a look and give you feedback.</p>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_graphql">GraphQL</h3>
+<div class="paragraph">
+<p><a href="https://github.com/graphql/graphiql" class="bare">https://github.com/graphql/graphiql</a>
+An in-browser IDE for exploring GraphQL.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_grpc">gRPC</h3>
+<div class="paragraph">
+<p><a href="https://github.com/pseudomuto/protoc-gen-doc" class="bare">https://github.com/pseudomuto/protoc-gen-doc</a>
+[protoc-gen-doc] is a documentation generator plugin for the Google Protocol Buffers compiler (protoc). The plugin can generate HTML, JSON, DocBook and Markdown documentation from comments in your .proto files.</p>
+</div>
+</div>
 </div>
 </div>
 <div class="sect1">
@@ -931,7 +1071,7 @@ WHERE
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2019-02-15 15:35:33 EST
+Last updated 2019-02-23 17:25:37 WET
 </div>
 </div>
 </body>
