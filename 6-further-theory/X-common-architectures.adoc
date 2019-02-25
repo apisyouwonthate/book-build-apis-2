@@ -1,0 +1,11 @@
+== GraphQL Wrapping REST is Odd
+
+Talking about layers of abstraction helping out frontends
+
+Richardson and why for each step
+
+Not about crud https://t.co/pgkkfHoN28?amp=1
+
+Folks adding status codes to GraphQL https://medium.com/@estrada9166/return-custom-errors-with-status-code-on-graphql-45fca360852?source=linkShare-63d3c9a9b3be-1529271826
+
+Datasources as rest https://twitter.com/darrel_miller/status/1010556863845470208?s=20

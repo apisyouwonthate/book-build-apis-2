@@ -1,0 +1,3 @@
+Wireshark ofc
+https://mitmproxy.org/
+https://curlhub.io/
