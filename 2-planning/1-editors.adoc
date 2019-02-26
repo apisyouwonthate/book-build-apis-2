@@ -1,4 +1,58 @@
 = Editors
 
-SwaggerHub & Swagger Editor
-Stoplight
+Editors exist in various forms for various API spec formats, and they can drastically ease the creation of contracts when starting from scratch. These can take a few forms.
+
+Some editors are GUI-based (Graphical User Interface) and let you design things with clicking buttons and working with forms.
+
+Others are text-based and provide you with a real-time preview panel whilst you type, making it slightly easier than working with plain-old YAML/JSON.
+
+Beyond the "text-based" or "GUI" distinction, there are other characteristics which will effect where the contracts live and how you interact with them.
+
+Some editors are intended for rapid prototyping only, helping you to create an initial design and then push you to export the spec as text to copy-and-paste, or download as files. From that point on, you're on your own, and have to find some other way to keep your specification files up-to-date.
+
+Others are hosted solutions which keep a hold of your spec files, and offer limited options for syncing to whatever pre-determined locations they chose to support. Maybe something specific like GitLab, or generic git repository, or they publish them to a URL accessible over HTTP, or something else.
+
+Other editors can take the form of desktop applications, which can be used throughout the life-cycle, loading local files and allowing you to edit them at commit them back to the repository (or wherever they live) at will.
+
+== OpenAPI Editors
+
+=== Swagger Editor
+
+Swagger Editor is a very simple hosted text-based editor from https://smartbear.com/[SmartBear].
+
+NOTE: SmartBear are the folks who originally created the "Swagger" API description language, before it was renamed to OpenAPI and handed over to the OpenAPI Initiative. They like to keep using the name Swagger for their set of tools, but the description language itself is now called OpenAPI. No more calling it Swagger folks.
+
+image::images/editors-swagger-editor.png[]
+
+Mostly it is just a text-editor, but it has a few handy forms for adding new operations, tags, servers, etc.
+
+image::images/editors-swagger-editor-form.png[]
+
+This is a pretty simple editor, that helps in a few cases, like:
+
+- You have never written any specifications and want to try playing around with real-time feedback
+- You are getting validation errors from some local tool which seem weird so bundle your spec into one file and check it out in the browser
+
+Not much more use for it than this. If you are splitting files up using `$ref` (which you pretty much always want to do), then this won't work as it only supports the one text box.
+
+For ongoing editing, and multi-file support, you need something a bit more powerful.
+
+=== SwaggerHub
+
+SwaggerHub is another tool from Smartbear. It is a larger set of integrated tools, which incorporates the Swagger Editor as one approach, but also TODO I think there is a GUI that uses forms and stuff to I dont remember better go use it
+
+=== Stoplight
+
+Stoplight is a GUI editor
+
+== GraphQL Editors
+
+TODO Find them
+
+== Protobuf Editors
+
+TODO Find them
+
+== Other Editors
+
+Generic API editors which allow output to multiple formats. I forgot the one somebody linked in Slack and used a bit at WeWork. Hmm. API Designer? Something like that. TODO

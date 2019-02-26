@@ -15,7 +15,7 @@ include::1-theory/2-different-paradigms.adoc[]
 
 include::2-planning/0-introduction.adoc[]
 include::2-planning/1-editors.adoc[]
-include::2-planning/2-documentation.adoc[]
+include::2-planning/3-documentation.adoc[]
 
 = Part Three: Testing & Monitoring
 

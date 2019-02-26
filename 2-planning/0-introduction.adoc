@@ -13,6 +13,8 @@ Feedback is then a simple case of tweaking those files, with no need to change a
 
 This is much closer to the Agile workflow, instead of the Waterfall model. Waterfall is junk for API development.
 
-TODO: Diagram of waterfall model showing API development, two clients development, feedback.
+[TODO] Diagram of waterfall model showing API development, two clients development, feedback.
 
-So, how do we create documentation from our contracts, and what the hell are mock servers anyway?
+So, you are sold that API contracts are the way to go, you've picked your paradigm (and possibly an implementation too), and now you want to start writing down what the actual API is going to look like.
+
+You might not want to start typing YAML or JSON into an empty text file. Nobody does. For that, thankfully, we have editors!

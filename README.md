@@ -32,6 +32,7 @@ So far, this feels like how the book is gonna play out:
   - [ ] Authentication
 
 - [ ] Part Two: Planning & Design
+  - [x] Editors
   - [x] Documentation
   - [ ] Mocking & Sandboxes
   - [ ] Style Guides
