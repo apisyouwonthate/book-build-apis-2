@@ -27,6 +27,7 @@ So far, this feels like how the book is gonna play out:
     - [ ] Layers of abstraction on top of RPC
     - [ ] Next available actions
     - [ ] Standards (JSON:API, HAL, etc.)
+  - [ ] Errors and Validation
   - [ ] HTTP/1, HTTP/2 and HTTP/3
     - [ ] HTTP/2 is a real world thing today use it
     - [ ] Lets Stop Building Around a Network Hack
@@ -41,8 +42,6 @@ So far, this feels like how the book is gonna play out:
     - [ ] Documentation
     - [ ] Mocking & Sandboxes
   - [ ] Style Guides
-  - [ ] Error Formats
-  - [ ] Validation
 
 - [ ] Part Three: Testing & Monitoring
   - [ ] Debugging
@@ -55,7 +54,8 @@ So far, this feels like how the book is gonna play out:
   - [ ] Testing in Production
   - [ ] Notes on Deployment
 
-- [ ] Part Four: Management
+- [ ] Part Four: Management & Experience
+  - [ ] Portals & Documentation
   - [ ] API Gateways
   - [ ] Gateway Validation
   - [ ] Rate Limiting

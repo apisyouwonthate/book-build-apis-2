@@ -1,0 +1,3 @@
+Some folks will say that a REST API does not need reference documentation, due to hypermedia controls telling an API developer how interactions should be made, and most other important information being baked into the message itself, documentation can always things a little clearer and provide valuable examples.
+
+Some folks will say that https://github.com/graphql/graphiql[GraphQL] also does not need reference documentation, because the official GraphiQL tool provides an interactive console which contains documentation too.
