@@ -1,0 +1,5 @@
+https://stackoverflow.com/questions/40519610/grpc-protobuf-interface-versioning
+https://groups.google.com/forum/#!topic/grpc-io/LPsPg5ctQd4
+https://www.beautifulcode.co/backward-and-forward-compatibility-protobuf-versioning-serialization
+https://www.apiacademy.co/articles/2015/12/how-to-http-caching-for-restful-hypermedia-apis
+https://blog.apollographql.com/graphql-schema-design-building-evolvable-schemas-1501f3c59ed5
