@@ -47,7 +47,16 @@ Stoplight is a GUI editor
 
 == GraphQL Editors
 
-TODO Find them
+https://graphqleditor.com/[GraphQL Editor] is a GUI editor, with text on the left where you define various types, and a visual representation of everything as nodes on the right. You can click on those nodes, modify properties, and set criteria like required, null, etc.
+
+It can be installed locally via npm, then invoked as a React component.
+
+If you don't know what any of those things mean then fair enough, there is a hosted version: https://app.graphqleditor.com/[GraphQL Editor Cloud].
+
+.A screenshot of https://app.graphqleditor.com/showcase/github[the "Github example" on graphqleditor.com]
+image::images/editors-graphql-editor.png[]
+
+As with many editors it comes with an option to provide a mock server for the schemas you've just written up. The hosted version also has the ability to save projects.
 
 == Protobuf Editors
 
