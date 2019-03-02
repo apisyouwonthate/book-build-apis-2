@@ -173,7 +173,7 @@ An early example of that would be SOAP, which used something called a WSDL,
 something discussed in <<theory-paradigms,the previous chapter>>.
 
 [quote, Wikipedia]
-----
+____
 The Web Services Description Language is an XML-based interface definition
 language that is used for describing the functionality offered by a web service.
 The acronym is also used for any specific WSDL description of a web service,
@@ -181,7 +181,7 @@ which provides a machine-readable description of how the service can be called,
 what parameters it expects, and what data structures it returns. Therefore, its
 purpose is roughly similar to that of a type signature in a programming
 language.
-----
+____
 
 WSDLs were only used for SOAP, and not many paradigms or implementations seemed
 to bother with this sort of description language for a long time. Luckily that
@@ -215,15 +215,18 @@ more theoretical.
 With this in mind, lets go look at how contracts are written for endpoint-based
 APIs (REST, RESTish, some RPC), GraphQL and gRPC.
 
-==== Endpoint-based APIs: OpenAPI & JSON Schema
+== Introduction to API Description Languages
+
+
+
+=== REST/RESTish: OpenAPI & JSON Schema
 
 In the endpoint-based API world there were a few such as
-https://apiblueprint.org/[API Blueprint], https://raml.org/[RAML], and Swagger,
-but for years the tooling was a bit lacking, and mostly only allowed for
-outputting as documentation. Around 2018 one description language settled the
-mainstream favourite, and that was OpenAPI v3.0. Another popular language is
-http://json-schema.org/[JSON Schema], which parts of OpenAPI are based on, and
-mostly compatible with.
+https://apiblueprint.org/[API Blueprint], https://raml.org/[RAML], and OpenAPI
+(at the time called Swagger), but for years the tooling was a bit lacking, and
+mostly only allowed for outputting as documentation.
+
+OpenAPI v3.0 popped in 2015 up which solved a lot of problems with OpenAPI v2.0, and beat the heck out of the other description formats. It took a few years for tooling to catch up, but by 2018 pretty much everything supported OpenAPI v3.0, and this description format settled as the mainstream favourite.
 
 ----
 The OpenAPI Specification (OAS) defines a standard, programming
@@ -232,11 +235,6 @@ and computers to discover and understand the capabilities of a service without
 requiring access to source code, additional documentation, or inspection of
 network traffic.
 ----
-
-OpenAPI has become the go-to description language for writing "endpoint-based
-API" contracts, and you will come to see why as it pops up in pretty much every
-part of this book. Planning, design, testing, management, you name it, OpenAPI
-can help out.
 
 .An overly simplified example of OpenAPI describing an API which lists collections and resources of hats.
 [source,yaml]
@@ -290,11 +288,15 @@ headers, requests and responses, allows for examples in different mime types,
 outlines errors, and even lets developers write in potential values, validation
 rules, etc.
 
-OpenAPI can describe both service and data model. In the example above,
-everything under `paths` is describing the service model, then everything under
-`components.schemas` is describing the data model. The schema keywords that OpenAPI
-v3.0 uses are based on JSON Schema, and there is a bit of a tangent we should
-look into here about compatibility.
+Another popular language is http://json-schema.org/[JSON Schema], which parts of OpenAPI
+are based on. The two are mostly compatible, and are both used for slightly different but complimentary things.
+
+OpenAPI can describe both service and data model, and JSON Schema mainly only
+defines the data model. In the example above, everything under `paths` is
+describing the service model, then everything under `components.schemas` is
+describing the data model. The schema keywords that OpenAPI v3.0 uses are based
+on JSON Schema, and there is a bit of a tangent we should look into here about
+compatibility.
 
 [[WARNING]]
 ====
