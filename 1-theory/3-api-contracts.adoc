@@ -292,7 +292,7 @@ rules, etc.
 
 OpenAPI can describe both service and data model. In the example above,
 everything under `paths` is describing the service model, then everything under
-`components.schema` is describing data model. The schema keywords that OpenAPI
+`components.schemas` is describing the data model. The schema keywords that OpenAPI
 v3.0 uses are based on JSON Schema, and there is a bit of a tangent we should
 look into here about compatibility.
 
