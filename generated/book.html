@@ -444,12 +444,20 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <li><a href="#_about_the_author">About the Author</a></li>
 <li><a href="#_introduction">Introduction</a></li>
 <li><a href="#_part_one_theory">Part One: Theory</a></li>
-<li><a href="#_understanding_different_paradigms">Understanding Different Paradigms</a>
+<li><a href="#theory-paradigms">Understanding Different Paradigms</a>
 <ul class="sectlevel2">
 <li><a href="#_remote_procedure_call_rpc">Remote Procedure Call (RPC)</a></li>
 <li><a href="#_representational_state_transfer_rest">Representational State Transfer (REST)</a></li>
 <li><a href="#_query_languages">Query Languages</a></li>
 <li><a href="#_im_lost">I&#8217;m Lost!</a></li>
+</ul>
+</li>
+<li><a href="#theory-contracts">API Contracts</a>
+<ul class="sectlevel2">
+<li><a href="#_what_forms_can_an_api_contract_take">What forms can an API Contract take?</a></li>
+<li><a href="#_service_model_data_model">Service Model &amp; Data Model</a></li>
+<li><a href="#_introduction_to_api_description_languages">Introduction to API Description Languages</a></li>
+<li><a href="#_summary">Summary</a></li>
 </ul>
 </li>
 <li><a href="#_part_one_theory_2">Part One: Theory</a></li>
@@ -517,7 +525,7 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 </div>
 </div>
 <div class="sect1">
-<h2 id="_understanding_different_paradigms">Understanding Different Paradigms</h2>
+<h2 id="theory-paradigms">Understanding Different Paradigms</h2>
 <div class="sectionbody">
 <div class="paragraph">
 <p>If APIs are the interface for some sort of service, it should not come as a surprise that not all the interfaces in the world are going to have the same needs and requirements. Most of them are a case of "execute a command", "interact with data", or a combination of both.</p>
@@ -591,13 +599,13 @@ Content-Type: application/json
 </div>
 <div class="listingblock">
 <div class="content">
-<pre>/* Signature */
+<pre class="highlight"><code class="language-javascript" data-lang="javascript">/* Signature */
 function sayHello(name) {
   // ...
 }
 
 /* Usage */
-sayHello("Racey McRacerson");</pre>
+sayHello("Racey McRacerson");</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -651,7 +659,7 @@ sayHello("Racey McRacerson");</pre>
 <div class="sect2">
 <h3 id="_representational_state_transfer_rest">Representational State Transfer (REST)</h3>
 <div class="paragraph">
-<p>REST is a network paradigm described by Roy Fielding in a dissertation in 2000. REST is all about a client-server relationship, where server-side data are made available through representations of data in simple formats. This format is usually JSON or XML but could be anything (including Protobuf).</p>
+<p>REST is a network paradigm, published by Roy Fielding in a dissertation in 2000. REST is all about a client-server relationship, where server-side data are made available through representations of data in simple formats. This format is usually JSON or XML but could be anything (including Protobuf).</p>
 </div>
 <div class="paragraph">
 <p>These representations portray data from various sources as simple "resources", or "collections" of resources, which are then potentially modifiable with actions and relationships being made discoverable via a concept known as HATEOAS (Hypermedia as the Engine of Application State). That&#8217;s a rough acronym that confuses folks, so many API people just use the term "Hypermedia Controls" to mean the same thing.</p>
@@ -755,16 +763,22 @@ sayHello("Racey McRacerson");</pre>
 <p>Some folks look at all this and do not understand why REST requires "all the extra faffing about". There are many who just do not quite get the point of any of it, and consider RPC to be the almighty. To them, it is all about executing the remote code as fast possible, but REST (which can still absolutely be performant) focuses far more on longevity and reduced client-coupling instead. Knowing when to have a fat client and when to have a skinny client is a powerful decision making process to have in your arsenal, so definitely do not be one of those people who things it should always be A, or always be B.</p>
 </div>
 <div class="paragraph">
-<p>Another interesting thing about REST is that it does not require the use of schema metadata (like WSDL or similar), but does allow it. In fact, REST has no opinions either way: it does not explicitly demand it, nor disallow it. the metadata is something many API developers hated about SOAP, and from 2015 to current day, it has become more and more of a growing trend once again, thanks to gRPC and GraphQL including and requiring type systems in their implementations. the HTTP community (building REST or whatever) has a few type systems available for optional use, the main one these days being: JSON Schema.</p>
+<p>Another interesting thing about REST is that it does not require the use of schema metadata (like WSDL or similar), but does allow it. In fact, REST has no opinions either way: it does not explicitly demand it, nor disallow it. The metadata is something many API developers hated about SOAP, and from 2015 to current day, it has become more and more of a growing trend once again, thanks to gRPC and GraphQL including and requiring type systems in their implementations.</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="./images/contracts-unspecified-json.jpeg" alt="A cyclist jams a stick into hisi spokes then complains about it. A pretty accurate metaphor for using unspecified JSON in a REST API then blaming REST for it.">
+</div>
+<div class="title">Figure 1. It&#8217;s pretty common to blame REST for not forcing a type system onto everyone involved in the API, but they&#8217;re absolutely useable. Don&#8217;t blame a paradigm for implementation level decisions.</div>
 </div>
 <div class="paragraph">
-<p>JSON Schema is inspired by XML Schema — but not functionally identical — and is one of the most important things to happen to HTTP APIs in years, and will be discussed a lot throughout the book.</p>
+<p>The HTTP community (building REST or whatever) has a few type systems available for optional use, the main one these days being: JSON Schema. JSON Schema is inspired by XML Schema — but not functionally identical — and is one of the most important things to happen to HTTP APIs in years, and will be discussed a lot throughout the book.</p>
 </div>
 <div class="paragraph">
 <p>Unfortunately, REST became a marketing buzzword for most of 2006–2014. It became a metric of quality that developers would aspire to, fail to understand, then label as REST anyway. Most systems saying they are REST are little more than RPC with HTTP verbs and pretty URLs. As such, you might not get cacheability provided, it might have a bunch of wacky conventions, and there might not be any links for you to use to discover next available actions. These APIs are jovially called REST<em>ish</em> by people aware of the difference.</p>
 </div>
 <div class="paragraph">
-<p>REST has no specification which is what leads to some of this confusion, nor does it have concrete implementations. That said, there are two large popular specifications which provide a whole lot of standardization for various aspects of REST APIs that chose to use them:</p>
+<p>REST has no specification which is what leads to some of this confusion, nor does it have concrete implementations. That said, there are two large popular API standards designed to standardize certain aspects of REST APIs that chose to use them:</p>
 </div>
 <div class="ulist">
 <ul>
@@ -856,7 +870,7 @@ WHERE
 <div class="content">
 <img src="images/graphql-query-example.png" alt="Example of a GraphQL query being made" width="requesting first the hero (this is a Star Wars example)" height="then the names of the friends for that hero.">
 </div>
-<div class="title">Figure 1. GraphQL Request (left) and the corresponding response (right).</div>
+<div class="title">Figure 2. GraphQL Request (left) and the corresponding response (right).</div>
 </div>
 <div class="paragraph">
 <p>Any sort of RPC action which is intended to cause modifications is done with a "Mutation". SO to handle creates, updates, deletes, etc. you would create a mutation.</p>
@@ -865,10 +879,13 @@ WHERE
 <div class="content">
 <img src="images/graphql-mutation-example.png" alt="Example of a GraphQL Mutation definition" width="then being called with arguments">
 </div>
-<div class="title">Figure 2. Definition of a mutation (top left), the mutation request (bottom left), and the response (right).</div>
+<div class="title">Figure 3. Definition of a mutation (top left), the mutation request (bottom left), and the response (right).</div>
 </div>
 <div class="paragraph">
-<p>Facebook chose to ignore most of the conventions of the transportation layer (HTTP), meaning they had full control over the concepts. Endpoints are gone, resources are gone, HTTP methods are gone (everything is just a POST to a single endpoint), resources declaring their own cacheability is gone, the concept of the uniform interface (as REST defines it) is obliterated. All of this has the advertised benefit of making GraphQL portable enough that it could fit into AMQP, or any other transportation protocol which is something REST could theoretically do but nobody ever bothers with due to the amount of crowbarring it would take.</p>
+<p>Facebook chose to ignore most of the conventions of the transportation layer so they could focus on building their own conventioins. So although it is often used with HTTP, endpoints are gone, resources are gone, HTTP methods are gone, and most implementations are a single <code>POST /graphql</code> endpoint. This means that resources declaring their own cacheability is gone,and the concept of the uniform interface (as REST defines it) is obliterated.</p>
+</div>
+<div class="paragraph">
+<p>All of this has the advertised benefit of making GraphQL portable enough that it could fit into AMQP, or any other transportation protocol which is something REST could theoretically do but nobody ever bothers with due to the amount of crowbarring it would take.</p>
 </div>
 <div class="paragraph">
 <p>GraphQL has many fantastic features and benefits, which are all bundled in one package, with a nice marketing site. If you are trying to learn how to make calls to a GraphQL API, the <a href="http://graphql.org/learn/">Learn GraphQL</a> documentation will help, and their site has a bunch of other resources.</p>
@@ -893,7 +910,644 @@ WHERE
 <div class="sect2">
 <h3 id="_im_lost">I&#8217;m Lost!</h3>
 <div class="paragraph">
-<p>Fair comment. This has been a whirlwind tour of a whole bunch of different topics which will be covered more in depth later. If you are nodding and smiling already then you are going to enjoy this book as we delve deeper, and if you have no idea what&#8217;s going on then you are in the right place too. There are lots to learn!</p>
+<p>Fair comment. This has been a whirlwind tour of a whole bunch of different topics which will be covered more in depth later. If you are nodding and smiling already then you are going to enjoy this book as we delve deeper, and if you have no idea what&#8217;s going on then you are in the right place too.</p>
+</div>
+<div class="paragraph">
+<p>We will cover a lot of specifics about the technical and functional aspects of these various API paradigms and implementations, helping you to figure out when to uses which, and how to build the best possible API whichever of them you chose for a certain use case.</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="theory-contracts">API Contracts</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The "I" in "API" means interface, and so writing a contract for that interface
+is the act of writing down what that interface is going to look like, to avoid
+folks having to guess, or go and hunt for some documentation somewhere.</p>
+</div>
+<div class="paragraph">
+<p>Let&#8217;s use the fantastic <a href="https://pokeapi.co/">PokeAPI</a> as an example.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-javascript" data-lang="javascript">{
+  "id": 12,
+  "name": "butterfree",
+  "base_experience": 178,
+  "height": 11,
+  "is_default": true,
+  "order": 16,
+  "weight": 320,
+  "abilities": [{
+    "is_hidden": true,
+    "slot": 3
+  }]
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>If we look just at the data, we can deduce that sure, ID is probably an
+auto-incrementing identifier, the name seems to be a lower-cased English string,
+but after that it starts getting a bit odd.</p>
+</div>
+<div class="paragraph">
+<p>Height and weight, I guess there is no imperial and metric in the game just
+units, but what is order all about? The order that pokemon is sat in my current
+party? That Ash bumped into in the cartoon? In order of cuteness? What?!</p>
+</div>
+<div class="paragraph">
+<p>An API contract can help answer most of the questions and more for anyone
+wanting to understand how an API is meant to work.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Which resources or methods are available and how do you interact with them?</p>
+</li>
+<li>
+<p>Which HTTP headers are required for that endpoint, for things like authentication?</p>
+</li>
+<li>
+<p>Which properties are available in the request and response?</p>
+</li>
+<li>
+<p>What are those various properties data types?</p>
+</li>
+<li>
+<p>Which of those properties are required or optional?</p>
+</li>
+<li>
+<p>What other validation rules can be applied to those properties?</p>
+</li>
+</ul>
+</div>
+<div class="quoteblock">
+<blockquote>
+<div class="paragraph">
+<p>A contract is an agreement between two or more parties, especially one that is written and enforceable by law.</p>
+</div>
+</blockquote>
+<div class="attribution">
+&#8212; The American Heritage Dictionary of the English Language
+</div>
+</div>
+<div class="paragraph">
+<p>Thinking about writing an API contract might sound a bit odd if you just think
+about an API as sharing some data or as a convenient way to trigger commands on
+another server, but people need to know what that data is, or what arguments
+they should send to those commands.</p>
+</div>
+<div class="paragraph">
+<p>The enforceable bit is important too. We can use those contracts in our test
+suite to confirm that our actual APIs are following the rules of the contract.</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<div class="title">Note</div>
+</td>
+<td class="content">
+Some people use the term "API Specifications" to describe all this, but
+the word "specification" is used to mean a lot of different things. We just used
+it in the last chapter for something totally different, so let&#8217;s stick to API
+Contracts to avoid confusion.
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>Written down exactly from an early point (and agreed upon) means that there are
+far fewer surprises throughout the API life-cycle, from planning, through
+development, and into usage by clients.</p>
+</div>
+<div class="paragraph">
+<p>Having a good contract means that API developers can be confident that:</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>The interface is doing what they intend</p>
+</li>
+<li>
+<p>The interface is going to be useful for client developers</p>
+</li>
+<li>
+<p>The interface is understood well by client developers</p>
+</li>
+<li>
+<p>The interface is not changing accidentally when code changes</p>
+</li>
+</ol>
+</div>
+<div class="paragraph">
+<p>This confidence will save everyone a lot of time, money and frustration. Having
+no contract in place leads to slower rollout of the initial version, loads more
+time spent testing subsequent deployments, and wasted developer time having
+loads of meetings to explain things that could have been written down and clear
+to everyone already.</p>
+</div>
+<div class="sect2">
+<h3 id="_what_forms_can_an_api_contract_take">What forms can an API Contract take?</h3>
+<div class="paragraph">
+<p>Some folks might think "That sounds like documentation", others might think
+"That sounds like tests". The answer is both, and more.</p>
+</div>
+<div class="paragraph">
+<p>An API contract can exist in several forms, some more useful than others.</p>
+</div>
+<div class="sect3">
+<h4 id="_the_dreaded_verbal_contract">The Dreaded Verbal Contract</h4>
+<div class="paragraph">
+<p>A common case is the verbal contract, where the API developers discuss it with
+the frontend or other client application developers as they go. The backend
+developers write their code, the client developers write theirs, and as various
+endpoints or properties are conceived, they are explained somehow: literally
+explained out loud over the conference room table, shouted over a hail of nerf
+gun pellets and ping pong, or DMed over Slack chats.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>Fred: Hey Sarah, there’s a new "fudge" field and it can be "blah" or "whatever".
+
+Sarah: Great! Thanks I’ll chuck that in now.</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>This might seem good enough as the API works, the app runs fine, the
+project/product managers are happy, and the company may even be making money off
+of this whole thing. Sadly this method has a bunch of downsides.</p>
+</div>
+<div class="paragraph">
+<p>The primary issue is that communication is hard. You never really know if
+somebody understood what you meant even if they say they did.</p>
+</div>
+<div class="paragraph">
+<p>Beyond that, not having things written down means people can forget. If another
+client team also needs the information and they ask another client team, they
+are getting a copy of a copy which might be slightly wrong.</p>
+</div>
+<div class="paragraph">
+<p>Another outcome is the original author(s) cannot remember the exact rules,
+leading to time wasted checking the code. An even worse scenario is that the
+original author(s) are not reachable for some reason. Maybe the whole team of
+developers who worked on that API are all on a flight together from New York to
+Uruguay, and for that entire 9 hour flight nobody can get any answers about how
+the API is supposed to work, so they&#8217;re stuck not being able to fix a production
+issue&#8230;&#8203; They might also have quit.</p>
+</div>
+<div class="paragraph">
+<p>When folks rely on a verbal contract, two common things happen:</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>Developers waste time writing a new endpoint out of fear of using the old one</p>
+</li>
+<li>
+<p>Developers waste time trying to guess the contract, and might guess wrong</p>
+</li>
+</ol>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_shoddy_human_contracts">Shoddy Human Contracts</h4>
+<div class="paragraph">
+<p>When folks first start thinking about contracts, it often takes the form of
+rudimentary API Reference Documentation. This might be dumped into a Google Doc,
+shoved in a wiki, or written up in finger blistering HTML. These formats are
+usually fairly painstaking to create, because you are focusing on formatting
+<em>and</em> content, shuffling things around whenever you remember that you should
+list headers too, and copying and pasting examples of JSON which might change
+over time. API developers would not settle for writing software like this, but
+apparently when it comes to documentation it&#8217;s accepted as the norm.</p>
+</div>
+<div class="paragraph">
+<p>This whole slow, manual approach is probably why many people forgo writing
+contracts this way, and opt for verbal contracts instead. It probably would not
+be a huge jump to say the "startup mindset" (and "agile") are one of a few
+potential driving factors in this "just get on with it" approach. There are many
+technical leaders inexperienced in this area telling their team "We&#8217;ll write
+lovely docs later when we&#8217;ve got more time!", without realizing their lack of
+clarity is slowing down initial development, client integrations, increasing
+testing efforts, and causing bizarre production issues and throughout their
+ecosystem.</p>
+</div>
+<div class="paragraph">
+<p>Anyway, aside from this medium of API contracts being time consuming, it is also
+impossible to enforce. After you have spent the time writing up a Google
+Doc/HTML/Wiki, the only output of that is going to be&#8230;&#8203; a Google Doc/HTML/Wiki
+and maybe a PDF if you want to go wild. You can&#8217;t exactly jam that Google Doc
+into an API test suite and have it confirm that the API is conforming to
+whatever is written in there.</p>
+</div>
+<div class="paragraph">
+<p>There is another way.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_description_languages">Description Languages</h4>
+<div class="paragraph">
+<p>A description language can be text based or look a bit like a programming
+language. This format lets you describe an API in a reusable way, which means
+you can do a whole bunch of stuff:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Documentation</p>
+</li>
+<li>
+<p>Client-side validation</p>
+</li>
+<li>
+<p>Server-side validation</p>
+</li>
+<li>
+<p>Client-library Generation (SDKs)</p>
+</li>
+<li>
+<p>UI Generation</p>
+</li>
+<li>
+<p>Server/Application generation</p>
+</li>
+<li>
+<p>Mock servers</p>
+</li>
+<li>
+<p>Contract testing</p>
+</li>
+<li>
+<p>Automated Postman/Paw Collections</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>An early example of that would be SOAP, which used something called a WSDL,
+something discussed in <a href="#theory-paradigms">the previous chapter</a>.</p>
+</div>
+<div class="quoteblock">
+<blockquote>
+<div class="paragraph">
+<p>The Web Services Description Language is an XML-based interface definition
+language that is used for describing the functionality offered by a web service.
+The acronym is also used for any specific WSDL description of a web service,
+which provides a machine-readable description of how the service can be called,
+what parameters it expects, and what data structures it returns. Therefore, its
+purpose is roughly similar to that of a type signature in a programming
+language.</p>
+</div>
+</blockquote>
+<div class="attribution">
+&#8212; Wikipedia
+</div>
+</div>
+<div class="paragraph">
+<p>WSDLs were only used for SOAP, and not many paradigms or implementations seemed
+to bother with this sort of description language for a long time. Luckily that
+has all changed over the last few years.</p>
+</div>
+<div class="paragraph">
+<p>Before we look at how various description languages are used today, lets learn
+another bit of theory.</p>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_service_model_data_model">Service Model &amp; Data Model</h3>
+<div class="paragraph">
+<p>Two terms that pop up from time to time are "service model" and "data model".
+These are two ways to specify which part of the API contract you are talking
+about.</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="images/data-model-service-model.png" alt="data model service model">
+</div>
+</div>
+<div class="paragraph">
+<p>The service model is the language used to describe things like the URL, HTTP
+method, headers like content type, authentication strategy, etc. It is used to
+explain all the things outside of the message, the stuff peripheral to the
+actual data. In a programming language this would be class names, method names,
+possible exceptions, but would not cover anything about the arguments: type
+hints, possible validations, etc.</p>
+</div>
+<div class="paragraph">
+<p>The data model is used to describe the contents of the message, which is
+probably what you find in the HTTP body. The word "schema" is often associated
+with the data model too. They are often just two different terms describing the
+same concept, but often the term "schema" is used to represent the actual
+technical file containing the description language, and the term data model is
+more theoretical.</p>
+</div>
+<div class="paragraph">
+<p>With this in mind, lets go look at how contracts are written for endpoint-based
+APIs (REST, RESTish, some RPC), GraphQL and gRPC.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_introduction_to_api_description_languages">Introduction to API Description Languages</h3>
+<div class="sect3">
+<h4 id="_restrestish_openapi_json_schema">REST/RESTish: OpenAPI &amp; JSON Schema</h4>
+<div class="paragraph">
+<p>In the endpoint-based API world there were a few such as
+<a href="https://apiblueprint.org/">API Blueprint</a>, <a href="https://raml.org/">RAML</a>, and OpenAPI
+(at the time called Swagger), but for years the tooling was a bit lacking, and
+mostly only allowed for outputting as documentation.</p>
+</div>
+<div class="paragraph">
+<p>OpenAPI v3.0 popped in 2015 up which solved a lot of problems with OpenAPI v2.0, and beat the heck out of the other description formats. It took a few years for tooling to catch up, but by 2018 pretty much everything supported OpenAPI v3.0, and this description format settled as the mainstream favourite.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>The OpenAPI Specification (OAS) defines a standard, programming
+language-agnostic interface description for REST APIs, which allows both humans
+and computers to discover and understand the capabilities of a service without
+requiring access to source code, additional documentation, or inspection of
+network traffic.</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">An overly simplified example of OpenAPI describing an API which lists collections and resources of hats.</div>
+<div class="content">
+<pre class="highlight"><code class="language-yaml" data-lang="yaml">openapi: 3.0.2
+info:
+  title: Cat on the Hat API
+  version: 1.0.0
+  description: The API for selling hats with pictures of cats.
+servers:
+  - url: "https://hats.example.com"
+    description: Production server
+  - url: "https://hats-staging.example.com"
+    description: Staging server
+
+paths:
+  /hats:
+    get:
+      description: Returns all hats from the system that the user has access to
+      responses:
+        '200':
+          description: A list of hats.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/hats'
+
+components:
+  schemas:
+    hats:
+      type: array
+      items:
+        $ref: "#/components/schemas/hat"
+
+    hat:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+          enum:
+            - bowler
+            - top
+            - fedora</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>OpenAPI is a YAML or JSON based descriptive language which covers endpoints,
+headers, requests and responses, allows for examples in different mime types,
+outlines errors, and even lets developers write in potential values, validation
+rules, etc.</p>
+</div>
+<div class="paragraph">
+<p>Another popular language is <a href="http://json-schema.org/">JSON Schema</a>, which parts of OpenAPI
+are based on. The two are mostly compatible, and are both used for slightly different but complimentary things.</p>
+</div>
+<div class="paragraph">
+<p>OpenAPI can describe both service and data model, and JSON Schema mainly only
+defines the data model. In the example above, everything under <code>paths</code> is
+describing the service model, then everything under <code>components.schemas</code> is
+describing the data model. The schema keywords that OpenAPI v3.0 uses are based
+on JSON Schema, and there is a bit of a tangent we should look into here about
+compatibility.</p>
+</div>
+<div id="WARNING" class="exampleblock">
+<div class="content">
+<div class="paragraph">
+<p>OpenAPI v3.0 schema objects are a subset/superset/sideset implementation of
+<em>JSON Schema draft 05</em>. Most JSON Schema keywords are available and work as
+expected, a few extra OpenAPI-only keywords were added, but some JSON Schema
+keywords are not supported. There is also the tricky situation where JSON Schema
+has continued to progress quickly since draft 5 (draft 8 is almost complete at
+time of writing).</p>
+</div>
+<div class="paragraph">
+<p>This can cause confusion for new developers, but interoperability
+amongst standards is always a tricky one. Thankfully, future versions of OpenAPI
+(probably v3.1) aim to solve this, so no need to get too stuck in the weeds here.
+For those who want to learn more,
+<a href="https://blog.apisyouwonthate.com/openapi-and-json-schema-divergence-part-1-1daf6678d86e">this
+first article</a> fully explains the situation, and
+<a href="https://blog.apisyouwonthate.com/openapi-and-json-schema-divergence-part-2-52e282e06a05">this
+second article</a> explains workarounds and longer term solutions.</p>
+</div>
+</div>
+</div>
+<div class="paragraph">
+<p>OpenAPI contract files are usually static. They&#8217;re usually written down along
+with the source code, then sometimes deployed to a file hosting service like S3
+for folks to use. Some managers want to treat these like business secrets and
+hide them under lock and key, which makes absolutely no damned sense as they are
+meta-data only. Most "hackers" could probably figure out that you keep your list
+of companies under <code>GET /companies</code>, so just don&#8217;t make that a publicly
+available endpoint and you&#8217;re gonna be ok. PayPal, Microsoft, and other
+companies make their OpenAPI contracts available to anyone who wants to download
+them, and this approach can help folks integrate with your APIs.</p>
+</div>
+<div class="paragraph">
+<p>You can imagine an OpenAPI file growing to be rather unwieldy once its got 50+
+endpoints and more complex examples, but have no fear you can spread things
+around in multiple files to make it a lot more DRY (Don&#8217;t Repeat Yourself) and
+useful. The first thing to go is usually the <code>components.schemas</code> definitions,
+which can be moved to their own files. Once these are split into their own
+files, an extra step can be taken to turn them into proper JSON Schema files.
+Once they are split out they can be referenced in a HTTP response header.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code>Link: &lt;http://example.com/schemas/hat.json#&gt;; rel="describedby"</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>When a client sees this they can use it for all sorts of things - like form
+generation and client-side validation - all without needing to figure out how to
+distribute the files to them ahead of time.</p>
+</div>
+<div id="NOTE" class="exampleblock">
+<div class="content">
+<div class="paragraph">
+<p>One more note on OpenAPI and its old name Swagger. You still see the word Swagger floating around a lot. SmartBear, the original authors of the "Swagger" API description language, still use the word Swagger in a lot of their tooling because they have the brand recognition. The description language itself was renamed to OpenAPI and handed over to the OpenAPI Initiative.</p>
+</div>
+<div class="paragraph">
+<p>Since 2015, anyone calling it Swagger is out of date, and the fact that folks keep using the word Swagger in 2019 is still a huge source of confusion. If you look for "Swagger tools" you will only find those from SmartBear, or really really out of date ones. Call it OpenAPI, search for OpenAPI, and we don&#8217;t need to keep saying OpenAPI/Swagger like they yare two alternative but equally valid things.</p>
+</div>
+</div>
+</div>
+<div class="paragraph">
+<p>OpenAPI and JSON Schema are a fantastic pair, and we will show how to combine the two throughout the book.</p>
+</div>
+<div class="sect4">
+<h5 id="_graphql_schemas">GraphQL Schemas</h5>
+<div class="paragraph">
+<p>GraphQL as an implementation comes bundled with
+<a href="https://graphql.org/learn/schema/">GraphQL Schemas</a>. GraphQL does not really have
+a service model, as it does not need one.</p>
+</div>
+<div class="paragraph">
+<p>Seeing as most interactions operate under a
+single HTTP endpoint like <code>POST /graphql</code>, there is no real need to
+bother writing a contract around that in great detail. It would just be
+mentioned in passing as an implementation detail, and the majority of the effort
+would go into describing the data model.</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<div class="title">Note</div>
+</td>
+<td class="content">
+Some folks might have different endpoints for different use-cases, but
+this is rarely spotted in the wild.
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>All the GraphQL documentation examples are Star Wars. Sure, it&#8217;s obviously
+inferior to Stargate SG-1, but let&#8217;s reuse their examples for simplicity:</p>
+</div>
+<div class="listingblock">
+<div class="title">An example of GraphQL schemas in the GraphQL Schema Language, implementing interfaces and sharing properties across different types.</div>
+<div class="content">
+<pre class="highlight"><code class="language-graphql" data-lang="graphql">interface Character {
+  id: ID!
+  name: String!
+  friends: [Character]
+  appearsIn: [Episode]!
+}
+
+type Human implements Character {
+  id: ID!
+  name: String!
+  friends: [Character]
+  appearsIn: [Episode]!
+  starships: [Starship]
+  totalCredits: Int
+}
+
+type Droid implements Character {
+  id: ID!
+  name: String!
+  friends: [Character]
+  appearsIn: [Episode]!
+  primaryFunction: String
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The syntax in this example is using the
+<a href="https://facebook.github.io/graphql/draft/#sec-Type-System">GraphQL Schema
+Language</a> (a.k.a IDL), but these files can be written in whatever programming
+language the API is built in: JavaScript, PHP, Go, whatever.</p>
+</div>
+<div class="paragraph">
+<p>Writing them in Go for example would make them a little tricky to interact with
+for other languages, like trying to give these types to a JavaScript web-app. If
+the client really needs them, a lot of the language-specific implementations
+offer a way to "Dump" them to the IDL, which can then be read by the client with
+the right tooling.</p>
+</div>
+<div class="paragraph">
+<p>If dumping and distributing isn&#8217;t a viable workflow,
+<a href="https://graphql.org/learn/introspection/">introspection</a> can be used! This is
+basically the process of quering the GraphQL API for information about the
+schema, just like how <code>Link</code> is used to provide the client with the JSON Schema
+in other HTTP APIs.</p>
+</div>
+<div class="paragraph">
+<p>GraphQL schema does not support validation rules defined in the contract -
+beyond required/optional/null like OpenAPI and JSON Schema, but there are some
+extensions floating around which can help. More on all of that later.</p>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_grpc_protobuf">gRPC: Protobuf</h5>
+<div class="paragraph">
+<p>gRPC uses another Google tool for its API contract:
+<a href="https://developers.google.com/protocol-buffers/">Protobuf</a>. Protobuf is basically
+a serializer for data going over the wire. Much like GraphQL and its schemas,
+Protobuf is integral to gRPC. Instead of schemas they call them "Message Types",
+but it&#8217;s all the same sort of idea.</p>
+</div>
+<div class="paragraph">
+<p>Instead of writing them in whatever language the API is written in (like
+GraphQL), a new  <code>.proto</code> file is written using
+<a href="https://developers.google.com/protocol-buffers/docs/proto">Protocol Buffer
+Language Syntax</a>. This C-family/Java style language exists solely for writing
+these files. It might be a bit of a pain to figure out a brand new syntax, but it
+has the benefit of being fairly portable as you can read them in multiple
+languages. Finding a JavaScript, Ruby, Python, Go, etc. tool that can read a
+<code>.proto</code> file is a whole lot easier than trying to get Python to read something
+written in  - for example - JavaScript.</p>
+</div>
+<div class="paragraph">
+<p>Rarely are <code>.proto</code> files made available over a URL, they are usually bundled
+and distributed with client code. Then usually things are kept backwards
+compatible until the clients have upgraded whatever client code brought the
+<code>.proto</code> files their way.</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_summary">Summary</h3>
+<div class="paragraph">
+<p>The terms "API Contract" and "API Specifications" often mean the same thing
+depending on the context, but the term specification is used to describe a lot
+of other things in this space too. If you are talking about planning, building,
+or documenting an API and somebody mentions "API specifications", then they are
+talking about this stuff.</p>
+</div>
+<div class="paragraph">
+<p>The terms "schema", and "data model", are usually closely related. In the terms
+of an HTTP API, the data model describes the body of the HTTP message, and the
+technical document or actual file which provides that description is often
+referred to as a schema.</p>
+</div>
+<div class="paragraph">
+<p>Ask a bunch of different people and you will get a lot of difference answers,
+but these terms will be used throughout the book just so there is one standard
+way of talking.</p>
+</div>
+<div class="paragraph">
+<p>Writing down contracts might seem like a lot of work, but these days it should
+no longer be considered as an optional step. Flinging around arbitrary JSON and
+hoping people and other applications are all using it properly over time is just
+reckless, selfish, and actually makes work considerably more mundane. Seeing as
+API contracts are not just for creating documentation, writing the contract down
+with a decent description language increases productivity throughout the
+life-cycle of the API. Then reference documentation appears for free as one of
+many outputs of the description language using documentation generators.</p>
+</div>
+<div class="paragraph">
+<p>Later chapters will cover exactly how contracts can get involved at various
+points. This introduction will most likely have left you with questions, and
+they will be answered throughout the rest of the book.</p>
 </div>
 </div>
 </div>
@@ -931,7 +1585,7 @@ WHERE
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2019-02-15 15:35:33 EST
+Last updated 2019-03-02 09:39:01 WET
 </div>
 </div>
 </body>
