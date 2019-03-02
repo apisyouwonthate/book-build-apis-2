@@ -4,11 +4,15 @@ Editors exist in various forms for various API description languages, and they
 can drastically ease the creation of contracts when starting from scratch. These
 can take a few forms.
 
+== Text or GUI
+
 Some editors are GUI-based (Graphical User Interface) and let you design things
 with clicking buttons and working with forms.
 
 Others are text-based and provide you with a real-time preview panel whilst you
 type, making it slightly easier than working with plain-old YAML/JSON.
+
+== Prototyping, Walled Gardens, & Local File Editors
 
 Beyond the "text-based" or "GUI" distinction, there are other characteristics
 which will effect where the contracts live and how you interact with them.
