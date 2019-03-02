@@ -278,7 +278,7 @@ components:
           type: string
           format: uuid
         name:
-          type: enum
+          type: string
           enum:
             - bowler
             - top
