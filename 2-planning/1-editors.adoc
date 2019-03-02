@@ -1,6 +1,6 @@
 = Editors
 
-Editors exist in various forms for various API spec formats, and they can drastically ease the creation of contracts when starting from scratch. These can take a few forms.
+Editors exist in various forms for various API description languages, and they can drastically ease the creation of contracts when starting from scratch. These can take a few forms.
 
 Some editors are GUI-based (Graphical User Interface) and let you design things with clicking buttons and working with forms.
 
@@ -8,9 +8,9 @@ Others are text-based and provide you with a real-time preview panel whilst you 
 
 Beyond the "text-based" or "GUI" distinction, there are other characteristics which will effect where the contracts live and how you interact with them.
 
-Some editors are intended for rapid prototyping only, helping you to create an initial design and then push you to export the spec as text to copy-and-paste, or download as files. From that point on, you're on your own, and have to find some other way to keep your specification files up-to-date.
+Some editors are intended for rapid prototyping only, helping you to create an initial design and then push you to export the contracts as text to copy-and-paste, or download as files. From that point on, you're on your own, and have to find some other way to keep your contract files up-to-date.
 
-Others are hosted solutions which keep a hold of your spec files, and offer limited options for syncing to whatever pre-determined locations they chose to support. Maybe something specific like GitLab, or generic git repository, or they publish them to a URL accessible over HTTP, or something else.
+Others are hosted solutions which keep a hold of your contract files, and offer limited options for syncing to whatever pre-determined locations they chose to support. Maybe something specific like GitLab, or generic git repository, or they publish them to a URL accessible over HTTP, or something else.
 
 Other editors can take the form of desktop applications, which can be used throughout the life-cycle, loading local files and allowing you to edit them at commit them back to the repository (or wherever they live) at will.
 
@@ -20,30 +20,67 @@ Other editors can take the form of desktop applications, which can be used throu
 
 Swagger Editor is a very simple hosted text-based editor from https://smartbear.com/[SmartBear].
 
-NOTE: SmartBear are the folks who originally created the "Swagger" API description language, before it was renamed to OpenAPI and handed over to the OpenAPI Initiative. They like to keep using the name Swagger for their set of tools, but the description language itself is now called OpenAPI. No more calling it Swagger folks.
+NOTE: Remember, SmartBear call their suite of tools "Swagger" because they own the copyright and they don't feel like re-branding, but the description language is officially called OpenAPI, not Swagger. Nobody else should be using the word Swagger, or calling their tooling Swagger, or anything else.
 
 image::images/editors-swagger-editor.png[]
 
-Mostly it is just a text-editor, but it has a few handy forms for adding new operations, tags, servers, etc.
+Mostly it is just a text-editor, with the left panel being a YAML/JSON editor, and the right panel is https://swagger.io/tools/swagger-ui/[Swagger UI], the documentation tool from SmartBear.
+
+It can be nice to write specifications on the left and see their rendering as documentation on the right, but it would possibly be more useful if the right contained forms for managing the specification beyond modifying text, but the right panel is purely read-only. There are a few forms for adding new operations, tags, servers, etc. but they do not cover everything.
 
 image::images/editors-swagger-editor-form.png[]
 
-This is a pretty simple editor, that helps in a few cases, like:
+This simple editor helps in a few cases, like:
 
-- You have never written any specifications and want to try playing around with real-time feedback
-- You are getting validation errors from some local tool which seem weird so bundle your spec into one file and check it out in the browser
+- You have never written any OpenAPI and want to try playing around with real-time feedback
+- You are getting validation errors from some local tool which seem weird, so you bundle the multiple files into one file and paste it up here to see what it says
 
-Not much more use for it than this. If you are splitting files up using `$ref` (which you pretty much always want to do), then this won't work as it only supports the one text box.
+There is not much else you will want to use Swagger Editor for. If you are splitting files up using `$ref` (which you pretty much always want to do), then this will not work as it only supports the one text box.
 
-For ongoing editing, and multi-file support, you need something a bit more powerful.
+For ongoing editing and multi-file support you will need something a bit more powerful.
 
 === SwaggerHub
 
-SwaggerHub is another tool from Smartbear. It is a larger set of integrated tools, which incorporates the Swagger Editor as one approach, but also TODO I think there is a GUI that uses forms and stuff to I dont remember better go use it
+https://swagger.io/tools/swaggerhub/[SwaggerHub] is another tool from Smartbear, and it is basically the hosted version of Swagger Editor which has some integrations with the rest of the Swagger tool-suite.
+
+.In this demo of SwaggerHub you can see Swagger Editor in full swing, with a few other options floating around the outside.
+image::images/editors-swaggerhub-demo.png[]
+
+SwaggerHub includes a mock server, as most of these editors do. It will help you converting from OpenAPI v2.0 to v3.0 which is a nice touch. The integration with Swagger Inspector - a lovely tool which can help build OpenAPI specifications off of HTTP interactions... more on that later.
+
+The collaboration options here are pretty handy. You can invite users or teams to collaborate on an API, and they have a permissions system which seems pretty closely modelled on Google Docs.
+
+.Get collaborating with other folks without having to email YAML files around!
+image::images/editors-swaggerhub-invite.png[]
+
+If working with multiple files is possible in SwaggerHub, I have certainly never figured it out. For this reason I have steered clear, but for teams just starting out it might be worth playing with.
+
+The pricing is user-based, and is likely to force you to really think about who you give access. At time of writing, 2 users is $30 a month, and that might seem reasonable if you only have two people who care about API contracts at the company. There's a lot of companies where this is sad but true, so sure, $30, why not. At larger companies where there are ~100 engineers and the culture is mature enough that most API developer and client wants to be planning and learning about APIs early on, that $15-per user, per month, regardless of levels of activity... well it all adds up really fast. For a YAML text-editor with collaboration, it might be tough to convince your manager that you need to be spending that money, especially when there are open-source alternatives around the place.
 
 === Stoplight
 
-Stoplight is a GUI editor
+http://stoplight.io/[Stoplight] is a GUI editor, with forms and a much more "Wizard"-like approach. You can ignore the YAML representation entirely and work with their forms and model editors.
+
+Right now they only support OpenAPI v2.0 via the GUI but the text mode supports OpenAPI v3.0. They have all sorts of amazing features. Stoplight has the usual collaboration and mocking, and other features like linting based on style guides, the ability to share models throughout the organization (to avoid having 20 different "user" or "location" representations) and has desktop applications for Windows, Mac and Linux.
+
+I started working for Stoplight right around the time I started writing this second book, so to avoid complex bias I will share some words from Kin "API Evangelist" Lane:
+
+[quote,Kin Lane,API Evangelist]
+____
+I feel like Stoplight has the potential to shift the landscape pretty significantly, something I haven't seen any API service provider do in a while.
+____
+
+More to come on this one. They will most likely have a new suite of tools out before this book goes to the printer.
+
+// TODO Review the fancy new editor
+
+Stoplight costs more than SwaggerHub, but is likely to be an easier sell due to the fact it does a whole lot more. Non-technical users can get in there to play around, and it adds a lot more value beyond being a YAML/JSON text-editor.
+
+=== Open-Source Tools
+
+Bootstrapping a project and have no budget for fancy tooling? Not a problem.
+
+Check out https://openapi.tools[OpenAPI.tools] for an up-to-date list, but there are a few GUI editors, and a few plugins for popular software like https://code.visualstudio.com/[Visual Studio Code], https://atom.io/[Atom], etc.
 
 == GraphQL Editors
 
