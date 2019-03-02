@@ -1,0 +1,9 @@
+Resources
+
+https://www.thoughtworks.com/insights/blog/rest-api-design-resource-modelinga
+
+Awesome article about graphql interfaces with a lot of lessons that apply to all resource design
+https://medium.com/@__xuorig__/graphql-interfaces-not-just-bags-of-fields-1adfcca027e9
+
+also probably (and if not here, it will go in evolvability)
+https://blog.apollographql.com/graphql-schema-design-building-evolvable-schemas-1501f3c59ed5
