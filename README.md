@@ -12,9 +12,9 @@ So far, this feels like how the book is gonna play out:
     - [x] RPC
     - [x] REST
     - [x] Query Languages
-  - [ ] API Contracts
-    - [ ] Service Model
-    - [ ] Data Model
+  - [x] API Contracts
+    - [x] Service Model
+    - [x] Data Model
     - [ ] Design First vs Code First
   - [ ] Design Theory
     - [ ] Resources
