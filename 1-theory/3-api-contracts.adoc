@@ -327,7 +327,7 @@ them, and this approach can help folks integrate with your APIs.
 You can imagine an OpenAPI file growing to be rather unwieldy once its got 50+
 endpoints and more complex examples, but have no fear you can spread things
 around in multiple files to make it a lot more DRY (Don't Repeat Yourself) and
-useful. The first thing to go is usually the `components.schema` definitions,
+useful. The first thing to go is usually the `components.schemas` definitions,
 which can be moved to their own files. Once these are split into their own
 files, an extra step can be taken to turn them into proper JSON Schema files.
 Once they are split out they can be referenced in a HTTP response header.
