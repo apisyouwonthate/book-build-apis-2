@@ -27,6 +27,8 @@ include::1-theory/3-api-contracts.adoc[]
 include::2-planning/0-introduction.adoc[]
 
 include::2-planning/1-editors.adoc[]
+include::2-planning/2-mocking.adoc[]
+include::2-planning/3-documentation.adoc[]
 
 :leveloffset: -1
 

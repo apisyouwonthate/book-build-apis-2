@@ -37,8 +37,8 @@ So far, this feels like how the book is gonna play out:
 
 - [ ] Part Two: Planning & Design
   - [x] Editors
-  - [ ] Mocking
-  - [ ] Documentation
+  - [x] Mocking
+  - [x] Documentation
   - [ ] Style Guides
 
 - [ ] Part Three: Testing & Monitoring

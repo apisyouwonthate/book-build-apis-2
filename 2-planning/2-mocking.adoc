@@ -1,0 +1,90 @@
+= Mocking
+
+Mocking in relation to APIs is a really simple idea, and that is to make a fake
+API before you make a real one. The introduction talks a little about why you
+might want to do that: basically to get feedback early, allowing you to tweak
+and change your way to a solution which is hopefully well suited for your
+clients. Nothing will ever be perfect, but you can cut out a lot of back and
+forth, leaving you with more time to research new bike routes for the weekend.
+
+The term "mock" for a lot of developers will have unit-testing connotations, and
+that's entirely fair. A mock in unit testing is a fake implementation of a class
+or function, which accepts the same arguments as the real thing, and might
+return something pretty similar to expected output. This is exactly what we're
+doing, at a HTTP level, using a mock server. We can control the output too, much
+like you would for unit-test mocks.
+
+You prep the much, tell it what endpoints to fake, tell it what to return, and
+run it, usually in the CLI. Let's have a look at how.
+
+== The Most Basic Mock Server EVER
+
+There are a lot of ways to get a mock server, but the most simple
+mock server around is https://github.com/typicode/json-server[JSON Server]. This thing is very handy for quickly getting a HTTP server spitting out some JSON that you control:
+
+.Woah what a surprise, another NPM tool!
+[source]
+----
+$ npm install -g json-server
+----
+
+Then you create a `db.json` file with some data in there:
+
+[source,javascript]
+----
+{
+  "posts": [
+    { "id": 1, "title": "json-server", "author": "typicode" }
+  ],
+  "comments": [
+    { "id": 1, "body": "some comment", "postId": 1 }
+  ],
+  "profile": { "name": "typicode" }
+}
+----
+
+Now, get that server started via the CLI.
+
+[source]
+----
+$ json-server --watch db.json
+----
+
+When browsing to `http://localhost:3000/posts/1` you will see the following JSON:
+
+[source]
+----
+{ "id": 1, "title": "json-server", "author": "typicode" }
+----
+
+Boom. A mock server.
+
+You can host that server somewhere simple (shove it on Heroku, Amazon EC2,
+etc.), or you can use https://my-json-server.typicode.com/[My JSON Server] - the
+hosted version from the same author.
+
+image::images/mocks-my-json-server.png[]
+
+Now, at this point you are probably thinking: "That's lovely and all, but that
+going to get tough to maintain!"
+
+If you add one property to a resource you've got to go and update a bunch of
+copied and pasted examples. Formatting this file will be a butt-ache, conflicts
+will be rife, etc., but for highlighting the concepts of a mock server it's
+served its purpose.
+
+Instead of manually creating this `db.json`, we can point a mock server at the
+API contracts we've already created (right?!), and let it figure out its own
+examples based on the examples/default values supplied in there, or by using
+reasonable fake data!
+
+== Check Your Editor
+
+Most of the hosted editors covered so far have mock servers built in, and often it is either a case of enabling it, or it is already enabled and you just need to find the URL to the server instance.
+
+https://swagger.io/tools/swaggerhub/[SwaggerHub], http://stoplight.io/[Stoplight], and https://app.graphqleditor.com/[GraphQL Editor Cloud] all have mock servers.
+
+
+// Can JSON Schema do a decent mock?
+// https://www.npmjs.com/package/mock-json-schema
+// https://www.npmjs.com/package/cast-with-schema
