@@ -19,6 +19,8 @@ So far, this feels like how the book is gonna play out:
   - [ ] Design Theory
     - [ ] Resources
     - [ ] Collections
+    - [ ] Serialization
+    - [ ] Deserialization
     - [ ] Pagination
     - [ ] Filtering
     - [ ] Caching

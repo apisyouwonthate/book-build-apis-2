@@ -1,0 +1,8 @@
+self ddosing - When A calls B calls A again
+
+overloading speciifc fields with unexpected meaning, like "ID of ABC123F means
+the resource is a special 'foo' type... oh wait also ABC456E also means this...
+oops now theres another one. JUST ADD FUCKING type: 'foo' GAH
+
+bried mention of "if calling other peoples APIs use damn timeouts" but thats
+explained more in surviving other peoples apis aint doing it twice
