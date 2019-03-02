@@ -146,7 +146,7 @@ ecosystem.
 
 Anyway, aside from this medium of API contracts being time consuming, it is also
 impossible to enforce. After you have spent the time writing up a Google
-Docs/HTML/Wiki, the only output of that is going to be... a Google Doc/HTML/Wiki
+Doc/HTML/Wiki, the only output of that is going to be... a Google Doc/HTML/Wiki
 and maybe a PDF if you want to go wild. You can't exactly jam that Google Doc
 into an API test suite and have it confirm that the API is conforming to
 whatever is written in there.
