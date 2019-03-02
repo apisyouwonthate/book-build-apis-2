@@ -25,6 +25,7 @@ So far, this feels like how the book is gonna play out:
     - [ ] Filtering
     - [ ] Caching
   - [ ] Authentication
+  - [ ] Security
   - [ ] Hypermedia Controls (HATEOAS)
     - [ ] Layers of abstraction on top of RPC
     - [ ] Next available actions
