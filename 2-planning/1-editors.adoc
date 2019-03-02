@@ -55,7 +55,7 @@ image::images/editors-swaggerhub-invite.png[]
 
 If working with multiple files is possible in SwaggerHub, I have certainly never figured it out. For this reason I have steered clear, but for teams just starting out it might be worth playing with.
 
-The pricing is user-based, and is likely to force you to really think about who you give access. At time of writing, 2 users is $30 a month, and that might seem reasonable if you only have two people who care about API contracts at the company. There's a lot of companies where this is sad but true, so sure, $30, why not. At larger companies where there are ~100 engineers and the culture is mature enough that most API developer and client wants to be planning and learning about APIs early on, that $15-per user, per month, regardless of levels of activity... well it all adds up really fast. For a YAML text-editor with collaboration, it might be tough to convince your manager that you need to be spending that money, especially when there are open-source alternatives around the place.
+The pricing is user-based, and does not seem to support "monthly active users" like slack. Many companies only have 1 or 2 folks who care about API contracts (which is sad and slowly improving over time) but at a company with ~100 engineers (and a better culture), this could get rather expensive. Trying to convince your boss that a YAML text-editor with collaboration might be a tough sell, especially when there are more powerful alternatives, or free open-source offerings.
 
 === Stoplight
 
@@ -76,11 +76,17 @@ More to come on this one. They will most likely have a new suite of tools out be
 
 Stoplight costs more than SwaggerHub, but is likely to be an easier sell due to the fact it does a whole lot more. Non-technical users can get in there to play around, and it adds a lot more value beyond being a YAML/JSON text-editor.
 
-=== Open-Source Tools
+=== Free/Open-Source Tools
 
 Bootstrapping a project and have no budget for fancy tooling? Not a problem.
 
-Check out https://openapi.tools[OpenAPI.tools] for an up-to-date list, but there are a few GUI editors, and a few plugins for popular software like https://code.visualstudio.com/[Visual Studio Code], https://atom.io/[Atom], etc.
+Check out https://openapi.tools[OpenAPI.tools] for an up-to-date list, but there are a few GUI editors, and a few plugins for popular software like https://code.visualstudio.com/[Visual Studio Code], https://atom.io/[Atom], etc. which can ease the struggle of writing the files by hand.
+
+- VS Code: https://marketplace.visualstudio.com/items?itemName=mermade.openapi-lint[openapi-lint]
+- Atom: https://atom.io/packages/linter-swagger[linter-swagger]
+- Jetbrains IDE: https://senya.io/[Senya]
+
+Then there is https://apibldr.com/[ApiBldr], a free hosted GUI editor which can help build and then download contracts.
 
 == GraphQL Editors
 
@@ -97,8 +103,14 @@ As with many editors it comes with an option to provide a mock server for the sc
 
 == Protobuf Editors
 
-TODO Find them
+The Protobuf syntax is incredibly simple, and there is not much going on in the way of functionality, so maybe this is why there are not many editors around.
 
-== Other Editors
+https://sourceforge.net/projects/protobufeditor/[Protobuf Editor] is one I found lurking on SourceForge. It's getting 48 downloads a week at time of writing so might be worth taking for a spin.
 
-Generic API editors which allow output to multiple formats. I forgot the one somebody linked in Slack and used a bit at WeWork. Hmm. API Designer? Something like that. TODO
+== Maybe You Don't Use an Editor
+
+This can be a personal choice. Some folks love having their contracts live up in the cloud so they can be easily collaborated on, some want to keep them in the repository so they can discuss things in GitHub pull-requests for their collaboration, and as such want editors which can work with local files.
+
+Whatever you do, when you start out I recommend using an editor to get the ball rolling. Then later on if you want to tweak things by hand, that's probably ok. It will be a while before you work out your exact workflow for contracts (if nobody has worked that out for you), so it can make sense to just get stuck in with whatever hosted editor, then you can probably export things later and cancel your account if you hate it.
+
+Either way, if you are currently working on an API now, put this book down for a little bit, and get to work on creating some API contracts. It could be nonsense, or it could be a real project, but the next chapter will start by assuming you have written up a bunch of API contracts, and want to put them to work in a mock server to get feedback from potential clients.
