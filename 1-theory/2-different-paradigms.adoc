@@ -230,7 +230,9 @@ Any sort of RPC action which is intended to cause modifications is done with a "
 .Definition of a mutation (top left), the mutation request (bottom left), and the response (right).
 image::images/graphql-mutation-example.png[Example of a GraphQL Mutation definition, then being called with arguments]
 
-Facebook chose to ignore most of the conventions of the transportation layer (HTTP), meaning they had full control over the concepts. Endpoints are gone, resources are gone, HTTP methods are gone (everything is just a POST to a single endpoint), resources declaring their own cacheability is gone, the concept of the uniform interface (as REST defines it) is obliterated. All of this has the advertised benefit of making GraphQL portable enough that it could fit into AMQP, or any other transportation protocol which is something REST could theoretically do but nobody ever bothers with due to the amount of crowbarring it would take.
+Facebook chose to ignore most of the conventions of the transportation layer so they could focus on building their own conventioins. So although it is often used with HTTP, endpoints are gone, resources are gone, HTTP methods are gone, and most implementations are a single `POST /graphql` endpoint. This means that resources declaring their own cacheability is gone,and the concept of the uniform interface (as REST defines it) is obliterated.
+
+All of this has the advertised benefit of making GraphQL portable enough that it could fit into AMQP, or any other transportation protocol which is something REST could theoretically do but nobody ever bothers with due to the amount of crowbarring it would take.
 
 GraphQL has many fantastic features and benefits, which are all bundled in one package, with a nice marketing site. If you are trying to learn how to make calls to a GraphQL API, the http://graphql.org/learn/[Learn GraphQL] documentation will help, and their site has a bunch of other resources.
 
