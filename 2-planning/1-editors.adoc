@@ -103,9 +103,13 @@ As with many editors it comes with an option to provide a mock server for the sc
 
 == Protobuf Editors
 
-The Protobuf syntax is incredibly simple, and there is not much going on in the way of functionality, so maybe this is why there are not many editors around.
+The Protobuf syntax is incredibly simple, and there is not much going on in the way of functionality or logic in these files. Maybe this is why there are not many GUI editors around, as you just don't need them. https://sourceforge.net/projects/protobufeditor/[Protobuf Editor] is one I found lurking on SourceForge.
 
-https://sourceforge.net/projects/protobufeditor/[Protobuf Editor] is one I found lurking on SourceForge. It's getting 48 downloads a week at time of writing so might be worth taking for a spin.
+There are plenty of plugins ready to add syntax highlighting, linting, auto-complete, etc. to your IDE or code editor of choice.
+
+- VS Code: https://marketplace.visualstudio.com/items?itemName=zxh404.vscode-proto3[vscode-proto3]
+- Atom: https://atom.io/packages/language-protobuf[language-protobuf]
+- Jetbrains IDE: https://plugins.jetbrains.com/plugin/8277-protobuf-support[Protbuf Support]
 
 == Maybe You Don't Use an Editor
 

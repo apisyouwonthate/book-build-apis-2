@@ -1,15 +1,22 @@
-When I was younger and dumber, the planning stage for APIs was pretty much "think of a list of endpoints then start coding" which is wildly insufficient. As the <<theory-contracts,API Contracts>> chapter explained, contracts are incredibly important throughout the life-cycle of an API. We are going to look into how they can be used in the planning and design stage.
+When I was younger and dumber, the planning stage for APIs was pretty much "think of a list of endpoints then start coding". This is wildly insufficient. As the <<theory-contracts,API Contracts>> chapter explained, contracts are incredibly important throughout the life-cycle of an API. We are going to look into how they can be used in the planning and design stage.
 
 Most of the planning and design phase is intended to do two things:
 
 1. Make developers think really hard about the requirements for their API
 2. Gather feedback from clients application developers
+3. Use the feedback to improve the planning before the development phase begins
 
-Poorly planned APIs waste a lot of time and money for a lot of people. I've seen APIs go from v1 to v2 in the first few months after the clients noticed it didn't actually work properly.
+== Time is Money
 
-You need that feedback early on, with minimal effort from the API developers, and description languages let that happen. The least effort with most reward is to write some OpenAPI/JSON Schema/Protobuf/etc files, turn those into documentation, mock servers, or even sandbox servers, then get feedback on those interfaces.
+Poorly planned APIs waste a lot of time. Developers cost money, so paying extra money for developers to rewriting a bunch of code they wrote just recently due to some oversight is a cost most companies would like to avoid. I've seen APIs go from v1 to v2 in the first few months, because the developers handed over a finished product which might have been ok for one client, but caused some issues for another client.
 
-Feedback is then a simple case of tweaking those files, with no need to change a bunch of code, fix a bunch of tests, etc. Once the interface is agreed upon, the code can then just be written to make that interface work as explained in the contract.
+If that client had been involved earlier on then a solution could have been found to satisfy the needs of both clients, and the v1 could have been used for both. Now we've got two separate versions of the API being used at the same time, with developers maintaining two code paths, and at some point the original client using the original version of the API is going to have to rewrite their code to use the newer version of the API. What a daft mess.
+
+== Gather Feedback Early
+
+If clients had more insight into the planning of the API, they have a much better chance of catching out issues earlier on. We can give them fake API implementations to work with (these are called "Mocks" or "Mock Servers"), and when these are based on API contracts the mocks are generated with minimal effort from API developers.
+
+Making a few tweaks to the API contract files is much easier than rewriting a prototype and all of the tests that go with it, and is infinitely easier than deprecating and removing code that has already made it to production.
 
 This is much closer to the Agile workflow, instead of the Waterfall model. Waterfall is junk for API development.
 
@@ -17,4 +24,4 @@ This is much closer to the Agile workflow, instead of the Waterfall model. Water
 
 So, you are sold that API contracts are the way to go, you've picked your paradigm (and possibly an implementation too), and now you want to start writing down what the actual API is going to look like.
 
-You might not want to start typing YAML or JSON into an empty text file. Nobody does. For that, thankfully, we have editors!
+You might not want to start typing special YAML/JSON/Protobuf blindly into an empty text file. This has been used as an argument against API contracts for a very long time, but it has never been true. We can use text-based or visual editors, which have special knowledge of these description formats, to speed up the development of our contracts!
