@@ -99,9 +99,9 @@ Fred: Hey Sarah, there’s a new "fudge" field and it can be "blah" or "whatever
 Sarah: Great! Thanks I’ll chuck that in now.
 ----
 
-This might seem good enough as the API works API works, the app runs fine, we're
-making money, and may even be making money. Sadly this method has a bunch of
-downsides
+This might seem good enough as the API works, the app runs fine, the
+project/product managers are happy, and the company may even be making money off
+of this whole thing. Sadly this method has a bunch of downsides.
 
 The primary issue is that communication is hard. You never really know if
 somebody understood what you meant even if they say they did.
@@ -116,9 +116,9 @@ original author(s) are not reachable for some reason. Maybe the whole team of
 developers who worked on that API are all on a flight together from New York to
 Uruguay, and for that entire 9 hour flight nobody can get any answers about how
 the API is supposed to work, so they're stuck not being able to fix a production
-issue...
+issue... They might also have quit.
 
-When folks rely on a verbal contract, two common things happen.
+When folks rely on a verbal contract, two common things happen:
 
 1. Developers waste time writing a new endpoint out of fear of using the old one
 2. Developers waste time trying to guess the contract, and might guess wrong
@@ -135,7 +135,7 @@ over time. API developers would not settle for writing software like this, but
 apparently when it comes to documentation it's accepted as the norm.
 
 This whole slow, manual approach is probably why many people forgo writing
-contracts this way, and opt for verbal contracts instead.It probably would not
+contracts this way, and opt for verbal contracts instead. It probably would not
 be a huge jump to say the "startup mindset" (and "agile") are one of a few
 potential driving factors in this "just get on with it" approach. There are many
 technical leaders inexperienced in this area telling their team "We'll write
@@ -299,14 +299,15 @@ look into here about compatibility.
 [[WARNING]]
 ====
 OpenAPI v3.0 schema objects are a subset/superset/sideset implementation of
-_JSON Schema draft 05_. Most JSON Schema keywords as expected, a few extra
-OpenAPI-only keywords were added, and some JSON Schema keywords are not
-supported. There is also the tricky situation where JSON Schema has continued to
-progress quickly since draft 4 (draft 8 is almost complete at time of writing).
+_JSON Schema draft 05_. Most JSON Schema keywords are available and work as
+expected, a few extra OpenAPI-only keywords were added, but some JSON Schema
+keywords are not supported. There is also the tricky situation where JSON Schema
+has continued to progress quickly since draft 5 (draft 8 is almost complete at
+time of writing).
 
-This does cause a bit of confusion for new developers, but interoperability
+This can cause confusion for new developers, but interoperability
 amongst standards is always a tricky one. Thankfully, future versions of OpenAPI
-(probably v3.1) aim to solve this, so we won't get too stuck in the weeds here.
+(probably v3.1) aim to solve this, so no need to get too stuck in the weeds here.
 For those who want to learn more,
 https://blog.apisyouwonthate.com/openapi-and-json-schema-divergence-part-1-1daf6678d86e[this
 first article] fully explains the situation, and
@@ -354,16 +355,21 @@ OpenAPI and JSON Schema are a fantastic pair, and we will show how to combine th
 
 GraphQL as an implementation comes bundled with
 https://graphql.org/learn/schema/[GraphQL Schemas]. GraphQL does not really have
-a service model, as it does not need one. All interactions operate under a
-single HTTP endpoint - usually `POST /graphql` - so there is no real need to
+a service model, as it does not need one.
+
+Seeing as most interactions operate under a
+single HTTP endpoint like `POST /graphql`, there is no real need to
 bother writing a contract around that in great detail. It would just be
 mentioned in passing as an implementation detail, and the majority of the effort
 would go into describing the data model.
 
+NOTE: Some folks might have different endpoints for different use-cases, but
+this is rarely spotted in the wild.
+
 All the GraphQL documentation examples are Star Wars. Sure, it's obviously
 inferior to Stargate SG-1, but let's reuse their examples for simplicity:
 
-.An example of GraphQL schemas implementing interfaces and sharing properties across different types.
+.An example of GraphQL schemas in the GraphQL Schema Language, implementing interfaces and sharing properties across different types.
 [source,graphql]
 ----
 interface Character {
@@ -391,14 +397,26 @@ type Droid implements Character {
 }
 ----
 
-These schemas can be defined in whatever programming language the API is built
-in: JavaScript, PHP, Go, whatever, but they are usually not written in one
-definitive format. That makes portability a little funky (you couldn't give a Go
-defined schema to a JavaScript client), but not impossible.
+The syntax in this example is using the
+https://facebook.github.io/graphql/draft/#sec-Type-System[GraphQL Schema
+Language] (a.k.a IDL), but these files can be written in whatever programming
+language the API is built in: JavaScript, PHP, Go, whatever.
 
-GraphQL schema does not support validation being defined in the contract like
-OpenAPI and JSON Schema, but there are some extensions floating around which can
-help. More on all of that later.
+Writing them in Go for example would make them a little tricky to interact with
+for other languages, like trying to give these types to a JavaScript web-app. If
+the client really needs them, a lot of the language-specific implementations
+offer a way to "Dump" them to the IDL, which can then be read by the client with
+the right tooling.
+
+If dumping and distributing isn't a viable workflow,
+https://graphql.org/learn/introspection/[introspection] can be used! This is
+basically the process of quering the GraphQL API for information about the
+schema, just like how `Link` is used to provide the client with the JSON Schema
+in other HTTP APIs.
+
+GraphQL schema does not support validation rules defined in the contract -
+beyond required/optional/null like OpenAPI and JSON Schema, but there are some
+extensions floating around which can help. More on all of that later.
 
 ==== gRPC: Protobuf
 
