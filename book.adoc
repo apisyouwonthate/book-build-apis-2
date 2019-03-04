@@ -1,5 +1,6 @@
 = Build APIs You Won't Hate
 Philip Sturgeon <phil@apisyouwonthate.com>
+:doctype: book
 :toc:
 :leveloffset: +1
 
@@ -7,14 +8,27 @@ include::0-stuff/author.adoc[]
 
 include::0-stuff/introduction.adoc[]
 
+:sectnums:
+
 = Part One: Theory
+
+:leveloffset: +1
 
 include::1-theory/2-different-paradigms.adoc[]
+
 include::1-theory/3-api-contracts.adoc[]
 
-= Part One: Theory
+:leveloffset: -1
 
 = Part Two: Planning & Design
+
+:leveloffset: +1
+
+include::2-planning/0-introduction.adoc[]
+
+include::2-planning/1-editors.adoc[]
+
+:leveloffset: -1
 
 = Part Three: Testing & Monitoring
 

@@ -1,0 +1,60 @@
+= Introduction
+
+When I was younger and dumber, the planning stage for APIs was pretty much
+"think of a list of endpoints then start coding". This is wildly insufficient.
+As the <<theory-contracts,API Contracts>> chapter explained, contracts are
+incredibly important throughout the life-cycle of an API.
+
+The information provided in _Part One: Theory_ is going to come in useful for
+this section, as we go through the actual planning of an API. During this
+process we will plan an API properly, instead of doing the cowboy nonsense I
+used to get up to.
+
+The planning and design phase of an API is intended to do two things:
+
+1. Make developers think really hard about the requirements for their API
+2. Gather feedback from client application developers
+3. Use the feedback to improve the planning before the development phase begins
+
+== Time is Money
+
+Poorly planned APIs waste a lot of time. Developers cost money, so paying extra
+money for developers to rewriting a bunch of code they wrote just recently due
+to some oversight is a cost most companies would like to avoid. I've seen APIs
+go from v1 to v2 in the first few months, because the developers handed over a
+finished product which might have been ok for one client, but caused some issues
+for another client.
+
+If that client had been involved earlier on then a solution could have been
+found to satisfy the needs of both clients, and the v1 could have been used for
+both. Now we've got two separate versions of the API being used at the same
+time, with developers maintaining two code paths, and at some point the original
+client using the original version of the API is going to have to rewrite their
+code to use the newer version of the API. What a daft mess.
+
+== Gather Feedback Early
+
+If clients had more insight into the planning of the API, they have a much
+better chance of catching out issues earlier on. We can give them fake API
+implementations to work with (these are called "Mocks" or "Mock Servers"), and
+when these are based on API contracts the mocks are generated with minimal
+effort from API developers.
+
+Making a few tweaks to the API contract files is much easier than rewriting a
+prototype and all of the tests that go with it, and is infinitely easier than
+deprecating and removing code that has already made it to production.
+
+This is much closer to the Agile workflow, instead of the Waterfall model.
+Waterfall is junk for API development.
+
+// TODO: Diagram of waterfall model showing API development, two clients development, feedback.
+
+So, you are sold that API contracts are the way to go, you've picked your
+paradigm (and possibly an implementation too), and now you want to start writing
+down what the actual API is going to look like.
+
+You might not want to start typing special YAML/JSON/Protobuf blindly into an
+empty text file. This has been used as an argument against API contracts for a
+very long time, but it has never been true. We can use text-based or visual
+editors, which have special knowledge of these description formats, to speed up
+the development of our contracts!

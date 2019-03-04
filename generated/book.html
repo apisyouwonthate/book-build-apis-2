@@ -431,7 +431,7 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 @media amzn-kf8{#header,#content,#footnotes,#footer{padding:0}}
 </style>
 </head>
-<body class="article">
+<body class="book">
 <div id="header">
 <h1>Build APIs You Won&#8217;t Hate</h1>
 <div class="details">
@@ -443,28 +443,21 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <ul class="sectlevel1">
 <li><a href="#_about_the_author">About the Author</a></li>
 <li><a href="#_introduction">Introduction</a></li>
-<li><a href="#_part_one_theory">Part One: Theory</a></li>
-<li><a href="#theory-paradigms">Understanding Different Paradigms</a>
+<li><a href="#_part_one_theory">1. Part One: Theory</a>
 <ul class="sectlevel2">
-<li><a href="#_remote_procedure_call_rpc">Remote Procedure Call (RPC)</a></li>
-<li><a href="#_representational_state_transfer_rest">Representational State Transfer (REST)</a></li>
-<li><a href="#_query_languages">Query Languages</a></li>
-<li><a href="#_im_lost">I&#8217;m Lost!</a></li>
+<li><a href="#theory-paradigms">1.1. Understanding Different Paradigms</a></li>
+<li><a href="#theory-contracts">1.2. API Contracts</a></li>
 </ul>
 </li>
-<li><a href="#theory-contracts">API Contracts</a>
+<li><a href="#_part_two_planning_design">2. Part Two: Planning &amp; Design</a>
 <ul class="sectlevel2">
-<li><a href="#_what_forms_can_an_api_contract_take">What forms can an API Contract take?</a></li>
-<li><a href="#_service_model_data_model">Service Model &amp; Data Model</a></li>
-<li><a href="#_introduction_to_api_description_languages">Introduction to API Description Languages</a></li>
-<li><a href="#_summary">Summary</a></li>
+<li><a href="#_introduction_2">2.1. Introduction</a></li>
+<li><a href="#_editors">2.2. Editors</a></li>
 </ul>
 </li>
-<li><a href="#_part_one_theory_2">Part One: Theory</a></li>
-<li><a href="#_part_two_planning_design">Part Two: Planning &amp; Design</a></li>
-<li><a href="#_part_three_testing_monitoring">Part Three: Testing &amp; Monitoring</a></li>
-<li><a href="#_part_four_management">Part Four: Management</a></li>
-<li><a href="#_part_five_further_theory">Part Five: Further Theory</a></li>
+<li><a href="#_part_three_testing_monitoring">3. Part Three: Testing &amp; Monitoring</a></li>
+<li><a href="#_part_four_management">4. Part Four: Management</a></li>
+<li><a href="#_part_five_further_theory">5. Part Five: Further Theory</a></li>
 </ul>
 </div>
 </div>
@@ -519,14 +512,10 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 </div>
 </div>
 <div class="sect1">
-<h2 id="_part_one_theory">Part One: Theory</h2>
+<h2 id="_part_one_theory">1. Part One: Theory</h2>
 <div class="sectionbody">
-
-</div>
-</div>
-<div class="sect1">
-<h2 id="theory-paradigms">Understanding Different Paradigms</h2>
-<div class="sectionbody">
+<div class="sect2">
+<h3 id="theory-paradigms">1.1. Understanding Different Paradigms</h3>
 <div class="paragraph">
 <p>If APIs are the interface for some sort of service, it should not come as a surprise that not all the interfaces in the world are going to have the same needs and requirements. Most of them are a case of "execute a command", "interact with data", or a combination of both.</p>
 </div>
@@ -577,8 +566,8 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <div class="paragraph">
 <p>First, let us try and figure out the main conceptual differences between the paradigms.</p>
 </div>
-<div class="sect2">
-<h3 id="_remote_procedure_call_rpc">Remote Procedure Call (RPC)</h3>
+<div class="sect3">
+<h4 id="_remote_procedure_call_rpc">1.1.1. Remote Procedure Call (RPC)</h4>
 <div class="paragraph">
 <p>RPC is the earliest, simplest form of API interaction. It is about executing a block of code on another server, and when implemented in HyperText Transfer Protocol (HTTP) or Advanced Message Queuing Protocol (AMQP) it can become a Web API. There is a method and some arguments, and that is pretty much it. Think of it like calling a function in JavaScript, taking a method name and arguments.</p>
 </div>
@@ -656,8 +645,8 @@ sayHello("Racey McRacerson");</code></pre>
 <p>gRPC focuses on making single RPC interactions, and it aims to achieve this as quickly as possible, thanks to the aforementioned binary benefits, and its other huge benefit: HTTP/2. All of the gRPC implementations are HTTP/2 by default, and usually handle this with their own built-in web server to make sure HTTP/2 works the whole way through the transaction.</p>
 </div>
 </div>
-<div class="sect2">
-<h3 id="_representational_state_transfer_rest">Representational State Transfer (REST)</h3>
+<div class="sect3">
+<h4 id="_representational_state_transfer_rest">1.1.2. Representational State Transfer (REST)</h4>
 <div class="paragraph">
 <p>REST is a network paradigm, published by Roy Fielding in a dissertation in 2000. REST is all about a client-server relationship, where server-side data are made available through representations of data in simple formats. This format is usually JSON or XML but could be anything (including Protobuf).</p>
 </div>
@@ -797,8 +786,8 @@ sayHello("Racey McRacerson");</code></pre>
 <p>This book will look more at these two formats and others, as they are hugely important for avoiding bikeshedding over the implementation of trivial features and already solved problems.</p>
 </div>
 </div>
-<div class="sect2">
-<h3 id="_query_languages">Query Languages</h3>
+<div class="sect3">
+<h4 id="_query_languages">1.1.3. Query Languages</h4>
 <div class="paragraph">
 <p>Query languages are designed to give huge flexibility to the client, to make very specific requests, beyond a few simple arguments. Imagine a client asking for an a RPC endpoint to create a very specific report, like asking for a list of companies with unpaid invoices in the last 3 months. You would end up with <code>POST /getCompaniesByUnpaidRecently("&gt;= 3 months")</code> or something very specific.</p>
 </div>
@@ -811,8 +800,8 @@ sayHello("Racey McRacerson");</code></pre>
 <div class="paragraph">
 <p>For example, you could probably take some standard SQL, pipe it over an HTTP endpoint <code>POST /sql</code> and call it an API, but you probably don&#8217;t want to do that for a few thousand reasons.</p>
 </div>
-<div class="sect3">
-<h4 id="_sparql_2008">SPARQL (2008)</h4>
+<div class="sect4">
+<h5 id="_sparql_2008">SPARQL (2008)</h5>
 <div class="paragraph">
 <p>First released in 2008 and finally making it to be a <a href="https://www.w3.org/TR/sparql11-query/">W3C Recommendation</a> in 2013, SPARQL sets out to handle some rather complex queries.</p>
 </div>
@@ -907,8 +896,8 @@ WHERE
 </div>
 </div>
 </div>
-<div class="sect2">
-<h3 id="_im_lost">I&#8217;m Lost!</h3>
+<div class="sect3">
+<h4 id="_im_lost">1.1.4. I&#8217;m Lost!</h4>
 <div class="paragraph">
 <p>Fair comment. This has been a whirlwind tour of a whole bunch of different topics which will be covered more in depth later. If you are nodding and smiling already then you are going to enjoy this book as we delve deeper, and if you have no idea what&#8217;s going on then you are in the right place too.</p>
 </div>
@@ -917,10 +906,8 @@ WHERE
 </div>
 </div>
 </div>
-</div>
-<div class="sect1">
-<h2 id="theory-contracts">API Contracts</h2>
-<div class="sectionbody">
+<div class="sect2">
+<h3 id="theory-contracts">1.2. API Contracts</h3>
 <div class="paragraph">
 <p>The "I" in "API" means interface, and so writing a contract for that interface
 is the act of writing down what that interface is going to look like, to avoid
@@ -1048,8 +1035,8 @@ time spent testing subsequent deployments, and wasted developer time having
 loads of meetings to explain things that could have been written down and clear
 to everyone already.</p>
 </div>
-<div class="sect2">
-<h3 id="_what_forms_can_an_api_contract_take">What forms can an API Contract take?</h3>
+<div class="sect3">
+<h4 id="_what_forms_can_an_api_contract_take">1.2.1. What forms can an API Contract take?</h4>
 <div class="paragraph">
 <p>Some folks might think "That sounds like documentation", others might think
 "That sounds like tests". The answer is both, and more.</p>
@@ -1057,8 +1044,8 @@ to everyone already.</p>
 <div class="paragraph">
 <p>An API contract can exist in several forms, some more useful than others.</p>
 </div>
-<div class="sect3">
-<h4 id="_the_dreaded_verbal_contract">The Dreaded Verbal Contract</h4>
+<div class="sect4">
+<h5 id="_the_dreaded_verbal_contract">The Dreaded Verbal Contract</h5>
 <div class="paragraph">
 <p>A common case is the verbal contract, where the API developers discuss it with
 the frontend or other client application developers as they go. The backend
@@ -1111,8 +1098,8 @@ issue&#8230;&#8203; They might also have quit.</p>
 </ol>
 </div>
 </div>
-<div class="sect3">
-<h4 id="_shoddy_human_contracts">Shoddy Human Contracts</h4>
+<div class="sect4">
+<h5 id="_shoddy_human_contracts">Shoddy Human Contracts</h5>
 <div class="paragraph">
 <p>When folks first start thinking about contracts, it often takes the form of
 rudimentary API Reference Documentation. This might be dumped into a Google Doc,
@@ -1146,8 +1133,8 @@ whatever is written in there.</p>
 <p>There is another way.</p>
 </div>
 </div>
-<div class="sect3">
-<h4 id="_description_languages">Description Languages</h4>
+<div class="sect4">
+<h5 id="_description_languages">Description Languages</h5>
 <div class="paragraph">
 <p>A description language can be text based or look a bit like a programming
 language. This format lets you describe an API in a reusable way, which means
@@ -1215,8 +1202,8 @@ another bit of theory.</p>
 </div>
 </div>
 </div>
-<div class="sect2">
-<h3 id="_service_model_data_model">Service Model &amp; Data Model</h3>
+<div class="sect3">
+<h4 id="_service_model_data_model">1.2.2. Service Model &amp; Data Model</h4>
 <div class="paragraph">
 <p>Two terms that pop up from time to time are "service model" and "data model".
 These are two ways to specify which part of the API contract you are talking
@@ -1248,15 +1235,21 @@ more theoretical.</p>
 APIs (REST, RESTish, some RPC), GraphQL and gRPC.</p>
 </div>
 </div>
-<div class="sect2">
-<h3 id="_introduction_to_api_description_languages">Introduction to API Description Languages</h3>
 <div class="sect3">
-<h4 id="_restrestish_openapi_json_schema">REST/RESTish: OpenAPI &amp; JSON Schema</h4>
+<h4 id="_introduction_to_api_description_languages">1.2.3. Introduction to API Description Languages</h4>
 <div class="paragraph">
-<p>In the endpoint-based API world there were a few such as
-<a href="https://apiblueprint.org/">API Blueprint</a>, <a href="https://raml.org/">RAML</a>, and OpenAPI
-(at the time called Swagger), but for years the tooling was a bit lacking, and
-mostly only allowed for outputting as documentation.</p>
+<p>Any generic HTTP API can use the same description languages, but the modern implementations which the conventions of HTTP to roll their own approach require their own specific description languages.</p>
+</div>
+<div class="paragraph">
+<p>Here we use the term "HTTP APIs" to group REST, RESTish, and regular RPC when it&#8217;s just interacting over HTTP (GET, POST, etc) without some other set of conventions like gRPC getting involved.</p>
+</div>
+<div class="sect4">
+<h5 id="_http_apis_openapi_json_schema">HTTP APIs: OpenAPI &amp; JSON Schema</h5>
+<div class="paragraph">
+<p>In the HTTP API world there were a few such as <a href="https://apiblueprint.org/">API
+Blueprint</a>, <a href="https://raml.org/">RAML</a>, and OpenAPI (at the time called Swagger),
+but for years the tooling was a bit lacking, and mostly only allowed for
+outputting as documentation.</p>
 </div>
 <div class="paragraph">
 <p>OpenAPI v3.0 popped in 2015 up which solved a lot of problems with OpenAPI v2.0, and beat the heck out of the other description formats. It took a few years for tooling to catch up, but by 2018 pretty much everything supported OpenAPI v3.0, and this description format settled as the mainstream favourite.</p>
@@ -1400,8 +1393,8 @@ distribute the files to them ahead of time.</p>
 <div class="paragraph">
 <p>OpenAPI and JSON Schema are a fantastic pair, and we will show how to combine the two throughout the book.</p>
 </div>
-<div class="sect4">
-<h5 id="_graphql_schemas">GraphQL Schemas</h5>
+<div class="sect5">
+<h6 id="_graphql_schemas">GraphQL Schemas</h6>
 <div class="paragraph">
 <p>GraphQL as an implementation comes bundled with
 <a href="https://graphql.org/learn/schema/">GraphQL Schemas</a>. GraphQL does not really have
@@ -1485,8 +1478,8 @@ beyond required/optional/null like OpenAPI and JSON Schema, but there are some
 extensions floating around which can help. More on all of that later.</p>
 </div>
 </div>
-<div class="sect4">
-<h5 id="_grpc_protobuf">gRPC: Protobuf</h5>
+<div class="sect5">
+<h6 id="_grpc_protobuf">gRPC: Protobuf</h6>
 <div class="paragraph">
 <p>gRPC uses another Google tool for its API contract:
 <a href="https://developers.google.com/protocol-buffers/">Protobuf</a>. Protobuf is basically
@@ -1499,8 +1492,8 @@ but it&#8217;s all the same sort of idea.</p>
 GraphQL), a new  <code>.proto</code> file is written using
 <a href="https://developers.google.com/protocol-buffers/docs/proto">Protocol Buffer
 Language Syntax</a>. This C-family/Java style language exists solely for writing
-these files. It might be a bit of a pain to figure out a brand new syntax, but it
-has the benefit of being fairly portable as you can read them in multiple
+these files. It might be a bit of a pain to figure out a brand new syntax, but
+it has the benefit of being fairly portable as you can read them in multiple
 languages. Finding a JavaScript, Ruby, Python, Go, etc. tool that can read a
 <code>.proto</code> file is a whole lot easier than trying to get Python to read something
 written in  - for example - JavaScript.</p>
@@ -1514,8 +1507,84 @@ compatible until the clients have upgraded whatever client code brought the
 </div>
 </div>
 </div>
-<div class="sect2">
-<h3 id="_summary">Summary</h3>
+<div class="sect3">
+<h4 id="_when_are_contracts_written_and_by_who">1.2.4. When Are Contracts Written, And By Who?</h4>
+<div class="paragraph">
+<p>At what stage these contracts are written, and by who, is very much up to the
+culture of the organization. In some organizations the culture is "We dont
+bother at all" and I&#8217;ve been there. I spent two years helping teams fix the
+issues that came up from being vague about this stuff, and witnessed a lot of my
+friends and colleagues waste time (and the companies time) guessing contracts.</p>
+</div>
+<div class="paragraph">
+<p>When I first got to that company, the culture relating to API contracts was:</p>
+</div>
+<div class="exampleblock">
+<div class="content">
+<div class="paragraph">
+<p>That&#8217;s the thing that Phil keeps going on about, I think? Just ignore him. We&#8217;ve got unstable, untested, undocumented APIs full of problems to try and sort out, and they&#8217;re being misused by clients. No time for any of that contract-first planning, or contract-later nonsense.</p>
+</div>
+</div>
+</div>
+<div class="paragraph">
+<p>Two years later and that culture had changed substantially, to the point where
+most older APIs had contracts written down, and new ones invariably had
+contracts written before the work was started. Don&#8217;t make me come to your office
+and shout at you for two years, just start planning your APIs properly now.</p>
+</div>
+<div class="paragraph">
+<p>Who should create and maintain contracts? Everyone.</p>
+</div>
+<div class="paragraph">
+<p>When they should be created? As early as possible.</p>
+</div>
+<div class="paragraph">
+<p>If one person is tasked with developing an API, then that is the one person who
+should be writing the contracts as a planning stage, before they start working
+on the actual API code.</p>
+</div>
+<div class="paragraph">
+<p>If a whole team is tasked with developing an API, then that team should split up
+the planning work between them.</p>
+</div>
+<div class="paragraph">
+<p>The planning process involved getting out a whiteboard, getting a few of your
+clients in a room so you can listen to their needs (instead of just dictating
+to them), get somebody who knows a bit more about systems architecture than the
+average developer does (everyone thinks they&#8217;re an expert), and hash out some
+ideas.</p>
+</div>
+<div class="paragraph">
+<p>When those ideas start to solidify, start writing things down, and turn those
+notes into API contracts. When they&#8217;re ready, get them into a GitHub pull
+request, or some other collaborative place, and folks on your team can start to
+review them.</p>
+</div>
+<div class="paragraph">
+<p>Sometimes you would even see full service and data models written up and
+attached to the JIRA tasks!<sup class="footnote">[<a id="_footnoteref_1" class="footnote" href="#_footnotedef_1" title="View footnote.">1</a>]</sup>.</p>
+</div>
+<div class="sect4">
+<h5 id="_contract_first_vs_contract_later">Contract-First vs Contract-Later</h5>
+<div class="paragraph">
+<p>Whenever the topic of contract-first API development comes up, somebody will say "Damn, that sounds pretty good, but we already have an API written, and we didn&#8217;t write down the contract!"</p>
+</div>
+<div class="paragraph">
+<p>Fear not. Some more strict languages like Go and Java have annotation-based
+systems which can allow you to sprinkle some syntax around your applications to
+generate some API contracts. This approach does not work so well for dynamic
+programming languages like Ruby because anything can be anything and you end up
+having to write so much in manually that you might as well just be writing
+proper API contracts.</p>
+</div>
+<div class="paragraph">
+<p>There are a few tools out there which will help you create contracts by
+reading your JSON requests and responses.</p>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_summary">1.2.5. Summary</h4>
 <div class="paragraph">
 <p>The terms "API Contract" and "API Specifications" often mean the same thing
 depending on the context, but the term specification is used to describe a lot
@@ -1546,46 +1615,433 @@ many outputs of the description language using documentation generators.</p>
 </div>
 <div class="paragraph">
 <p>Later chapters will cover exactly how contracts can get involved at various
-points. This introduction will most likely have left you with questions, and
-they will be answered throughout the rest of the book.</p>
+points, like how we can use the contracts to get feedback, and specific tools we
+can use to collaborate on this stuff.</p>
+</div>
+<div class="paragraph">
+<p>This introduction will most likely have left you with questions, and they will
+be answered throughout the rest of the book.</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_part_two_planning_design">2. Part Two: Planning &amp; Design</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="_introduction_2">2.1. Introduction</h3>
+<div class="paragraph">
+<p>When I was younger and dumber, the planning stage for APIs was pretty much
+"think of a list of endpoints then start coding". This is wildly insufficient.
+As the <a href="#theory-contracts">API Contracts</a> chapter explained, contracts are
+incredibly important throughout the life-cycle of an API.</p>
+</div>
+<div class="paragraph">
+<p>The information provided in <em>Part One: Theory</em> is going to come in useful for
+this section, as we go through the actual planning of an API. During this
+process we will plan an API properly, instead of doing the cowboy nonsense I
+used to get up to.</p>
+</div>
+<div class="paragraph">
+<p>The planning and design phase of an API is intended to do two things:</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>Make developers think really hard about the requirements for their API</p>
+</li>
+<li>
+<p>Gather feedback from client application developers</p>
+</li>
+<li>
+<p>Use the feedback to improve the planning before the development phase begins</p>
+</li>
+</ol>
+</div>
+<div class="sect3">
+<h4 id="_time_is_money">2.1.1. Time is Money</h4>
+<div class="paragraph">
+<p>Poorly planned APIs waste a lot of time. Developers cost money, so paying extra
+money for developers to rewriting a bunch of code they wrote just recently due
+to some oversight is a cost most companies would like to avoid. I&#8217;ve seen APIs
+go from v1 to v2 in the first few months, because the developers handed over a
+finished product which might have been ok for one client, but caused some issues
+for another client.</p>
+</div>
+<div class="paragraph">
+<p>If that client had been involved earlier on then a solution could have been
+found to satisfy the needs of both clients, and the v1 could have been used for
+both. Now we&#8217;ve got two separate versions of the API being used at the same
+time, with developers maintaining two code paths, and at some point the original
+client using the original version of the API is going to have to rewrite their
+code to use the newer version of the API. What a daft mess.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_gather_feedback_early">2.1.2. Gather Feedback Early</h4>
+<div class="paragraph">
+<p>If clients had more insight into the planning of the API, they have a much
+better chance of catching out issues earlier on. We can give them fake API
+implementations to work with (these are called "Mocks" or "Mock Servers"), and
+when these are based on API contracts the mocks are generated with minimal
+effort from API developers.</p>
+</div>
+<div class="paragraph">
+<p>Making a few tweaks to the API contract files is much easier than rewriting a
+prototype and all of the tests that go with it, and is infinitely easier than
+deprecating and removing code that has already made it to production.</p>
+</div>
+<div class="paragraph">
+<p>This is much closer to the Agile workflow, instead of the Waterfall model.
+Waterfall is junk for API development.</p>
+</div>
+<div class="paragraph">
+<p>So, you are sold that API contracts are the way to go, you&#8217;ve picked your
+paradigm (and possibly an implementation too), and now you want to start writing
+down what the actual API is going to look like.</p>
+</div>
+<div class="paragraph">
+<p>You might not want to start typing special YAML/JSON/Protobuf blindly into an
+empty text file. This has been used as an argument against API contracts for a
+very long time, but it has never been true. We can use text-based or visual
+editors, which have special knowledge of these description formats, to speed up
+the development of our contracts!</p>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_editors">2.2. Editors</h3>
+<div class="paragraph">
+<p>Editors exist in various forms for various API description languages, and they
+can drastically ease the creation of contracts when starting from scratch. These
+can take a few forms.</p>
+</div>
+<div class="sect3">
+<h4 id="_text_or_gui">2.2.1. Text or GUI</h4>
+<div class="paragraph">
+<p>Some editors are GUI-based (Graphical User Interface) and let you design things
+with clicking buttons and working with forms.</p>
+</div>
+<div class="paragraph">
+<p>Others are text-based and provide you with a real-time preview panel whilst you
+type, making it slightly easier than working with plain-old YAML/JSON.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_prototyping_walled_gardens_local_file_editors">2.2.2. Prototyping, Walled Gardens, &amp; Local File Editors</h4>
+<div class="paragraph">
+<p>Beyond the "text-based" or "GUI" distinction, there are other characteristics
+which will effect where the contracts live and how you interact with them.</p>
+</div>
+<div class="paragraph">
+<p>Some editors are intended for rapid prototyping only, helping you to create an
+initial design and then push you to export the contracts as text to
+copy-and-paste, or download as files. From that point on, you&#8217;re on your own,
+and have to find some other way to keep your contract files up-to-date.</p>
+</div>
+<div class="paragraph">
+<p>Others are hosted solutions which keep a hold of your contract files, and offer
+limited options for syncing to whatever pre-determined locations they chose to
+support. Maybe something specific like GitLab, or generic git repository, or
+they publish them to a URL accessible over HTTP, or something else.</p>
+</div>
+<div class="paragraph">
+<p>Other editors can take the form of desktop applications, which can be used
+throughout the life-cycle, loading local files and allowing you to edit them at
+commit them back to the repository (or wherever they live) at will.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_openapi_editors">2.2.3. OpenAPI Editors</h4>
+<div class="sect4">
+<h5 id="_swagger_editor">Swagger Editor</h5>
+<div class="paragraph">
+<p>Swagger Editor is a very simple hosted text-based editor from
+<a href="https://smartbear.com/">SmartBear</a>.</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<div class="title">Note</div>
+</td>
+<td class="content">
+Remember, SmartBear call their suite of tools "Swagger" because they own
+the copyright and they don&#8217;t feel like re-branding, but the description language
+is officially called OpenAPI, not Swagger. Nobody else should be using the word
+Swagger, or calling their tooling Swagger, or anything else.
+</td>
+</tr>
+</table>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="images/editors-swagger-editor.png" alt="editors swagger editor">
+</div>
+</div>
+<div class="paragraph">
+<p>Mostly it is just a text-editor, with the left panel being a YAML/JSON editor,
+and the right panel is <a href="https://swagger.io/tools/swagger-ui/">Swagger UI</a>, the
+documentation tool from SmartBear.</p>
+</div>
+<div class="paragraph">
+<p>It can be nice to write specifications on the left and see their rendering as
+documentation on the right, but it would possibly be more useful if the right
+contained forms for managing the specification beyond modifying text, but the
+right panel is purely read-only. There are a few forms for adding new
+operations, tags, servers, etc. but they do not cover everything.</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="images/editors-swagger-editor-form.png" alt="editors swagger editor form">
+</div>
+</div>
+<div class="paragraph">
+<p>This simple editor helps in a few cases, like:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>You have never written any OpenAPI and want to try playing around with real-time feedback</p>
+</li>
+<li>
+<p>You are getting validation errors from some local tool which seem weird, so you bundle the multiple files into one file and paste it up here to see what it says</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>There is not much else you will want to use Swagger Editor for. If you are
+splitting files up using <code>$ref</code> (which you pretty much always want to do), then
+this will not work as it only supports the one text box.</p>
+</div>
+<div class="paragraph">
+<p>For ongoing editing and multi-file support you will need something a bit more powerful.</p>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_swaggerhub">SwaggerHub</h5>
+<div class="paragraph">
+<p><a href="https://swagger.io/tools/swaggerhub/">SwaggerHub</a> is another tool from Smartbear, and it is basically the hosted version of Swagger Editor which has some integrations with the rest of the Swagger tool-suite.</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="images/editors-swaggerhub-demo.png" alt="editors swaggerhub demo">
+</div>
+<div class="title">Figure 4. In this demo of SwaggerHub you can see Swagger Editor in full swing, with a few other options floating around the outside.</div>
+</div>
+<div class="paragraph">
+<p>SwaggerHub includes a mock server, as most of these editors do. It will help you
+converting from OpenAPI v2.0 to v3.0 which is a nice touch. The integration with
+Swagger Inspector - a lovely tool which can help build OpenAPI specifications
+off of HTTP interactions&#8230;&#8203; more on that later.</p>
+</div>
+<div class="paragraph">
+<p>The collaboration options here are pretty handy. You can invite users or teams
+to collaborate on an API, and they have a permissions system which seems pretty
+closely modelled on Google Docs.</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="images/editors-swaggerhub-invite.png" alt="editors swaggerhub invite">
+</div>
+<div class="title">Figure 5. Get collaborating with other folks without having to email YAML files around!</div>
+</div>
+<div class="paragraph">
+<p>If working with multiple files is possible in SwaggerHub, I have certainly never
+figured it out. For this reason I have steered clear, but for teams just
+starting out it might be worth playing with.</p>
+</div>
+<div class="paragraph">
+<p>The pricing is user-based, and does not seem to support "monthly active users"
+like slack. Many companies only have 1 or 2 folks who care about API contracts
+(which is sad and slowly improving over time) but at a company with ~100
+engineers (and a better culture), this could get rather expensive. Trying to
+convince your boss that a YAML text-editor with collaboration might be a tough
+sell, especially when there are more powerful alternatives, or free open-source
+offerings.</p>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_stoplight">Stoplight</h5>
+<div class="paragraph">
+<p><a href="http://stoplight.io/">Stoplight</a> is a GUI editor, with forms and a much more
+"Wizard"-like approach. You can ignore the YAML representation entirely and work
+with their forms and model editors.</p>
+</div>
+<div class="paragraph">
+<p>Right now they only support OpenAPI v2.0 via the GUI but the text mode supports
+OpenAPI v3.0. They have all sorts of amazing features. Stoplight has the usual
+collaboration and mocking, and other features like linting based on style
+guides, the ability to share models throughout the organization (to avoid having
+20 different "user" or "location" representations) and has desktop applications
+for Windows, Mac and Linux.</p>
+</div>
+<div class="paragraph">
+<p>I started working for Stoplight right around the time I started writing this
+second book, so to avoid complex bias I will share some words from Kin "API
+Evangelist" Lane:</p>
+</div>
+<div class="quoteblock">
+<blockquote>
+<div class="paragraph">
+<p>I feel like Stoplight has the potential to shift the landscape pretty significantly, something I haven&#8217;t seen any API service provider do in a while.</p>
+</div>
+</blockquote>
+<div class="attribution">
+&#8212; Kin Lane<br>
+<cite>API Evangelist</cite>
+</div>
+</div>
+<div class="paragraph">
+<p>More to come on this one. They will most likely have a new suite of tools out
+before this book goes to the printer.</p>
+</div>
+<div class="paragraph">
+<p>Stoplight costs more than SwaggerHub, but is likely to be an easier sell due to
+the fact it does a whole lot more. Non-technical users can get in there to play
+around, and it adds a lot more value beyond being a YAML/JSON text-editor.</p>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_freeopen_source_tools">Free/Open-Source Tools</h5>
+<div class="paragraph">
+<p>Bootstrapping a project and have no budget for fancy tooling? Not a problem.</p>
+</div>
+<div class="paragraph">
+<p>Check out <a href="https://openapi.tools">OpenAPI.tools</a> for an up-to-date list, but there
+are a few GUI editors, and a few plugins for popular software like
+<a href="https://code.visualstudio.com/">Visual Studio Code</a>, <a href="https://atom.io/">Atom</a>, etc.
+which can ease the struggle of writing the files by hand.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>VS Code: <a href="https://marketplace.visualstudio.com/items?itemName=mermade.openapi-lint">openapi-lint</a></p>
+</li>
+<li>
+<p>Atom: <a href="https://atom.io/packages/linter-swagger">linter-swagger</a></p>
+</li>
+<li>
+<p>Jetbrains IDE: <a href="https://senya.io/">Senya</a></p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>Then there is <a href="https://apibldr.com/">ApiBldr</a>, a free hosted GUI editor which can
+help build and then download contracts.</p>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_graphql_editors">2.2.4. GraphQL Editors</h4>
+<div class="paragraph">
+<p><a href="https://graphqleditor.com/">GraphQL Editor</a> is a GUI editor, with text on the
+left where you define various types, and a visual representation of everything
+as nodes on the right. You can click on those nodes, modify properties, and set
+criteria like required, null, etc.</p>
+</div>
+<div class="paragraph">
+<p>It can be installed locally via npm, then invoked as a React component.</p>
+</div>
+<div class="paragraph">
+<p>If you don&#8217;t know what any of those things mean then fair enough, there is a
+hosted version: <a href="https://app.graphqleditor.com/">GraphQL Editor Cloud</a>.</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="images/editors-graphql-editor.png" alt="editors graphql editor">
+</div>
+<div class="title">Figure 6. A screenshot of <a href="https://app.graphqleditor.com/showcase/github">the "Github example" on graphqleditor.com</a></div>
+</div>
+<div class="paragraph">
+<p>As with many editors it comes with an option to provide a mock server for the
+schemas you&#8217;ve just written up. The hosted version also has the ability to save
+projects.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_protobuf_editors">2.2.5. Protobuf Editors</h4>
+<div class="paragraph">
+<p>The Protobuf syntax is incredibly simple, and there is not much going on in the
+way of functionality or logic in these files. Maybe this is why there are not
+many GUI editors around, as you just don&#8217;t need them.
+<a href="https://sourceforge.net/projects/protobufeditor/">Protobuf Editor</a> is one I found
+lurking on SourceForge.</p>
+</div>
+<div class="paragraph">
+<p>There are plenty of plugins ready to add syntax highlighting, linting,
+auto-complete, etc. to your IDE or code editor of choice.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>VS Code: <a href="https://marketplace.visualstudio.com/items?itemName=zxh404.vscode-proto3">vscode-proto3</a></p>
+</li>
+<li>
+<p>Atom: <a href="https://atom.io/packages/language-protobuf">language-protobuf</a></p>
+</li>
+<li>
+<p>Jetbrains IDE: <a href="https://plugins.jetbrains.com/plugin/8277-protobuf-support">Protbuf Support</a></p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_maybe_you_dont_use_an_editor">2.2.6. Maybe You Don&#8217;t Use an Editor</h4>
+<div class="paragraph">
+<p>This can be a personal choice. Some folks love having their contracts live up in
+the cloud so they can be easily collaborated on, some want to keep them in the
+repository so they can discuss things in GitHub pull-requests for their
+collaboration, and as such want editors which can work with local files.</p>
+</div>
+<div class="paragraph">
+<p>Whatever you do, when you start out I recommend using an editor to get the ball
+rolling. Then later on if you want to tweak things by hand, that&#8217;s probably ok.
+It will be a while before you work out your exact workflow for contracts (if
+nobody has worked that out for you), so it can make sense to just get stuck in
+with whatever hosted editor, then you can probably export things later and
+cancel your account if you hate it.</p>
+</div>
+<div class="paragraph">
+<p>Either way, if you are currently working on an API now, put this book down for a
+little bit, and get to work on creating some API contracts. It could be
+nonsense, or it could be a real project, but the next chapter will start by
+assuming you have written up a bunch of API contracts, and want to put them to
+work in a mock server to get feedback from potential clients.</p>
+</div>
 </div>
 </div>
 </div>
 </div>
 <div class="sect1">
-<h2 id="_part_one_theory_2">Part One: Theory</h2>
+<h2 id="_part_three_testing_monitoring">3. Part Three: Testing &amp; Monitoring</h2>
 <div class="sectionbody">
 
 </div>
 </div>
 <div class="sect1">
-<h2 id="_part_two_planning_design">Part Two: Planning &amp; Design</h2>
+<h2 id="_part_four_management">4. Part Four: Management</h2>
 <div class="sectionbody">
 
 </div>
 </div>
 <div class="sect1">
-<h2 id="_part_three_testing_monitoring">Part Three: Testing &amp; Monitoring</h2>
+<h2 id="_part_five_further_theory">5. Part Five: Further Theory</h2>
 <div class="sectionbody">
 
 </div>
 </div>
-<div class="sect1">
-<h2 id="_part_four_management">Part Four: Management</h2>
-<div class="sectionbody">
-
 </div>
-</div>
-<div class="sect1">
-<h2 id="_part_five_further_theory">Part Five: Further Theory</h2>
-<div class="sectionbody">
-
-</div>
+<div id="footnotes">
+<hr>
+<div class="footnote" id="_footnotedef_1">
+<a href="#_footnoteref_1">1</a>. JIRA is a 'popular' piece of project management software from Atlassian
 </div>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2019-03-02 09:39:01 WET
+Last updated 2019-03-04 11:10:47 WET
 </div>
 </div>
 </body>

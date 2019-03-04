@@ -1,0 +1,6 @@
+
+
+[quote,Bryan Crowe]
+Consumer: "Why doesn't this request work?"
+You: "Let me see... oh you're passing the date query string param in the wrong format."
+Using specs helps avoid a lot of that.
