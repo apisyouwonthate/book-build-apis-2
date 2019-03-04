@@ -1,2 +1,0 @@
-RFC 7087
-JSON API Errors
