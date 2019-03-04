@@ -1,11 +1,22 @@
-= Documentation
+= Reference Documentation
 
-// TODO Rework this intro now editors and mocks came before iit
+So, you handed out the mock server to the various API client teams, and thought
+they would get straight to work trying to integrate it. Sadly your inbox is now
+rammed full of questions from those client developers asking how the heck they
+use the API.
 
-Throughout the planning phase, all the API developers involved, other folks on
-your team, and potential clients are going to want to see how this API is going
-to work. One of many ways to see this is with "API Reference Documentation",
-which is usually an overview of methods/resources, and looks a lot like the sort
+*REST devs:* You don't need reference docs, the message is self documenting
+through the rules of HTTP and HATEOAS explains interactions!
+
+*GraphQL devs:* You don't need reference docs, you have GraphiQL!
+
+*gRPC devs:* You don't need reference docs, you have .proto files!
+
+Guess what? If you want that sweet-sweet feedback, you'll need to help your
+clients implement the API, and the best way to avoid inboxmageddon is to
+distribute "API Reference Documentation".
+
+This is usually an overview of methods/resources, and looks a lot like the sort
 of documentation you'd expect to see for a class or function in any programming
 language. These should always be accompanied by guides and tutorials at a later
 stage, but early on you will want to provide at least the reference
@@ -67,9 +78,13 @@ $ redoc-cli serve openapi.yaml --watch
 TODO update example when ubuntu NodeJS stops cocking about
 ----
 
-This will run a local HTTP server, and you can load up in your local browser. The `--watch` switch means changes to the local files will be automatically detected, and should show up when you refresh the browser.
+This will run a local HTTP server, and you can load up in your local browser.
+The `--watch` switch means changes to the local files will be automatically
+detected, and should show up when you refresh the browser.
 
-When somebody else asks for a look, you can then do a few things, but a common thing to do is ask the documentation generator to create HTML for sharing around.
+When somebody else asks for a look, you can then do a few things, but a common
+thing to do is ask the documentation generator to create HTML for sharing
+around.
 
 [source]
 ----
@@ -116,4 +131,4 @@ develop the real one you can interact with that too.
 https://github.com/pseudomuto/protoc-gen-doc [protoc-gen-doc] is a documentation
 generator plugin for the Google Protocol Buffers compiler (protoc). The plugin
 can generate HTML, JSON, DocBook and Markdown documentation from comments in
-your .proto files.
+your `.proto` files.

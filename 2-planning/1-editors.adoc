@@ -31,7 +31,7 @@ Other editors can take the form of desktop applications, which can be used
 throughout the life-cycle, loading local files and allowing you to edit them at
 commit them back to the repository (or wherever they live) at will.
 
-== OpenAPI Editors
+== Standard HTTP Editors
 
 === Swagger Editor
 
@@ -194,8 +194,11 @@ nobody has worked that out for you), so it can make sense to just get stuck in
 with whatever hosted editor, then you can probably export things later and
 cancel your account if you hate it.
 
+== Next
+
 Either way, if you are currently working on an API now, put this book down for a
 little bit, and get to work on creating some API contracts. It could be
 nonsense, or it could be a real project, but the next chapter will start by
-assuming you have written up a bunch of API contracts, and want to put them to
-work in a mock server to get feedback from potential clients.
+assuming you have written up a bunch of API contracts.
+
+Consult the documentation, tutorials, videos, etc. for the specific API description language in question if there is any confusion that comes up. Hopefully the editors will have your back, but if they don't, there is always Google.

@@ -13,3 +13,7 @@ oops now theres another one. JUST ADD FUCKING type: 'foo' GAH
 
 brief mention of "if calling other peoples APIs use damn timeouts" but thats
 explained more in surviving other peoples apis aint doing it twice
+
+Talk about specs later a bit more:
+- https://inspector.swagger.io/builder
+- https://blog.apisyouwonthate.com/creating-api-specifications-from-bulls-t-f5a54c005135

@@ -1,26 +1,30 @@
 = Mocking
 
-Mocking in relation to APIs is a really simple idea, and that is to make a fake
-API before you make a real one. The introduction talks a little about why you
-might want to do that: basically to get feedback early, allowing you to tweak
-and change your way to a solution which is hopefully well suited for your
-clients. Nothing will ever be perfect, but you can cut out a lot of back and
-forth, leaving you with more time to research new bike routes for the weekend.
+Mocking in relation to APIs is a really simple idea, and that is to create a
+fake API before building the real one. The basic concepts were mentioned in the
+introduction, but primarily this is about getting feedback early, allowing you
+to tweak and change your way to a solution which is hopefully well suited for
+your clients. Folks scoff at this and say "You can never get things perfect",
+but you can absolutely cut out a lot back and forth and dodge a few daft
+mistakes by putting in some time first.
 
-The term "mock" for a lot of developers will have unit-testing connotations, and
-that's entirely fair. A mock in unit testing is a fake implementation of a class
-or function, which accepts the same arguments as the real thing, and might
-return something pretty similar to expected output. This is exactly what we're
-doing, at a HTTP level, using a mock server. We can control the output too, much
-like you would for unit-test mocks.
+The term "mock" for a lot of developers will have unit-testing connotations. In
+unit-testing, a mock is a fake implementation of a class or function, which
+accepts the same arguments as the real thing. It might return something pretty
+similar to expected output, and different test cases might even modify those
+returns to see how the code under test works.
 
-You prep the much, tell it what endpoints to fake, tell it what to return, and
-run it, usually in the CLI. Let's have a look at how.
+This is almost exactly the concept here, just at a HTTP level instead. This is
+done using a "mock server", which will respond to the expected endpoints, error
+for non-existent endpoints, often even provide realistic validation errors if a
+client sends it a nonsense request.
 
 == The Most Basic Mock Server EVER
 
-There are a lot of ways to get a mock server, but the most simple
-mock server around is https://github.com/typicode/json-server[JSON Server]. This thing is very handy for quickly getting a HTTP server spitting out some JSON that you control:
+There are a lot of ways to create a mock server, but the most simple mock server
+around is https://github.com/typicode/json-server[JSON Server]. This thing is
+very handy for quickly getting a HTTP server spitting out some JSON that you
+control:
 
 .Woah what a surprise, another NPM tool!
 [source]
@@ -65,26 +69,69 @@ hosted version from the same author.
 
 image::images/mocks-my-json-server.png[]
 
-Now, at this point you are probably thinking: "That's lovely and all, but that
-going to get tough to maintain!"
+Now, at this point you are probably thinking: "That's lovely and all, but
+maintaining that one JSON file is going to be a freaking nightmare!"
 
-If you add one property to a resource you've got to go and update a bunch of
-copied and pasted examples. Formatting this file will be a butt-ache, conflicts
-will be rife, etc., but for highlighting the concepts of a mock server it's
-served its purpose.
+Yup. Adding a single property to a resource means you are going to have to go
+through each record in `db.json`. Beyond that, formatting the file can turn into
+a pain in the ass, conflicts will be rife as the file grows and different
+developers add different properties, etc. It's good for quick and dirty demos,
+but is probably not something you will want to use in anger.
 
-Instead of manually creating this `db.json`, we can point a mock server at the
-API contracts we've already created (right?!), and let it figure out its own
-examples based on the examples/default values supplied in there, or by using
-reasonable fake data!
+How about instead of manually maintaining `db.json`, a tool could be pointed at API contracts, and a mock server was automagically created?! Then it figure out its own
+examples based on the examples/default values supplied in the contract, and if the description language has validation rules it could even apply those too!
 
-== Check Your Editor
+Thankfully loads of folks in the API ecosystem thought about this, and there is a wide selection of tooling.
+
+== Hosted Editors Love Mock Servers
 
 Most of the hosted editors covered so far have mock servers built in, and often it is either a case of enabling it, or it is already enabled and you just need to find the URL to the server instance.
 
-https://swagger.io/tools/swaggerhub/[SwaggerHub], http://stoplight.io/[Stoplight], and https://app.graphqleditor.com/[GraphQL Editor Cloud] all have mock servers.
+== Standard HTTP Mocking
 
+=== Hosted Mock Servers
 
-// Can JSON Schema do a decent mock?
+https://swagger.io/tools/swaggerhub/[SwaggerHub]
+
+http://stoplight.io/[Stoplight]
+
+// TODO Maybe I'll add https://getsandbox.com/ but yesterday on a github issue they thanks somebody for reminding them OpenAPI v3.0 existed and its 2019!
+
+// TODO creators of wiremock have a thing http://get.mocklab.io/ - import "swagger" and integrates with swaggerhub
+
+=== Free/Open-Source Tools
+
+http://stoplight.io/platform/prism/[Prism]
+
+https://github.com/danielgtaylor/apisprout[API Sprout]
+
+As always check https://openapi.tools/[OpenAPI.Tools] for the latest offering of mocking tools.
+
+// TODO Can JSON Schema do a decent mock?
 // https://www.npmjs.com/package/mock-json-schema
 // https://www.npmjs.com/package/cast-with-schema
+
+== GraphQL Mocking
+
+https://app.graphqleditor.com/[GraphQL Editor Cloud]
+
+https://www.apollographql.com/docs/graphql-tools/mocking.html[Apollo - GraphQL Tools]
+
+== gRPC Mocking
+
+gRPC has two mocking tools which require a bit more setup. They seem to be more useful for unit/integration testing (which will be covered in later sections) than helping at a planning stage. We will look at testing later on.
+
+// TODO can these be used for mock servers like the above? https://github.com/YoshiyukiKato/grpc-mock
+// https://github.com/jekiapp/gripmock
+
+== Interacting with this Mock
+
+Interacting with a mock server should be incredibly similar to how you would interact with any API. That is the point, after-all.
+
+Just find the instance of the mock server, then point your HTTP/GraphQL/gRPC client at it.
+
+// TODO Totally phoned this in but im tired of talking about mocking. Show real examples with prism.
+
+== Next
+
+Hopefully you have managed to get a mock server running for your API contracts, and can interact with it.
