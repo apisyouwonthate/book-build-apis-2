@@ -455,17 +455,9 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <li><a href="#_editors">2.2. Editors</a></li>
 </ul>
 </li>
-<<<<<<< HEAD
-<li><a href="#_part_one_theory_2">Part One: Theory</a></li>
-<li><a href="#_part_two_planning_design">Part Two: Planning &amp; Design</a></li>
-<li><a href="#_part_three_testing_monitoring">Part Three: Testing &amp; Monitoring</a></li>
-<li><a href="#_part_four_management">Part Four: Management</a></li>
-<li><a href="#_part_five_further_theory">Part Five: Further Theory</a></li>
-=======
 <li><a href="#_part_three_testing_monitoring">3. Part Three: Testing &amp; Monitoring</a></li>
 <li><a href="#_part_four_management">4. Part Four: Management</a></li>
 <li><a href="#_part_five_further_theory">5. Part Five: Further Theory</a></li>
->>>>>>> 761f57d... Fixed book kparts numbering
 </ul>
 </div>
 </div>
@@ -1245,13 +1237,19 @@ APIs (REST, RESTish, some RPC), GraphQL and gRPC.</p>
 </div>
 <div class="sect3">
 <h4 id="_introduction_to_api_description_languages">1.2.3. Introduction to API Description Languages</h4>
-<div class="sect4">
-<h5 id="_restrestish_openapi_json_schema">REST/RESTish: OpenAPI &amp; JSON Schema</h5>
 <div class="paragraph">
-<p>In the endpoint-based API world there were a few such as
-<a href="https://apiblueprint.org/">API Blueprint</a>, <a href="https://raml.org/">RAML</a>, and OpenAPI
-(at the time called Swagger), but for years the tooling was a bit lacking, and
-mostly only allowed for outputting as documentation.</p>
+<p>Any generic HTTP API can use the same description languages, but the modern implementations which the conventions of HTTP to roll their own approach require their own specific description languages.</p>
+</div>
+<div class="paragraph">
+<p>Here we use the term "HTTP APIs" to group REST, RESTish, and regular RPC when it&#8217;s just interacting over HTTP (GET, POST, etc) without some other set of conventions like gRPC getting involved.</p>
+</div>
+<div class="sect4">
+<h5 id="_http_apis_openapi_json_schema">HTTP APIs: OpenAPI &amp; JSON Schema</h5>
+<div class="paragraph">
+<p>In the HTTP API world there were a few such as <a href="https://apiblueprint.org/">API
+Blueprint</a>, <a href="https://raml.org/">RAML</a>, and OpenAPI (at the time called Swagger),
+but for years the tooling was a bit lacking, and mostly only allowed for
+outputting as documentation.</p>
 </div>
 <div class="paragraph">
 <p>OpenAPI v3.0 popped in 2015 up which solved a lot of problems with OpenAPI v2.0, and beat the heck out of the other description formats. It took a few years for tooling to catch up, but by 2018 pretty much everything supported OpenAPI v3.0, and this description format settled as the mainstream favourite.</p>
@@ -1494,8 +1492,8 @@ but it&#8217;s all the same sort of idea.</p>
 GraphQL), a new  <code>.proto</code> file is written using
 <a href="https://developers.google.com/protocol-buffers/docs/proto">Protocol Buffer
 Language Syntax</a>. This C-family/Java style language exists solely for writing
-these files. It might be a bit of a pain to figure out a brand new syntax, but it
-has the benefit of being fairly portable as you can read them in multiple
+these files. It might be a bit of a pain to figure out a brand new syntax, but
+it has the benefit of being fairly portable as you can read them in multiple
 languages. Finding a JavaScript, Ruby, Python, Go, etc. tool that can read a
 <code>.proto</code> file is a whole lot easier than trying to get Python to read something
 written in  - for example - JavaScript.</p>
@@ -1510,7 +1508,83 @@ compatible until the clients have upgraded whatever client code brought the
 </div>
 </div>
 <div class="sect3">
-<h4 id="_summary">1.2.4. Summary</h4>
+<h4 id="_when_are_contracts_written_and_by_who">1.2.4. When Are Contracts Written, And By Who?</h4>
+<div class="paragraph">
+<p>At what stage these contracts are written, and by who, is very much up to the
+culture of the organization. In some organizations the culture is "We dont
+bother at all" and I&#8217;ve been there. I spent two years helping teams fix the
+issues that came up from being vague about this stuff, and witnessed a lot of my
+friends and colleagues waste time (and the companies time) guessing contracts.</p>
+</div>
+<div class="paragraph">
+<p>When I first got to that company, the culture relating to API contracts was:</p>
+</div>
+<div class="exampleblock">
+<div class="content">
+<div class="paragraph">
+<p>That&#8217;s the thing that Phil keeps going on about, I think? Just ignore him. We&#8217;ve got unstable, untested, undocumented APIs full of problems to try and sort out, and they&#8217;re being misused by clients. No time for any of that contract-first planning, or contract-later nonsense.</p>
+</div>
+</div>
+</div>
+<div class="paragraph">
+<p>Two years later and that culture had changed substantially, to the point where
+most older APIs had contracts written down, and new ones invariably had
+contracts written before the work was started. Don&#8217;t make me come to your office
+and shout at you for two years, just start planning your APIs properly now.</p>
+</div>
+<div class="paragraph">
+<p>Who should create and maintain contracts? Everyone.</p>
+</div>
+<div class="paragraph">
+<p>When they should be created? As early as possible.</p>
+</div>
+<div class="paragraph">
+<p>If one person is tasked with developing an API, then that is the one person who
+should be writing the contracts as a planning stage, before they start working
+on the actual API code.</p>
+</div>
+<div class="paragraph">
+<p>If a whole team is tasked with developing an API, then that team should split up
+the planning work between them.</p>
+</div>
+<div class="paragraph">
+<p>The planning process involved getting out a whiteboard, getting a few of your
+clients in a room so you can listen to their needs (instead of just dictating
+to them), get somebody who knows a bit more about systems architecture than the
+average developer does (everyone thinks they&#8217;re an expert), and hash out some
+ideas.</p>
+</div>
+<div class="paragraph">
+<p>When those ideas start to solidify, start writing things down, and turn those
+notes into API contracts. When they&#8217;re ready, get them into a GitHub pull
+request, or some other collaborative place, and folks on your team can start to
+review them.</p>
+</div>
+<div class="paragraph">
+<p>Sometimes you would even see full service and data models written up and
+attached to the JIRA tasks!<sup class="footnote">[<a id="_footnoteref_1" class="footnote" href="#_footnotedef_1" title="View footnote.">1</a>]</sup>.</p>
+</div>
+<div class="sect4">
+<h5 id="_contract_first_vs_contract_later">Contract-First vs Contract-Later</h5>
+<div class="paragraph">
+<p>Whenever the topic of contract-first API development comes up, somebody will say "Damn, that sounds pretty good, but we already have an API written, and we didn&#8217;t write down the contract!"</p>
+</div>
+<div class="paragraph">
+<p>Fear not. Some more strict languages like Go and Java have annotation-based
+systems which can allow you to sprinkle some syntax around your applications to
+generate some API contracts. This approach does not work so well for dynamic
+programming languages like Ruby because anything can be anything and you end up
+having to write so much in manually that you might as well just be writing
+proper API contracts.</p>
+</div>
+<div class="paragraph">
+<p>There are a few tools out there which will help you create contracts by
+reading your JSON requests and responses.</p>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_summary">1.2.5. Summary</h4>
 <div class="paragraph">
 <p>The terms "API Contract" and "API Specifications" often mean the same thing
 depending on the context, but the term specification is used to describe a lot
@@ -1541,19 +1615,18 @@ many outputs of the description language using documentation generators.</p>
 </div>
 <div class="paragraph">
 <p>Later chapters will cover exactly how contracts can get involved at various
-points. This introduction will most likely have left you with questions, and
-they will be answered throughout the rest of the book.</p>
+points, like how we can use the contracts to get feedback, and specific tools we
+can use to collaborate on this stuff.</p>
+</div>
+<div class="paragraph">
+<p>This introduction will most likely have left you with questions, and they will
+be answered throughout the rest of the book.</p>
 </div>
 </div>
 </div>
 </div>
 </div>
 <div class="sect1">
-<<<<<<< HEAD
-<h2 id="_part_one_theory_2">Part One: Theory</h2>
-<div class="sectionbody">
-
-=======
 <h2 id="_part_two_planning_design">2. Part Two: Planning &amp; Design</h2>
 <div class="sectionbody">
 <div class="sect2">
@@ -1562,18 +1635,27 @@ they will be answered throughout the rest of the book.</p>
 <p>When I was younger and dumber, the planning stage for APIs was pretty much
 "think of a list of endpoints then start coding". This is wildly insufficient.
 As the <a href="#theory-contracts">API Contracts</a> chapter explained, contracts are
-incredibly important throughout the life-cycle of an API. We are going to look
-into how they can be used in the planning and design stage.</p>
+incredibly important throughout the life-cycle of an API.</p>
 </div>
 <div class="paragraph">
-<p>Most of the planning and design phase is intended to do two things:</p>
+<p>The information provided in <em>Part One: Theory</em> is going to come in useful for
+this section, as we go through the actual planning of an API. During this
+process we will plan an API properly, instead of doing the cowboy nonsense I
+used to get up to.</p>
+</div>
+<div class="paragraph">
+<p>The planning and design phase of an API is intended to do two things:</p>
 </div>
 <div class="olist arabic">
 <ol class="arabic">
 <li>
-<p>Make developers think really hard about the requirements for their API 2.
-Gather feedback from clients application developers 3. Use the feedback to
-improve the planning before the development phase begins</p>
+<p>Make developers think really hard about the requirements for their API</p>
+</li>
+<li>
+<p>Gather feedback from client application developers</p>
+</li>
+<li>
+<p>Use the feedback to improve the planning before the development phase begins</p>
 </li>
 </ol>
 </div>
@@ -1927,13 +2009,8 @@ little bit, and get to work on creating some API contracts. It could be
 nonsense, or it could be a real project, but the next chapter will start by
 assuming you have written up a bunch of API contracts, and want to put them to
 work in a mock server to get feedback from potential clients.</p>
->>>>>>> 761f57d... Fixed book kparts numbering
 </div>
 </div>
-<div class="sect1">
-<h2 id="_part_two_planning_design">Part Two: Planning &amp; Design</h2>
-<div class="sectionbody">
-
 </div>
 </div>
 </div>
@@ -1956,13 +2033,15 @@ work in a mock server to get feedback from potential clients.</p>
 </div>
 </div>
 </div>
+<div id="footnotes">
+<hr>
+<div class="footnote" id="_footnotedef_1">
+<a href="#_footnoteref_1">1</a>. JIRA is a 'popular' piece of project management software from Atlassian
+</div>
+</div>
 <div id="footer">
 <div id="footer-text">
-<<<<<<< HEAD
-Last updated 2019-03-02 09:39:01 WET
-=======
-Last updated 2019-03-02 17:30:56 WET
->>>>>>> 761f57d... Fixed book kparts numbering
+Last updated 2019-03-04 11:10:47 WET
 </div>
 </div>
 </body>
