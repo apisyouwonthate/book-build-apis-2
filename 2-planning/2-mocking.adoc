@@ -78,7 +78,7 @@ a pain in the ass, conflicts will be rife as the file grows and different
 developers add different properties, etc. It's good for quick and dirty demos,
 but is probably not something you will want to use in anger.
 
-How about instead of manually maintaining `db.json`, a tool could be pointed at API contracts, and a mock server was automagically created?! Then it figure out its own
+How about instead of manually maintaining `db.json`, a tool could be pointed at API contracts, and a mock server was automagically created?! Then it could figure out its own
 examples based on the examples/default values supplied in the contract, and if the description language has validation rules it could even apply those too!
 
 Thankfully loads of folks in the API ecosystem thought about this, and there is a wide selection of tooling.
@@ -119,7 +119,7 @@ https://www.apollographql.com/docs/graphql-tools/mocking.html[Apollo - GraphQL T
 
 == gRPC Mocking
 
-gRPC has two mocking tools which require a bit more setup. They seem to be more useful for unit/integration testing (which will be covered in later sections) than helping at a planning stage. We will look at testing later on.
+gRPC has two mocking tools which require a bit more setup. They seem to be more useful for unit/integration testing than helping at a planning stage. We will look at testing in later sections.
 
 // TODO can these be used for mock servers like the above? https://github.com/YoshiyukiKato/grpc-mock
 // https://github.com/jekiapp/gripmock
@@ -128,7 +128,7 @@ gRPC has two mocking tools which require a bit more setup. They seem to be more 
 
 Interacting with a mock server should be incredibly similar to how you would interact with any API. That is the point, after-all.
 
-Just find the instance of the mock server, then point your HTTP/GraphQL/gRPC client at it.
+Find the instance of the mock server, then point your HTTP/GraphQL/gRPC client at it.
 
 // TODO Totally phoned this in but im tired of talking about mocking. Show real examples with prism.
 

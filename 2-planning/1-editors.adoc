@@ -28,7 +28,7 @@ support. Maybe something specific like GitLab, or generic git repository, or
 they publish them to a URL accessible over HTTP, or something else.
 
 Other editors can take the form of desktop applications, which can be used
-throughout the life-cycle, loading local files and allowing you to edit them at
+throughout the life-cycle, loading local files and allowing you to edit them and
 commit them back to the repository (or wherever they live) at will.
 
 == Standard HTTP Editors

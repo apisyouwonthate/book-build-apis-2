@@ -16,7 +16,7 @@ Guess what? If you want that sweet-sweet feedback, you'll need to help your
 clients implement the API, and the best way to avoid inboxmageddon is to
 distribute "API Reference Documentation".
 
-This is usually an overview of methods/resources, and looks a lot like the sort
+This is usually an overview of methods/resources available in your API, and looks a lot like the sort
 of documentation you'd expect to see for a class or function in any programming
 language. These should always be accompanied by guides and tutorials at a later
 stage, but early on you will want to provide at least the reference
@@ -111,7 +111,7 @@ This tool is https://github.com/graphql/graphiql[GraphiQL], and it is basically
 an IDE which can run in various environments.
 
 Although you are in the planning stage and might not be sure what language you
-are going to build this thing in. If you are a big fan of NodeJS and are likely
+are going to build this thing in, if you are a big fan of NodeJS and are likely
 to use ExpressJS, then you are in luck:
 https://github.com/graphql/express-graphql[express-graphql] has Graphiql built
 in. There are some other installation instructions on the
