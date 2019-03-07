@@ -1,72 +1,9 @@
-= Success and Failure
+= Success or Failure
 
-In the world of API land, an error happens when whatever the client was trying to do did not work for some reason. One cause of this can be validation (they provided junk data in the request), or it could be a server issue (a piano fell on it).
+== Introduction
 
-Either way, if the thing the client was trying to do did not work, the client needs to know what happened, which can give them some hints as to what they should do next.
-
-.Some things a client might do in case of an error, in no particular order
-- Retry the request
-- Bubble an error up to the user
-- Send errors to Pagerduty
-- Email customer support staff
-- Throw a circuit breaker to disable this feature for other clients
-
-To let the client know if things worked or failed, there are a whole bunch of status codes defined in the HTTP standard, across various RFCs.
-
-== HTTP Status Codes
-
-Status codes are used in all responses and have a number from `100` to `599` – with plenty of gaps in between – and each has a message and a definition. Most server-side languages, frameworks, etc., default to `200 OK`.
-
-Status codes are grouped into a few different categories:
-
-**2xx is all about success**
-
-Whatever the client tried to do was successful up to the point that the response was sent. Keep in mind that a status like `202 Accepted` does not say anything about the actual result, it only indicates that a request was accepted and is being processed asynchronously.
-
-**3xx is all about redirection**
-
-These are all about sending the calling application somewhere else for the actual resource. The best known of these are the `303 See Other` and the `301 Moved Permanently`, which are used a lot on the web to redirect a browser to another URL.
-
-**4xx is all about client errors**
-
-With these status codes, we indicate that the client has done something invalid and needs to fix the request before attempting to make another request.
-
-**5xx is all about service errors**
-
-With these status codes, we indicate that something went wrong in the service. For example, the load balancer does not have any active servers to route traffic to, or some exception happened in the application layer like the connection failed.
-
-Typically, a client can retry these requests. The server can even specify when the client is allowed to retry the command using a `Retry-After` HTTP header.
-
-For a more complete list of HTTP status codes and their definitions https://http.cat/[http.cat] has pretty much all of them, and a cute cat photo to match. For definitions check https://httpstatuses.com.
-
-.Seriously https://http.cat is amazing.
-image::images/errors-599.jpg[]
-
-Arguments between developers until the end of time about which exact status code to use for any given situation, but here at the most important ones with a digestable description.
-
-* 200 - Generic everything is OK
-* 201 - Created something OK
-* 202 - Accepted but is being processed async (for a video means encoding, for an image means resizing, etc.)
-* 400 - Bad Request (should really be for invalid syntax, but some folks use for validation)
-* 401 - Unauthorized (no credentials provided, or they did not work)
-* 403 - Forbidden (the credentials are valid, but the owner of those credentials cannot do this thing)
-* 404 - That URL is not a valid route, or the item resource does not exist
-* 405 - Method Not Allowed (many web application frameworks will do this for you)
-* 410 - Data has been deleted, deactivated, suspended, etc.
-* 415 - The request had a `Content-Type` which the server does not know how to handle
-* 429 - Rate Limited, which means take a breather, try again later
-* 500 - Something unexpected happened, and it is the APIs fault
-* 503 - API is not here right now, please try again later
-
-It can be tempting to try and squeeze as many error codes in as you can, but I would advise you to try and keep it simple. You are not going to get an achievement badge for using them all.
-
-Just find the closest status code, and actually read the definition. To be clear, reading the definition is important. Some folks will just read the title, so they might see `406 Not Acceptable` and think that works for validation, but the definition is very clear:
-
-
-
-Most 5xx issues will likely happen under infrastructure or server related issues that could be nothing to do with your application code. For example, a we server segfaults behind Nginx (502), if your Amazon Elastic Load Balancer has no healthy instances (503), or if your disk drive fills up with cat gifs (507).
-
-== Error Codes and Error Messages
+// TODO talk about if 434 is not understood it should be handled as 400, etc.
+// TODO talk about why standars are important, fucking { error: { message: } = object Object}
 
 Error codes are usually strings or integers that act as a unique index to a corresponding human-readable error message with more information about what is going wrong. That sounds a lot like HTTP status codes, but these errors are about application specific things that may or may not have anything to do with HTTP specific responses.
 
@@ -273,17 +210,3 @@ A 410 on a resource could be due to a user deleting that entire piece of content
 In all of these situations, the ideal solution is to complement the HTTP status code with an error code, which can be whatever you want as long as they are unique within your API and documented somewhere.
 
 Do not do what Google does — supply a list of error codes while having other error codes that are not documented _anywhere_ — because if I see that, I will come for you.
-
-
-=== FIN
-
-
-
-The worst crime you can commit as an API designer is to return errors on a HTTP 200 OK status.
-
-
-.The folks over at CommitStrip.com know what's up.
-image::images/errors-200-ok.jpeg[This monster has got his API responding with HTTP Status 200 OK despite the request failing.]
-
-RFC 7087
-JSON API Errors

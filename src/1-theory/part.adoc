@@ -5,4 +5,8 @@ include::1-apis-services-microservices.adoc[]
 
 include::2-different-paradigms.adoc[]
 
-include::3-api-contracts.adoc[]
+include::3-input-and-output.adoc[]
+
+include::4-success-or-failure.adoc[]
+
+include::5-api-contracts.adoc[]

@@ -1,0 +1,281 @@
+= Input and Output
+
+Most of the whole idea of an API is "input" and "output", and in HTTP an input
+comes in the form of "requests", and output comes in the form of "responses".
+
+There's a "method" involved, and a URL (Universal Resource Location) also known as an "endpoint".
+
+== Requests
+
+.Making a GET request to the `/places` URL with some query string parameters.
+[source,http]
+----
+GET /places?lat=40.759211&lon=-73.984638 HTTP/1.1
+Host: api.example.org
+----
+
+Here `GET` is the method, the URL (or "endpoint") is `/places`, and the query
+string is `lat=40.759211&lon=-73.984638`. The HTTP version in use is HTTP/1.1,
+and the host name is defined to complete the URL. This is how a request to fetch
+data from `http://api.example.org/places` looks. This is essentially what your
+browser does when you go to any website - rather boring I'm sure.
+
+[source,http]
+----
+POST /moments/1/gift HTTP/1.1
+Host: api.example.org
+Content-Type: application/json
+
+{ "user_id" : 2 }
+----
+
+Here we make a POST request with an "HTTP body". The `Content-Type` header
+points out we are sending JSON and the blank line above the JSON separates the
+"HTTP headers" from the "HTTP body". HTTP really is amazingly simple. This is
+all you need to do for anything, and you can do all of this with an HTTP client
+in whatever programming language you feel like using this week:
+
+.Using PHP and the Guzzle HTTP library to make an HTTP Request
+[source,php]
+----
+use Guzzle\Http\Client;
+
+$headers = [
+    'Content-Type' => 'application/json',
+];
+$payload = [
+    'user_id' => 2
+];
+
+// Create a client and provide a base URL
+$client = new Client('http://api.example.org');
+
+$req = $client->post('/moments/1/gift', $headers, json_encode($payload));
+----
+
+.Using Python and the Requests HTTP library to make an HTTP Request
+[source,python]
+----
+import json
+import requests
+
+headers = {
+    'Content-Type': 'application/json',
+}
+payload = {
+    'user_id': 2
+}
+req = requests.post(
+  'http://api.example.org/moments/1/gift',
+  data=json.dumps(payload),
+  headers=headers
+)
+----
+
+It's all the same in any language. Define your headers, define the body in an appropriate
+format, and send it on its way.
+
+There are a bunch of HTTP methods you might run into:
+
+- GET
+- POST
+- PUT
+- PATCH
+- DELETE
+- HEAD
+- OPTIONS
+- TRACE
+
+Some of these methods might look familiar from your favourite web application frameworks routing layer.
+
+Some frameworks like Rails push their super magical routing to abstract away from manually declaring these routes, so if you are a Rails developer who is unfamiliar with these routes, try typing `rails routes` to see what shows up.
+
+There are a more HTTP methods floating around, but the idea is that they all have very specific defined behavior. Lazy people can pick the wrong method and misuse it, which cocks up a lot of various HTTP tools, but theoretically if used properly tools will know what to do in a lot of scenarios you might not have thought of.
+
+For example, many tools will know that they can cache a GET request, but cannot cache a POST. They will know they can retry a PUT or a DELETE, but better not retry a PATCH.
+
+Let's take a quick peruse through the HTTP methods.
+
+=== GET
+
+Just fetch some stuff. Don't trigger any destructive changes anywhere else as result. This should be repeatable.
+
+=== POST
+
+Often used purely for "creates" but can be used for any non-idempotent action. Idempotent means you can do this thing over and over again, and it happening two or more times won't create different outcomes.
+
+Creating something is a good example of a non-idempotent action, because if you send two requests to create a thing, you now have two things. You could also be triggering the sending of an email, paying an invoice, etc., it does not have to be a create.
+
+=== PUT
+
+This is a very handy for supplying the entirety of
+
+Once a request is made by the API client, your server will attempt to produce a response.
+
+== Responses
+
+Much the same as an HTTP request, your HTTP response is going to end up as plain
+text (unless you're using SSL, but hang on, we aren't there yet).
+
+.Example HTTP response containing a JSON body
+[source,http]
+----
+HTTP/1.1 200 OK
+Server: nginx
+Content-Type: application/json
+
+{
+  "id":"1690",
+  "is_gift":true,
+  "user":{
+    "id":1,
+    "name":"Theron Weissnat",
+    "bio":"Occaecati excepturi magni odio distinctio dolores.",
+    "gender":"female",
+    "picture_url":"https://cdn.example.org/foo.png",
+    "timezone":-1,
+    "birthday":"1989-09-17 16:27:36",
+    "status":"available",
+    "created_at":"2013-11-22 16:37:57",
+    "redeem_by":"2013-12-22 16:37:57"
+  }
+}
+----
+
+We can spot some fairly obvious things here. `200 OK` is a standard
+no-issues-here-buddy response. We have a `Content-Type` again, and the API is
+pointing out that caching this is not ok.
+
+//  TODO when internet exists link to HTTP RFC This is essentially the majority
+of how an API works. Just like learning a programming language, you will always
+come across new parts of the HTTP specification. This book will cover a lot of
+this extra functionality, but just like the [levenshtein()] function in PHP,
+there will be HTTP headers that you had no idea existed popping up that will
+make you think, "How the shit did I not notice that?".
+
+[levenshtein()]: http://php.net/manual/en/function.levenshtein.php
+
+== Mime Types
+
+HTTP APIs can work with all sorts of data. Whilst SOAP may have been restricted
+to XML, REST and GraphQL can work with any response types. gRPC is kinda stuck
+with Protobuf.
+
+An API can support almost unlimited options, but of course building support for
+every content type ever would be a rather laborious job. There are a few we can
+cut out early on.
+
+=== Ditch Form Data
+
+"Form Data" uses the `application/x-www-form-urlencoded` mime type, and mostly
+only seems to be used by PHP developers. Luckily most other folks ignore this
+wholeheartedly.
+
+.Form data doesn't really have data types, just awkward strings.
+[source]
+----
+foo=something&bar=1&baz=0
+----
+
+Another issue with form data is similar to how XML suffers a lack of obvious data types. For example, to handle a boolean a client has to send `1` or `0`, because `bar=true` would be `string("true")` on the server-side.
+
+Data types are important, so let's not just throw them out the window for the sake of "easy access to our data", especially as most web application frameworks have something like `$request->body->foo` to easily get to the foo property.
+
+WARNING: Rails is awful at this. If you have a `?foo=a` query string parameter, and you also send `{ "foo": "b" }` in the HTTP body, then `params[:foo]` will be set to `"b"` as the latter overrides the former. Code that you build, including any generic frameworks/tooling that you release, should avoid conflating query strings and body properties at all costs. They're different things and this nonsense causes confusion, especially when you realize that `params[:action]` means "controller method name" and actually overrides whatever is in `?action=` _without_ anything being in the body...
+
+.Instead of form data, use a nice JSON object.
+[source,http]
+----
+POST /checkins HTTP/1.1
+Host: api.example.org
+Content-Type: application/json
+
+{
+    "checkin": {
+        "place_id" : 1,
+        "message": "This is a bunch of text.",
+        "with_friends": [1, 2, 3, 4, 5]
+    }
+}
+----
+
+This is a perfectly valid HTTP body for a checkin. You know what they are saying. You know who the user is from their auth token. You know who they are with and you get the benefit of having it wrapped up in a single `checkin` key for simple documentation, and, easy "You sent a checkin object to the user settings page, muppet." responses.
+
+That same request using form data is a mess.
+
+.The alternative to a nice JSON object when using form data.
+[source,http]
+----
+POST /checkins HTTP/1.1
+Host: api.example.org
+Content-Type: application/x-www-form-urlencoded
+
+checkin[place_id]=1&checkin[message]=This is a bunch of text&checkin[with_friends][]=1&checkin[with_friends][]=2&checkin[with_friends][]=3&checkin[with_friends][]=4&checkin[with_friends][]=5
+----
+
+This makes me upset _and_ angry. Do not do it in your API.
+
+Finally, do not try to be clever by mixing JSON with form data:
+
+.This is nonsense. Do not do it.
+[source,http]
+----
+POST /checkins HTTP/1.1
+Host: api.example.org
+Content-Type: application/x-www-form-urlencoded
+
+json="{
+    \"checkin\": {
+        \"place_id\" : 1,
+        \"message\": \"This is a bunch of text.\",
+        \"with_friends\": [1, 2, 3, 4, 5]
+    }
+}"
+----
+
+Who is the developer trying to impress with stuff like that? It is ludicrous,
+and anyone who advocates this needs to have their badge and gun revoked.
+
+### JSON and XML
+
+Any modern API you interact with will support JSON unless it is a financial
+services API, or there is some fancy binary format being used. Sometimes APIs
+will support XML too. XML used to be the popular format for data transfer with
+both SOAP and XML-RPC. XML is, however, a big old mess of tags, and the
+file-size of an XML file containing the same data as a JSON file is often much
+larger.
+
+Beyond purely the size of the data being stored, XML is horribly bad at storing
+type. That might not worry dynamic language develoers all that much, but look at this:
+
+[source,javascript]
+----
+{
+    "place": {
+        "id" : 1,
+        "name": "This is a bunch of text.",
+        "is_true": false,
+        "maybe": null,
+        "empty_string": ""
+    }
+}
+----
+
+That response in XML:
+
+[source,xml]
+----
+<places>
+    <place>
+        <id>1</id>,
+        <name>This is a bunch of text.</name>
+        <is_true>0</is_true>
+        <maybe />
+        <empty_string />
+    </place>
+</places>
+----
+
+Basically, in XML, _everything_ is considered a string, meaning integers, booleans, and nulls can be confused. Both `maybe` and `empty_string` have the same value, because there is no way to denote a null value either. Gross.
+
+Work out which content type(s) you actually need, and _stick to that_. The Flickr API used to support `lolcat` as a joke, and that was probably the result of a hack project in which the development team were only paid with cold pizza. JSON is fine. If you have a lot of Ruby folks around, then you will probably want to output YAML too, which is as easy to generate as JSON in most cases.
