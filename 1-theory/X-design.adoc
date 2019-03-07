@@ -1,3 +1,5 @@
+Introduce concept of api clients, talk about stakeholders, etc.
+
 Resources
 
 https://www.thoughtworks.com/insights/blog/rest-api-design-resource-modelinga
@@ -7,3 +9,5 @@ https://medium.com/@__xuorig__/graphql-interfaces-not-just-bags-of-fields-1adfcc
 
 also probably (and if not here, it will go in evolvability)
 https://blog.apollographql.com/graphql-schema-design-building-evolvable-schemas-1501f3c59ed5
+
+Where should we mention that Autoincrementing ids are bad
