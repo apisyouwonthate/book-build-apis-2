@@ -82,9 +82,8 @@ This will run a local HTTP server, and you can load up in your local browser.
 The `--watch` switch means changes to the local files will be automatically
 detected, and should show up when you refresh the browser.
 
-When somebody else asks for a look, you can then do a few things, but a common
-thing to do is ask the documentation generator to create HTML for sharing
-around.
+When somebody else asks for a look, you can ask the documentation generator to
+create HTML for sharing around.
 
 [source]
 ----
@@ -98,8 +97,7 @@ people can take a look and give you feedback.
 
 ReDoc will also have an API console at some point, but it is not complete at
 time of writing. This will turn a reference documentation tool into a fully
-fledged, API client, letting your users test out interactions from the browser,
-and avoiding the need to distribute public Postman collections or similar.
+fledged, API client, letting your users trial interactions from the browser.
 
 == GraphQL
 
@@ -118,15 +116,13 @@ in. There are some other installation instructions on the
 https://github.com/graphql/graphiql[repository README].
 
 There are also a bunch of Chrome extensions floating around which you can use
-for this, one of which is called
+instead of running a local instance of GraphiQL, one of which is called
 https://chrome.google.com/webstore/detail/chromeiql/fkkiamalmpiidkljmicmjfbieiclmeij[ChromeiQL].
 
 Using these tools you can interact with your fake API, and when you start to
 develop the real one you can interact with that too.
 
 == gRPC
-
-
 
 https://github.com/pseudomuto/protoc-gen-doc [protoc-gen-doc] is a documentation
 generator plugin for the Google Protocol Buffers compiler (protoc). The plugin
