@@ -1,4 +1,11 @@
-self ddosing - When A calls B calls A again
+self ddosing - When A calls B and B secretly calls back to A, which causes them
+both to slow down so much they both slow each other down MORE ANDE GUESS WHAT
+EVERYTHING IS ON FUCKING FIRE 
+
+The Keycard Situation of 2016
+
+Three-way syncs, where A, B and C all have different god damn validation rules,
+so something could be in A and B but not C, or B and C but not A, or... 
 
 overloading specific fields with unexpected meaning, like "ID of ABC123F means
 the resource is a special 'foo' type... oh wait also ABC456E also means this...
