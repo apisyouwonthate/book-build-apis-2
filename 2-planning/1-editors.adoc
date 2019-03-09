@@ -35,8 +35,9 @@ commit them back to the repository (or wherever they live) at will.
 
 === Swagger Editor
 
-Swagger Editor is a very simple hosted text-based editor from
-https://smartbear.com/[SmartBear].
+https://editor.swagger.io/[Swagger Editor] is a very simple text-based editor from
+https://smartbear.com/[SmartBear]. You can find it hosted on swagger.com, and it
+can be downloaded and run locally for free.
 
 NOTE: Remember, SmartBear call their suite of tools "Swagger" because they own
 the copyright and they don't feel like re-branding, but the description language
