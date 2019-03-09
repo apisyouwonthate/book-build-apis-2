@@ -1,3 +1,0 @@
-Can JSON Schema do a decent mock?
-https://www.npmjs.com/package/mock-json-schema
-https://www.npmjs.com/package/cast-with-schema
