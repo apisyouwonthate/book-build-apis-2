@@ -2,7 +2,7 @@ Introduce concept of api clients, talk about stakeholders, etc.
 
 Resources
 
-https://www.thoughtworks.com/insights/blog/rest-api-design-resource-modelinga
+https://www.thoughtworks.com/insights/blog/rest-api-design-resource-modeling
 
 Awesome article about graphql interfaces with a lot of lessons that apply to all resource design
 https://medium.com/@__xuorig__/graphql-interfaces-not-just-bags-of-fields-1adfcca027e9
