@@ -210,3 +210,42 @@ A 410 on a resource could be due to a user deleting that entire piece of content
 In all of these situations, the ideal solution is to complement the HTTP status code with an error code, which can be whatever you want as long as they are unique within your API and documented somewhere.
 
 Do not do what Google does — supply a list of error codes while having other error codes that are not documented _anywhere_ — because if I see that, I will come for you.
+
+=== FIN
+
+
+
+The worst crime you can commit as an API designer is to return errors on a HTTP 200 OK status.
+
+
+.The folks over at CommitStrip.com know what's up.
+image::images/errors-200-ok.jpeg[This monster has got his API responding with HTTP Status 200 OK despite the request failing.]
+
+RFC 7087
+JSON API Errors
+
+== GraphQL
+
+[source,javascript]
+----
+{
+  "data": {
+    "repository": null
+  },
+  "errors": [
+    {
+      "type": "NOT_FOUND",
+      "path": [
+        "repository"
+      ],
+      "locations": [
+        {
+          "line": 7,
+          "column": 3
+        }
+      ],
+      "message": "Could not resolve to a Repository with the name 'any'."
+    }
+  ]
+}
+----
