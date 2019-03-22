@@ -1,17 +1,24 @@
 = Success or Failure
 
-== Introduction
+Deal with the Happy Path™ in an API is pretty easy: When a client asks for a resource, show them the resource. When they trigger a procedure, let them know if it was triggered ok, or if it completed without a problem.
+
+What to do when something doesn't go according to plan? Well, that can be tricky.
+
+== Errors
+
+The main approach to handling failure is for the server to respond with a status code that suggests something went wrong.
 
 // TODO talk about if 434 is not understood it should be handled as 400, etc.
-// TODO talk about why standars are important, fucking { error: { message: } = object Object}
+// TODO talk about why standards are important, fucking { error: { message: } = object Object}
 
-Error codes are usually strings or integers that act as a unique index to a corresponding human-readable error message with more information about what is going wrong. That sounds a lot like HTTP status codes, but these errors are about application specific things that may or may not have anything to do with HTTP specific responses.
+Error codes are usually strings or integers that act as a unique identifier for a corresponding human-readable error message with more information about what is going wrong. That sounds a lot like HTTP status codes, but these errors are about application specific things that may or may not have anything to do with HTTP specific responses.
 
 Some folks will try to use HTTP status codes exclusively and skip using error codes because they do not like the idea of making their own error codes or having to document them, but this is not a scalable approach. There will be some situations where the same endpoint could easily return the same status code for more than one different condition. The status codes are there to merely hint at the category of error relying on the actual error code and error message provided in the HTTP response to include more information in case the client is interested.
 
-For example, an issue with the access token will always result in the user not being recognized. An uninterested client would simply say "User could not get in" while a more interested client would probably prefer to offer suggestions via messages in their own webapp/iPhone app interface.
+For example, an issue with the access token will always result in the user not being recognized. An uninterested client would simply say "User could not get in" while a more interested client would probably prefer to offer suggestions via messages in their own web-app/iPhone app interface.
 
-~~~~~~~~
+[source,javascript]
+----
 {
   "error": {
     "type": "OAuthException",
@@ -19,7 +26,7 @@ For example, an issue with the access token will always result in the user not b
 The current unix time is 1385848532."
   }
 }
-~~~~~~~~
+----
 
 Humans can understand that nicely enough, but Facebook used to lack error codes, making it rather hard for computers to understand the problem. They have added them since the first edition of this book, but before that you would find yourself doing substring matching on the message text, which is lunacy.
 
@@ -36,13 +43,14 @@ Foursquare is not a bad example of using both, but they place an emphasis on tyi
 |161  | You are unable to follow more people at this time | Corresponds with HTTP 403 - thrown when a user cannot follow another user due to some kind of limit |
 |179  | Sorry, you are not authorized to see this status  | Corresponds with HTTP 403 - thrown when a Tweet cannot be viewed by the authenticating user, usually due to the tweet's author having protected their tweets. |
 
-### Programmatically Detecting Error Codes
+=== Programmatically Detecting Error Codes
 
 You can use error codes to make an application respond intelligently to failure of something as basic as a posted Twitter
 status.
 
-{title="Using Python to catch exceptions and react to the Twitter error code", lang=python}
-~~~~~~~~
+.Using Python to catch exceptions and react to the Twitter error code
+[source,python]
+----
 try:
     api.PostUpdates(body['text'])
 
@@ -72,12 +80,13 @@ except twitter.TwitterError, exc:
             time.sleep(10)
 
         message.requeue()
-~~~~~~~~
+----
 
 Compare this sort of logic with the Facebook example from when they lacked error codes:
 
-{title="Using Python to analyse Facebook error strings as no codes exist", lang=python}
-~~~~~~~~
+.Using Python to analyse Facebook error strings as no codes exist
+[source,python]
+----
 except facebook.GraphAPIError, e:
 
     phrases = ['expired', 'session has been invalidated']
@@ -90,13 +99,13 @@ except facebook.GraphAPIError, e:
             self._deactivate_token(user['token_id'])
 
     log.error("-- Unknown Facebook Error", exec_info=True)
-~~~~~~~~
+----
 
 If they change their error messages then this might stop working, which would be a problem. Codes that
 do not change are a much more sensible way to go about this.
 
-{title="If Facebook added codes and documentation links to GraphAPI error responses.", lang=json}
-~~~~~~~~
+.If Facebook added codes and documentation links to GraphAPI error responses.",]lang=json}
+----
 {
   "error": {
     "type": "OAuthException",
@@ -105,7 +114,7 @@ do not change are a much more sensible way to go about this.
     "href": "http://example.org/docs/errors/#ERR-01234"
   }
 }
-~~~~~~~~
+----
 
 ## Error or Errors
 
@@ -115,8 +124,9 @@ laziness.
 
 After being forced to work with the JSON-API standard, the use of multiple errors started to feel more natural.
 
-{title="If Facebook returned multiple errors in a list for GraphAPI responses.", lang=json}
-~~~~~~~~
+.If Facebook returned multiple errors in a list for GraphAPI responses.
+[source,javascript]
+----
 {
   "errors": [{
     "type": "OAuthException",
@@ -125,7 +135,7 @@ After being forced to work with the JSON-API standard, the use of multiple error
     "href": "http://example.org/docs/errors/#ERR-01234"
   }]
 }
-~~~~~~~~
+----
 
 ## Standards for Error Responses
 
@@ -136,7 +146,7 @@ before forcing you to read complicated standards.
 There are two popular standards that cover error reporting, which are both fairly similar, but sadly
 still in draft at time of writing.
 
-### JSON-API
+=== JSON-API
 
 [JSON-API](http://jsonapi.org/format/#errors) is discussed in a few sections of this book and is a
 standard outlining the general format of requests and responses in JSON when working with HTTP APIs. It
@@ -160,7 +170,7 @@ The following is an excerpt from the JSON-API standard at time of writing.
 When constructing your API error responses, you pretty much just need to make an array with items that looks a bit
 like this:
 
-~~~~~~~~
+----
 {
   "errors": [{
     "code": "ERR-01234",
@@ -169,11 +179,11 @@ like this:
     "href": "http://example.org/docs/errors/#ERR-01234"
   }]
 }
-~~~~~~~~
+----
 
 See how that Facebook example has been slightly tweaked to follow the standard? Nice and easy.
 
-### Problem Details for HTTP APIs
+=== Problem Details for HTTP APIs
 
 This is currently a [draft RFC], which at the
 time of writing was on Draft 7.
@@ -193,13 +203,13 @@ If you are interested in implementing this standard then there are tools to make
 [crell/api-problem]: https://github.com/Crell/ApiProblem
 
 
-## Common Pitfalls
+== Common Pitfalls
 
-### 200 OK and Error Code
+=== 200 OK and Error Code
 
 If you return an HTTP status code of 200 with an error code, then Chuck Norris will roundhouse your door in, destroy your computer, instantly 35-pass wipe your backups, cancel your Dropbox account, and block you from GitHub. HTTP 4xx or 5xx codes alert the client that something bad happened, and error codes provide specifics of the exact issue if the client is interested.
 
-### Non-Existent, Gone, or Hiding?
+=== Non-Existent, Gone, or Hiding?
 
 404 is drastically overused in APIs. People use it for "never existed", "no longer exists", "you can't view it" and "it is deactivated", which is way too vague. That can be split up into 404, 403 and 410 but this is still vague.
 
@@ -211,7 +221,7 @@ In all of these situations, the ideal solution is to complement the HTTP status 
 
 Do not do what Google does — supply a list of error codes while having other error codes that are not documented _anywhere_ — because if I see that, I will come for you.
 
-=== FIN
+== FIN
 
 
 
