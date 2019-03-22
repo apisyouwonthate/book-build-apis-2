@@ -13,7 +13,7 @@ overloading specific fields with unexpected meaning, like "ID of ABC123F means
 the resource is a special 'foo' type... oh wait also ABC456E also means this...
 oops now theres another one. JUST ADD FUCKING type: 'foo' GAH
 
-When I rant on about how graphql is forcing you to wait for D to finish loading 
+When I rant on about how graphql is forcing you to wait for D to finish loading
 before you can show A remember to talk about Appollo specific @defer
 https://www.apollographql.com/docs/react/features/defer-support.html
 https://blog.apollographql.com/introducing-defer-in-apollo-server-f6797c4e9d6e
@@ -25,3 +25,9 @@ explained more in surviving other peoples apis aint doing it twice
 Talk about specs later a bit more:
 - https://inspector.swagger.io/builder
 - https://blog.apisyouwonthate.com/creating-api-specifications-from-bulls-t-f5a54c005135
+
+testing...
+https://www.toolsqa.com/postman/assertions-in-postman-with-chai-assertion-library/
+
+hypermedia cache pattern
+https://tools.ietf.org/html/draft-kelly-json-hal-08#section-8.3

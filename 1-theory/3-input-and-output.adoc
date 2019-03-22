@@ -14,19 +14,19 @@ GET /places?lat=40.759211&lon=-73.984638 HTTP/1.1
 Host: api.example.org
 ----
 
-Here `GET` is the method, the URL (or "endpoint") is `/places`, and the query
+Here `GET` is the method, and the part of the URL usually referred to as the "endpoint" is `/places`, and the query
 string is `lat=40.759211&lon=-73.984638`. The HTTP version in use is HTTP/1.1,
 and the host name is defined to complete the URL. This is how a request to fetch
-data from `http://api.example.org/places` looks. This is essentially what your
-browser does when you go to any website - rather boring I'm sure.
+data from `http://api.example.org/places` looks, and is almost exactly what your
+browser does when you go to any website.
 
 [source,http]
 ----
-POST /moments/1/gift HTTP/1.1
+POST /places HTTP/1.1
 Host: api.example.org
 Content-Type: application/json
 
-{ "user_id" : 2 }
+{ "some_property" : "some_value" }
 ----
 
 Here we make a POST request with an "HTTP body". The `Content-Type` header
@@ -72,8 +72,8 @@ req = requests.post(
 )
 ----
 
-It's all the same in any language. Define your headers, define the body in an appropriate
-format, and send it on its way.
+It's all the same in any language. Define your headers, define the body in an
+appropriate format, and send it on its way.
 
 There are a bunch of HTTP methods you might run into:
 
@@ -86,31 +86,206 @@ There are a bunch of HTTP methods you might run into:
 - OPTIONS
 - TRACE
 
-Some of these methods might look familiar from your favourite web application frameworks routing layer.
+Some of these methods might look familiar from your favourite web application
+frameworks routing layer.
 
-Some frameworks like Rails push their super magical routing to abstract away from manually declaring these routes, so if you are a Rails developer who is unfamiliar with these routes, try typing `rails routes` to see what shows up.
+Some frameworks like Rails push their super magical routing to abstract away
+from manually declaring these routes, so if you are a Rails developer who is
+unfamiliar with these routes, try typing `rails routes` to see what shows up.
 
-There are a more HTTP methods floating around, but the idea is that they all have very specific defined behavior. Lazy people can pick the wrong method and misuse it, which cocks up a lot of various HTTP tools, but theoretically if used properly tools will know what to do in a lot of scenarios you might not have thought of.
+There are a more HTTP methods floating around, but the idea is that they all
+have very specific defined behavior. Lazy people can pick the wrong method and
+misuse it, which cocks up a lot of various HTTP tools, but theoretically if used
+properly tools will know what to do in a lot of scenarios you might not have
+thought of.
 
-For example, many tools will know that they can cache a GET request, but cannot cache a POST. They will know they can retry a PUT or a DELETE, but better not retry a PATCH.
+For example, many tools will know that they can cache a GET request, but know
+that caching a POST would be spooky and problematic. They will know they can
+retry a PUT or a DELETE, but better not retry a PATCH. These conventions allow a
+lot of tools that do not have direct knowledge of each other to work together.
+
+
+=== HTTP Methods
 
 Let's take a quick peruse through the HTTP methods.
 
-=== GET
+==== GET
 
-Just fetch some stuff. Don't trigger any destructive changes anywhere else as result. This should be repeatable.
+Just fetch some stuff. Don't trigger any destructive changes anywhere else as
+result. This should be repeatable.
 
-=== POST
+SIDEBAR: They can technically have a body some servers and tools will start
+acting a bit wonky, meaning people generally avoid creating GETs with bodies.
 
-Often used purely for "creates" but can be used for any non-idempotent action. Idempotent means you can do this thing over and over again, and it happening two or more times won't create different outcomes.
+==== POST
 
-Creating something is a good example of a non-idempotent action, because if you send two requests to create a thing, you now have two things. You could also be triggering the sending of an email, paying an invoice, etc., it does not have to be a create.
+Often used purely for "creates" but can be used for any non-idempotent action.
+Idempotent means you can do this thing over and over again, and it happening two
+or more times won't create different outcomes.
 
-=== PUT
+Creating something is a good example of a non-idempotent action, because if you
+send two requests to create a thing, you now have two things. You could also be
+triggering the sending of an email, paying an invoice, etc., it does not have to
+be a create.
 
-This is a very handy for supplying the entirety of
+==== PUT
 
-Once a request is made by the API client, your server will attempt to produce a response.
+Often incorrectly associated with being an "edit" action, PUT can actually do a
+whole lot more than that. PUT is designed to be an idempotent way to send data
+to a server, where the request contains the entirety of the resource. Whatever
+it says should go, so if the attempt fails for any reason and the client
+retries, there wil be no negative consequence as its said the same thing twice.
+
+An example of this would be an image upload. An API might have the ability to
+upload an image for a user, which is probably a profile image. A request with
+`PUT /users/jane/image` and a body of either the image contents (or a JSON
+payload with a URL) could then provide the image. It does not matter if the user
+already had an image or not, if the request is a success they will have one. If
+the upload fails that is fine, another request can be set, and it will be
+overridden.
+
+SIDEBAR: Some folks get a bit concerned about this being a "create or update"
+action, but their concern comes from a misplaced sense that HTTP verbs
+correspond to a specific CRUD action. If somebody complains at you about this,
+politely point them at this section.
+
+PUT is not always appropriate, and can lead to race conditions if not used
+cautiously.
+
+===== 🏎 Race Conditions 🏎
+
+Think about a resource represented with JSON, that has two properties:
+`property1` and `property2`. After getting the initial value of the resource
+with a GET request, two different HTTP clients make requests (Request A and
+(Request B) to update the value of just one property via a PUT. Both `property1`
+and `property2` are `false` in the original response of the GET request.
+
+**Request A**
+
+Updating `property1` to be true.
+
+[source]
+====
+PUT /foos/123
+
+{
+  "property1": true,
+  "property2": false
+}
+====
+
+**Request B**
+
+Updating `property2` to be true.
+
+[source]
+====
+PUT /foos/123
+
+{
+  "property1": false,
+  "property2": true
+}
+====
+
+Both properties started at `false`, and both clients were only trying to update one property, but little do they know they are clobbering the results and essentially reverting the updates from other clients. Instead of ending up with both values being `true`, the API will just hold whatever the most recent request was, which is going to be `"property1": false` and `"property2": true`.
+
+Some folks consider this to be a feature, but others consider it a bug because if they only want to update one property, why do they need to send everything? People in the second camp decide to just send the relevant properties they want to change, which is a flagrant misuse of how PUT is supposed to work and can lead to confusion with tools that expect PUT to contain an entire resource, not just partial changes.
+
+For partial changes, there is another method.
+
+==== PATCH
+
+Patch is a more recent condition to HTTP, with its RFC being finalized in 2010.
+
+[quote,Internet Engineering Task Force (IETF),https://tools.ietf.org/html/rfc5789]
+====
+The existing HTTP PUT method only allows a complete replacement of a document.
+This proposal adds a new HTTP method, PATCH, to modify an existing HTTP resource.
+====
+
+So if PUT is for when a client has all the answers and wants to give that
+exactly to the server, PATCH is for when the client only wants to update certain
+parts of the resource.
+
+Some folks have never heard of the conflict scenario above, and recommend PATCH
+because it is essentially a performance improvement. Technically they are right:
+sending less stuff over the wire is quicker than sending more stuff.
+
+How exactly PATCH works can vary on which data format you're using. If its JSON
+then there are two popular approaches: https://tools.ietf.org/html/rfc6902[JSON
+Patch] and https://tools.ietf.org/html/rfc7396[JSON Merge Patch].
+
+JSON Merge Patch is what most people will want to use for general APIs, and it is
+simple to use. From the RFC:
+
+[quote,Internet Engineering Task Force (IETF),https://tools.ietf.org/html/rfc7396]
+____
+
+Given the following example JSON document:
+
+  {
+    "title": "Goodbye!",
+    "author" : {
+      "givenName" : "John",
+      "familyName" : "Doe"
+    },
+    "tags":[ "example", "sample" ],
+    "content": "This will be unchanged"
+  }
+
+A user agent wishing to change the value of the "title" member from
+"Goodbye!" to the value "Hello!", add a new "phoneNumber" member,
+remove the "familyName" member from the "author" object, and replace
+the "tags" array so that it doesn't include the word "sample" would
+send the following request:
+
+  PATCH /my/resource HTTP/1.1
+  Host: example.org
+  Content-Type: application/merge-patch+json
+
+  {
+    "title": "Hello!",
+    "phoneNumber": "+01-123-456-7890",
+    "author": {
+      "familyName": null
+    },
+    "tags": [ "example" ]
+  }
+
+The resulting JSON document would be:
+
+  {
+    "title": "Hello!",
+    "author" : {
+      "givenName" : "John"
+    },
+    "tags": [ "example" ],
+    "content": "This will be unchanged",
+    "phoneNumber": "+01-123-456-7890"
+  }
+____
+
+==== HEAD
+
+Pretty much exactly the same as GET in every way, but HEAD responses must not
+contain a body. This is great for checks to see if something exists, and if it
+does the client does not have to wait for the entire response body to be
+generated then sent down the wire.
+
+==== DELETE
+
+Guess what this does?!
+
+DELETE requests _can_ contain a body, but generally do not. They are considered
+idempotent like PUT, because if you are asking to delete something, and you
+accidentally delete it twice, then the response both times should be "Yes this
+is deleted".
+
+Some APIs do not implement it that way so a second attempt to
+delete the same thing will get a 404. That is a bit of a shame as it means
+clients can get a "You cannot delete this" message when they did in fact delete
+it... plan accordingly.
 
 == Responses
 
@@ -146,12 +321,12 @@ We can spot some fairly obvious things here. `200 OK` is a standard
 no-issues-here-buddy response. We have a `Content-Type` again, and the API is
 pointing out that caching this is not ok.
 
-//  TODO when internet exists link to HTTP RFC This is essentially the majority
-of how an API works. Just like learning a programming language, you will always
-come across new parts of the HTTP specification. This book will cover a lot of
-this extra functionality, but just like the [levenshtein()] function in PHP,
-there will be HTTP headers that you had no idea existed popping up that will
-make you think, "How the shit did I not notice that?".
+This is essentially the majority of how an API works. Just like learning a
+programming language, you will always come across new parts of the HTTP
+specification. This book will cover a lot of this extra functionality, but just
+like the [levenshtein()] function in PHP, there will be HTTP headers that you
+had no idea existed popping up that will make you think, "How the shit did I not
+notice that?".
 
 [levenshtein()]: http://php.net/manual/en/function.levenshtein.php
 
@@ -177,11 +352,22 @@ wholeheartedly.
 foo=something&bar=1&baz=0
 ----
 
-Another issue with form data is similar to how XML suffers a lack of obvious data types. For example, to handle a boolean a client has to send `1` or `0`, because `bar=true` would be `string("true")` on the server-side.
+Another issue with form data is similar to how XML suffers a lack of obvious
+data types. For example, to handle a boolean a client has to send `1` or `0`,
+because `bar=true` would be `string("true")` on the server-side.
 
-Data types are important, so let's not just throw them out the window for the sake of "easy access to our data", especially as most web application frameworks have something like `$request->body->foo` to easily get to the foo property.
+Data types are important, so let's not just throw them out the window for the
+sake of "easy access to our data", especially as most web application frameworks
+have something like `$request->body->foo` to easily get to the foo property.
 
-WARNING: Rails is awful at this. If you have a `?foo=a` query string parameter, and you also send `{ "foo": "b" }` in the HTTP body, then `params[:foo]` will be set to `"b"` as the latter overrides the former. Code that you build, including any generic frameworks/tooling that you release, should avoid conflating query strings and body properties at all costs. They're different things and this nonsense causes confusion, especially when you realize that `params[:action]` means "controller method name" and actually overrides whatever is in `?action=` _without_ anything being in the body...
+WARNING: Rails is awful at this. If you have a `?foo=a` query string parameter,
+and you also send `{ "foo": "b" }` in the HTTP body, then `params[:foo]` will be
+set to `"b"` as the latter overrides the former. Code that you build, including
+any generic frameworks/tooling that you release, should avoid conflating query
+strings and body properties at all costs. They're different things and this
+nonsense causes confusion, especially when you realize that `params[:action]`
+means "controller method name" and actually overrides whatever is in `?action=`
+_without_ anything being in the body...
 
 .Instead of form data, use a nice JSON object.
 [source,http]
@@ -276,6 +462,12 @@ That response in XML:
 </places>
 ----
 
-Basically, in XML, _everything_ is considered a string, meaning integers, booleans, and nulls can be confused. Both `maybe` and `empty_string` have the same value, because there is no way to denote a null value either. Gross.
+Basically, in XML, _everything_ is considered a string, meaning integers,
+booleans, and nulls can be confused. Both `maybe` and `empty_string` have the
+same value, because there is no way to denote a null value either. Gross.
 
-Work out which content type(s) you actually need, and _stick to that_. The Flickr API used to support `lolcat` as a joke, and that was probably the result of a hack project in which the development team were only paid with cold pizza. JSON is fine. If you have a lot of Ruby folks around, then you will probably want to output YAML too, which is as easy to generate as JSON in most cases.
+Work out which content type(s) you actually need, and _stick to that_. The
+Flickr API used to support `lolcat` as a joke, and that was probably the result
+of a hack project in which the development team were only paid with cold pizza.
+JSON is fine. If you have a lot of Ruby folks around, then you will probably
+want to output YAML too, which is as easy to generate as JSON in most cases.
