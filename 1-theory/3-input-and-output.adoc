@@ -3,7 +3,7 @@
 Most of the whole idea of an API is "input" and "output", and in HTTP an input
 comes in the form of "requests", and output comes in the form of "responses".
 
-There's a "method" involved, and a URL (Universal Resource Location) also known as an "endpoint".
+There's a "method" involved, and a URL (Uniform Resource Locator) also known as an "endpoint".
 
 == Requests
 
@@ -391,7 +391,7 @@ POST /checkins HTTP/1.1
 Host: api.example.org
 Content-Type: application/x-www-form-urlencoded
 
-checkin[place_id]=1&checkin[message]=This is a bunch of text&checkin[with_friends][]=1&checkin[with_friends][]=2&checkin[with_friends][]=3&checkin[with_friends][]=4&checkin[with_friends][]=5
+checkin[place_id]=1&checkin[message]=This is a bunch of text.&checkin[with_friends][]=1&checkin[with_friends][]=2&checkin[with_friends][]=3&checkin[with_friends][]=4&checkin[with_friends][]=5
 ----
 
 This makes me upset _and_ angry. Do not do it in your API.
