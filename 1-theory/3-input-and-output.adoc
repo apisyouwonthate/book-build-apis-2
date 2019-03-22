@@ -300,19 +300,12 @@ Server: nginx
 Content-Type: application/json
 
 {
-  "id":"1690",
-  "is_gift":true,
   "user":{
     "id":1,
     "name":"Theron Weissnat",
     "bio":"Occaecati excepturi magni odio distinctio dolores.",
-    "gender":"female",
     "picture_url":"https://cdn.example.org/foo.png",
-    "timezone":-1,
-    "birthday":"1989-09-17 16:27:36",
-    "status":"available",
-    "created_at":"2013-11-22 16:37:57",
-    "redeem_by":"2013-12-22 16:37:57"
+    "created_at":"2013-11-22 16:37:57"
   }
 }
 ----
@@ -323,12 +316,10 @@ pointing out that caching this is not ok.
 
 This is essentially the majority of how an API works. Just like learning a
 programming language, you will always come across new parts of the HTTP
-specification. This book will cover a lot of this extra functionality, but just
-like the [levenshtein()] function in PHP, there will be HTTP headers that you
-had no idea existed popping up that will make you think, "How the shit did I not
-notice that?".
+specification, and there is a lot to learn.
 
-[levenshtein()]: http://php.net/manual/en/function.levenshtein.php
+SIDEBAR: For those interested in HTTP RFCs that can help them with building APIs,
+head over to https://standards.rest/[Standards.REST].
 
 == Mime Types
 
@@ -385,7 +376,11 @@ Content-Type: application/json
 }
 ----
 
-This is a perfectly valid HTTP body for a checkin. You know what they are saying. You know who the user is from their auth token. You know who they are with and you get the benefit of having it wrapped up in a single `checkin` key for simple documentation, and, easy "You sent a checkin object to the user settings page, muppet." responses.
+This is a perfectly valid HTTP body for a checkin. You know what they are
+saying. You know who the user is from their auth token. You know who they are
+with and you get the benefit of having it wrapped up in a single `checkin` key
+for simple documentation, and, easy "You sent a checkin object to the user
+settings page, muppet." responses.
 
 That same request using form data is a mess.
 
@@ -419,31 +414,29 @@ json="{
 }"
 ----
 
-Who is the developer trying to impress with stuff like that? It is ludicrous,
-and anyone who advocates this needs to have their badge and gun revoked.
+Who is the developer trying to impress with stuff like that?
 
-### JSON and XML
+=== JSON and XML
 
-Any modern API you interact with will support JSON unless it is a financial
-services API, or there is some fancy binary format being used. Sometimes APIs
-will support XML too. XML used to be the popular format for data transfer with
-both SOAP and XML-RPC. XML is, however, a big old mess of tags, and the
-file-size of an XML file containing the same data as a JSON file is often much
-larger.
+Any modern API you interact with will support JSON, or there is some fancy
+binary format being used. Sometimes APIs will support XML too, especially if the
+API is maintained by an older financial services company. XML is generally a
+big old mess of tags, and the size of an XML file containing the same data
+as a JSON file is often much larger.
 
 Beyond purely the size of the data being stored, XML is horribly bad at storing
-type. That might not worry dynamic language develoers all that much, but look at this:
+type. That might not worry dynamic language developers all that much, but look at this:
 
 [source,javascript]
 ----
 {
-    "place": {
-        "id" : 1,
-        "name": "This is a bunch of text.",
-        "is_true": false,
-        "maybe": null,
-        "empty_string": ""
-    }
+  "place": {
+    "id" : 1,
+    "name": "This is a bunch of text.",
+    "is_true": false,
+    "maybe": null,
+    "empty_string": ""
+  }
 }
 ----
 
@@ -469,5 +462,7 @@ same value, because there is no way to denote a null value either. Gross.
 Work out which content type(s) you actually need, and _stick to that_. The
 Flickr API used to support `lolcat` as a joke, and that was probably the result
 of a hack project in which the development team were only paid with cold pizza.
-JSON is fine. If you have a lot of Ruby folks around, then you will probably
-want to output YAML too, which is as easy to generate as JSON in most cases.
+JSON is fine.
+
+CSV can be pretty handy as an export format too, especially if your API is
+offering data for any sort of "Reports".
