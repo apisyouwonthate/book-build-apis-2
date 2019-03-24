@@ -27,7 +27,7 @@ very handy for quickly getting a HTTP server spitting out some JSON that you
 control:
 
 .Woah what a surprise, another NPM tool!
-[source]
+[source,bash]
 ----
 $ npm install -g json-server
 ----
@@ -49,14 +49,14 @@ Then you create a `db.json` file with some data in there:
 
 Now, get that server started via the CLI.
 
-[source]
+[source,bash]
 ----
 $ json-server --watch db.json
 ----
 
 When browsing to `http://localhost:3000/posts/1` you will see the following JSON:
 
-[source]
+[source,javascript]
 ----
 { "id": 1, "title": "json-server", "author": "typicode" }
 ----
@@ -78,14 +78,19 @@ a pain in the ass, conflicts will be rife as the file grows and different
 developers add different properties, etc. It's good for quick and dirty demos,
 but is probably not something you will want to use in anger.
 
-How about instead of manually maintaining `db.json`, a tool could be pointed at API contracts, and a mock server was automagically created?! Then it could figure out its own
-examples based on the examples/default values supplied in the contract, and if the description language has validation rules it could even apply those too!
+How about instead of manually maintaining `db.json`, a tool could be pointed at
+API contracts, and a mock server was automagically created?! Then it could
+figure out its own examples based on the examples/default values supplied in the
+contract, and if the description language has validation rules it could even
+apply those too!
 
 Thankfully loads of folks in the API ecosystem thought about this, and there is a wide selection of tooling.
 
 == Hosted Editors Love Mock Servers
 
-Most of the hosted editors covered so far have mock servers built in, and often it is either a case of enabling it, or it is already enabled and you just need to find the URL to the server instance.
+Most of the hosted editors covered so far have mock servers built in, and often
+it is either a case of enabling it, or it is already enabled and you just need
+to find the URL to the server instance.
 
 == Standard HTTP Mocking
 
@@ -105,7 +110,8 @@ http://stoplight.io/platform/prism/[Prism]
 
 https://github.com/danielgtaylor/apisprout[API Sprout]
 
-As always check https://openapi.tools/[OpenAPI.Tools] for the latest offering of mocking tools.
+As always check https://openapi.tools/[OpenAPI.Tools] for the latest offering of
+mocking tools.
 
 // TODO Can JSON Schema do a decent mock?
 // https://www.npmjs.com/package/mock-json-schema

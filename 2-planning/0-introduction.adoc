@@ -2,7 +2,7 @@
 
 When I was younger and dumber, the planning stage for APIs was pretty much
 "think of a list of endpoints then start coding". This is wildly insufficient.
-As the <<theory-contracts,API Contracts>> chapter explained, contracts are
+As the <<1-theory/5-api-contracts#theory-contracts,API Contracts>> chapter explained, contracts are
 incredibly important throughout the life-cycle of an API.
 
 The information provided in _Part One: Theory_ is going to come in useful for

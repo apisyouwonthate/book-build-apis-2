@@ -1,3 +1,4 @@
+[authorblurb]
 = About the Author
 
 You can contact {author} at {email}.
