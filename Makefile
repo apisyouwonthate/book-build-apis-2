@@ -17,5 +17,5 @@ build-pdf:
 
 build-epub:
 	export XML_CATALOG_FILES=/usr/local/etc/xml/catalog
-	a2x -v -fepub -dbook --no-xmllint book.adoc && mkdir -p generated/html
+	a2x -v -fepub -dbook --no-xmllint book.adoc
 	mkdir generated/epub && mv book.epub generated/epub/
