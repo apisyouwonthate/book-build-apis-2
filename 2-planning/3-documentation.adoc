@@ -63,19 +63,22 @@ all sorts of other handy stuff.
 .Down arrows let you expand nested objects to avoid initial clutter.
 image::images/docs-redoc-data-struct.png[]
 
-ReDoc can be used as a React command or embedded in HTML, but the most common approach to use it is via the command line. Look at their documentation for instructions, but one way is to install as a node module.
+ReDoc can be used as a React command or embedded in HTML, but the most common
+approach to use it is via the command line. Look at their documentation for
+instructions, but one way is to install as a node module.
 
-[source]
+[source,javascript]
 ----
 $ npm install -g redoc-cli
 ----
 
 To see how the documentation looks locally, you can run a local web server using the ReDoc CLI tool.
 
-[source]
+[source,bash]
 ----
 $ redoc-cli serve openapi.yaml --watch
-TODO update example when ubuntu NodeJS stops cocking about
+Server started: http://127.0.0.1:8080
+👀  Watching /Users/phil/src/pokeapi for changes...
 ----
 
 This will run a local HTTP server, and you can load up in your local browser.
@@ -85,7 +88,7 @@ detected, and should show up when you refresh the browser.
 When somebody else asks for a look, you can ask the documentation generator to
 create HTML for sharing around.
 
-[source]
+[source,bash]
 ----
 $ redoc-cli bundle openapi.yaml
 ----

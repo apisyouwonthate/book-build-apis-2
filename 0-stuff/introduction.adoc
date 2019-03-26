@@ -1,3 +1,4 @@
+[preface]
 = Introduction
 
 This book is my second effort at writing down everything I know about APIs. _Build APIs You Wont Hate_ was essentially every complicated design I had to navigate when building an API for a mobile-centric startup that was basically a combination of Foursquare, Groupon, and Instragram. I had to think about naming endpoints, writing documentation for designers, shaping the response body JSON, was curious about which status codes to use, etc.

@@ -20,3 +20,6 @@ if (ENV['MOCK_API']) {
   http_server = 'http://mock.server.api'
 }
 ----
+
+pretty much all of this
+https://principledgraphql.com/

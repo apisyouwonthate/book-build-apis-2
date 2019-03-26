@@ -337,7 +337,7 @@ which can be moved to their own files. Once these are split into their own
 files, an extra step can be taken to turn them into proper JSON Schema files.
 Once they are split out they can be referenced in a HTTP response header.
 
-[source]
+[source,http]
 ----
 Link: <http://example.com/schemas/hat.json#>; rel="describedby"
 ----
