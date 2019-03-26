@@ -70,4 +70,4 @@ So far, this feels like how the book is gonna play out:
 
 ## Preview
 
-[HTML5 Preview](http://htmlpreview.github.com/?https://github.com/apisyouwonthate/build-apis-2/blob/master/generated/book.html)
+[PDF Preview](http://htmlpreview.github.com/?https://github.com/apisyouwonthate/book-build-apis-2/blob/master/generated/book.pdf)
