@@ -6,14 +6,14 @@ the majority of developers, and talking about different things.
 
 == API
 
-The acronym API stands for “Application Program Interface”, and that’s what it
+The acronym API stands for "Application Programming Interface", and that's what it
 says on the tin: an interface for programmatically interacting with an
 application. This is a rather generic term in the world of computer science and
 programming, as a Linux command-line utility would consider its command names
 and options to be an API, whilst a Java library would also consider the method
 names and arguments to be an API.
 
-Essentially it’s all the same concept, but this book will be talking about Web
+Essentially it's all the same concept, but this book will be talking about Web
 APIs. Frustratingly there are a few different meanings of the term Web API too.
 Some folks will use this term to describe things like various JavaScipt
 libraries baked into browsers, like the Local Storage API, Audio API, etc.
@@ -24,14 +24,14 @@ to make an API which operates over the web.
 
 The goal of a Web API is to provide other applications with access to specific
 subset of functionality and data that this application owns. Some APIs are
-public (anyone can get the weather from api.weather.gov), some are private (it’s
-probably tough to get access to JPMorgan Chase’s Enterprise Customers API), and
+public (anyone can get the weather from api.weather.gov), some are private (it's
+probably tough to get access to JPMorgan Chase's Enterprise Customers API), and
 some are a mixture.
 
 APIs can provide data for a single-page JavaScript application, handle payment
 information to avoid clients needing to worry about storing credit card details,
 post Facebook statuses on a users timeline, or share the same data across a
-myriad of different devices; Watch that Netflix show on your Xbox, it’s all
+myriad of different devices; Watch that Netflix show on your Xbox, it's all
 good, APIs have you covered.
 
 APIs are built by all sorts of folks; maybe another company, some large like
@@ -69,9 +69,9 @@ integrated foundational management services and then business process-type
 services based upon units of work ...
 ____
 
-Service-orientated architecture is essentially the idea of taking various
-modules out of your application, and putting them on a different server, with a
-network protocol in the way.
+Service-oriented architecture is essentially the idea of breaking various
+modules out of your application, possibly putting them on different servers, with a
+network interface or socket facilitating communication.
 
 For example, instead of having one application that handles user directories,
 billing, messaging, shipping, inventories, etc., you have multiple applications
@@ -98,7 +98,7 @@ One commonly cited benefit is the ability to write services in all sorts of
 different languages and frameworks, using the network and standardized protocols
 as glue. Instead of using the same language for everything, teams can use the
 right tool for the job, selecting a programming language based on its strengths
-and weakniesses when applied to the task at hand.
+and weaknesses when applied to the task at hand.
 
 WARNING: One thing to be wary of here is that some developers get a little giddy
 when told they can "use whatever language you like", finally giving
@@ -117,15 +117,15 @@ billing logic to its own service potentially means that only the billing service
 has to worry about being compliant.
 
 Other compliance standards like SOX can impose strict rules on how deployments
-happen, multi-step review processes with multiple stakeholders signing off, who
-has access to what, etc. I've worked at companies where SOX really slowed down
-deployments, meaning that even when code is finished and confirmed working, it
-might take a week or two to get it deployed. Other teams were happily cranking
-along, deploying multiple times a day, because the infection of SOX had not
-spread to their services.
+happen, multi-step review processes with multiple stakeholders signing off,
+rigorous access control, etc. I've worked at companies where SOX really slowed
+down deployments, meaning that even when code is finished and confirmed working,
+it might take a week or two to get it deployed. Other teams were happily
+cranking along, deploying multiple times a day, because the infection of SOX had
+not spread to their services.
 
 The positives are fairly clear, but an often overlooked problem with
-service-orientated architecture is the complexity of managing multiple services,
+service-oriented architecture is the complexity of managing multiple services,
 and not just the complications of handling "more servers". Managing two services
 is not twice as hard as managing a single application, it is infinitely more
 complex, and you need people who know how to handle these issues.
@@ -162,9 +162,8 @@ accordingly. Attempts will be made to disambiguate if it gets confusing.
 == Microservice
 
 Microservices as a term was coined around 2011. It is meant to be an off-shoot
-of SoA, with more emphasis on isolation and autonomy, but
-https://martinfowler.com/bliki/SemanticDiffusion.html[semantic diffusion] has
-caused a lot of confusion.
+of SoA, with more emphasis on isolation and autonomy, like the UNIX philosophy of single responsibility. Like any popular term, over time there has been
+https://martinfowler.com/bliki/SemanticDiffusion.html[semantic diffusion] of the original meaning, and now there is literally meanings, common meanings, etc.
 
 Some folks define microservice by some objective metric, like number of
 endpoints or methods - which is essentially confusing them with functions.
@@ -195,8 +194,9 @@ I've worked in that architecture. The Rooms Booking service goes down, the
 customer-facing social network crashes, the messaging system goes down, all of a
 sudden the user application is down and sparks come flying out of terminals
 throughout the entire building like the Starship Enterprise is under attack.
-Tools like "service mesh", "service discovery", "circuit breakers" and more
-exist to help with these problems, and we will talk about that a bit.
+Tools like "service mesh", "service discovery", "circuit breakers", "distributed
+tracing", and more exist to help with these problems, and we will talk about
+that.
 
 Without these things, a microservice architecture is likely to be a distributed
 monolith, which has all of the downsides of a regular monolith and a whole lot more
