@@ -19,6 +19,8 @@ include::0-stuff/introduction.adoc[]
 = Part One: Theory
 :imagesdir: 1-theory
 
+include::1-theory/1-apis-services-microservices.adoc[]
+
 include::1-theory/2-different-paradigms.adoc[]
 
 include::1-theory/3-api-contracts.adoc[]

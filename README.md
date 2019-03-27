@@ -7,7 +7,7 @@ The API World has changed a lot since 2014, and keeping the original book up-to-
 So far, this feels like how the book is gonna play out:
 
 - [ ] Part One: Theory
-  - [ ] APIs, Services, and Microservices
+  - [x] APIs, Services, and Microservices
   - [x] Understanding Different Paradigms
   - [x] API Contracts
   - [ ] Design Theory
