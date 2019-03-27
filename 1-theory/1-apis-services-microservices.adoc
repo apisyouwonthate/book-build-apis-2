@@ -154,7 +154,7 @@ Some APIs could have a more descriptive name than service: like function, or
 database.
 
 .https://twitter.com/adamralph[Adam Ralph] at https://ndcporto.com/[NDC Porto 2019]. Photo credit https://twitter.com/dhelper[Dror Helper].
-image::./images/service-is-not.jpg[Adam Ralph points out that a service with the only functionality bering a function is not a service, its a function. A service which nly exposes data is a database. Adding some HTTP in front does not change its name.]
+image::./images/service-is-not.jpg[Adam Ralph points out that a service with the only functionality bering a function is not a service, its a function. A service which only exposes data is a database. Adding some HTTP in front does not change its name.]
 
 Throughout the book we will use the terms service, function and database
 accordingly. Attempts will be made to disambiguate if it gets confusing.
