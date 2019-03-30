@@ -173,7 +173,7 @@ It is understandable, as hearing service and microservice makes you think one is
 meant to be "smaller", but size in this context is not counted by the surface
 area of the interface, or even the size of the entire dependency chart.
 
-[quote,Martin Fowler & James Lewis,https://martinfowler.com/articles/microservices.html]
+[quote,Martin Fowler and James Lewis,https://martinfowler.com/articles/microservices.html]
 ____
 In short, the microservice architectural style [1] is an approach to developing a single application as a suite of small services, each running in its own process and communicating with lightweight mechanisms, often an HTTP resource API. These services are built around business capabilities and independently deployable by fully automated deployment machinery. There is a bare minimum of centralized management of these services, which may be written in different programming languages and use different data storage technologies.
 ____
