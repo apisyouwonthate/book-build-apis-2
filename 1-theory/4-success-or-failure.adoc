@@ -1,21 +1,81 @@
 = Success or Failure
 
-Deal with the Happy Path™ in an API is pretty easy: When a client asks for a resource, show them the resource. When they trigger a procedure, let them know if it was triggered ok, or if it completed without a problem.
+Dealing with the Happy Path™ in an API is pretty easy: When a client asks for a
+resource, show them the resource. When they trigger a procedure, let them know
+if it was triggered ok, and maybe if it completed without a problem.
 
-What to do when something doesn't go according to plan? Well, that can be tricky.
+What to do when something doesn't go according to plan? Well, that can be
+tricky.
 
 == Errors
 
-The main approach to handling failure is for the server to respond with a status code that suggests something went wrong.
+HTTP status codes are part of the picture, they can define a category of issue,
+but they are never going to explain the whole story.
 
-// TODO talk about if 434 is not understood it should be handled as 400, etc.
-// TODO talk about why standards are important, fucking { error: { message: } = object Object}
+[source,text]
+----
+HTTP/1.1 400 Bad Request
 
-Error codes are usually strings or integers that act as a unique identifier for a corresponding human-readable error message with more information about what is going wrong. That sounds a lot like HTTP status codes, but these errors are about application specific things that may or may not have anything to do with HTTP specific responses.
+{
+  "errors" : [{
+    "code"   : 20002,
+    "title"  : "There are no savings for this user."
+  }]
+}
+----
 
-Some folks will try to use HTTP status codes exclusively and skip using error codes because they do not like the idea of making their own error codes or having to document them, but this is not a scalable approach. There will be some situations where the same endpoint could easily return the same status code for more than one different condition. The status codes are there to merely hint at the category of error relying on the actual error code and error message provided in the HTTP response to include more information in case the client is interested.
+[source,text]
+----
+HTTP/1.1 400 Bad Request
 
-For example, an issue with the access token will always result in the user not being recognized. An uninterested client would simply say "User could not get in" while a more interested client would probably prefer to offer suggestions via messages in their own web-app/iPhone app interface.
+{
+  "errors" : [{
+    "code"   : 20010,
+    "title"  : "Invalid geopoints for simulated savings."
+  }]
+}
+----
+
+
+This is often touted as a failing of the HTTP status code concept, but it was
+never intended to cover every single possible application specific error
+message. Think of HTTP status codes like an exception. In Ruby you might get a
+`ArgumentError` or `LoadError` exception which gives you a pretty good hint as
+to what the issue is, but there is also data specific to the instance of that
+failure that helps with fixing the situation.
+
+.Programming languages do not just give you the exception name, they give you instance information too.
+[source,ruby]
+----
+> require "nonsense"
+LoadError (cannot load such file -- nonsense)
+----
+
+Errors in HTTP APIs are pretty similar to exceptions: they can tell the client
+what is going on, and combine a bunch of useful metadata to help both the client
+and the server solve problems. This is often in the response body, using JSON or
+whatever data format the API generally uses.
+
+=== Error Objects
+
+A well designed API error will have at the very least:
+
+- A 4xx or 5xx status code depending on the situation
+- A human readable short summary: `Cannot checkout with an empty shopping cart`
+- A human readable message: `It looks like you have tried to check out but there is nothing in your...`
+- An application-specific error code relating to the problem: `ERRCARTEMPTY`
+- Links to a documentation page or knowledge based where a client or user of the client can figure out what to do next
+
+This will help humans and machines to figure out what is happening. Missing out
+the error code means clients need to implement substring matching, which is
+awful for everyone, and turns contents of the error message into part of the
+agree contract. Imagine a text-change breaking integration with multiple unknown
+clients! 😳
+
+This used to happen with Facebook and their rather bad Graph API, where any issue
+with an access token would return type: `OAuthException`, regardless of the type
+of issue. If it was an expired token which needed a refresh, or if it was just
+total nonsense, you would get the same type, and a different string.
 
 [source,javascript]
 ----
@@ -28,131 +88,156 @@ The current unix time is 1385848532."
 }
 ----
 
-Humans can understand that nicely enough, but Facebook used to lack error codes, making it rather hard for computers to understand the problem. They have added them since the first edition of this book, but before that you would find yourself doing substring matching on the message text, which is lunacy.
+Without getting too much into Authentication at this point, there are times
+where the client would want to take different actions for different errors. For
+example, when an access token was previously good but expires, the client wants
+to suggest the user try logging in again, or reconnecting their Facebook
+account. When the token is just nonsense (a totally invalid token) then a
+different action needs to be taken.
 
-Foursquare is not a bad example of using both, but they place an emphasis on tying their errors to a status code.
+These days Facebook have a far more robust error object in their Graph API, with
+error codes and even "sub-codes", so the client developer has enough information to
+react programmatically to various errors.
 
-<https://developer.foursquare.com/overview/responses>
-
- Twitter does a great job of having HTTP status codes documented and having specific error codes for other issues too. Some are tied to HTTP status codes, which is fine, but many are not. Some are also tied to the same status code, highlighting the issues raised above.
-
- <https://dev.twitter.com/docs/error-codes-responses>
-
-|Code | Text                                              | Description                                                |
-|-----|---------------------------------------------------|------------------------------------------------------------|
-|161  | You are unable to follow more people at this time | Corresponds with HTTP 403 - thrown when a user cannot follow another user due to some kind of limit |
-|179  | Sorry, you are not authorized to see this status  | Corresponds with HTTP 403 - thrown when a Tweet cannot be viewed by the authenticating user, usually due to the tweet's author having protected their tweets. |
-
-=== Programmatically Detecting Error Codes
-
-You can use error codes to make an application respond intelligently to failure of something as basic as a posted Twitter
-status.
-
-.Using Python to catch exceptions and react to the Twitter error code
-[source,python]
-----
-try:
-    api.PostUpdates(body['text'])
-
-except twitter.TwitterError, exc:
-
-    skip_codes = [
-        # Page does not exist
-        34,
-
-        # You cannot send messages to users who are not following you
-        150,
-
-        # Sent too many
-        # TODO Make this requeue with a dekal somehow
-        151
-    ]
-
-    error_code = exc.__getitem__(0)[0]['code']
-
-    # If the error code is one of those listed before, let’s just end here
-    if error_code in skip_codes:
-        message.reject()
-
-    else:
-        # Rate limit exceeded? Might be worth taking a nap before we requeue
-        if error_code == 88:
-            time.sleep(10)
-
-        message.requeue()
-----
-
-Compare this sort of logic with the Facebook example from when they lacked error codes:
-
-.Using Python to analyse Facebook error strings as no codes exist
-[source,python]
-----
-except facebook.GraphAPIError, e:
-
-    phrases = ['expired', 'session has been invalidated']
-
-    for phrase in phrases:
-
-        # If the token has expired then lets knock it out so we don't try again
-        if e.message.find(phrase) > 0:
-            log.info("Deactivating Token %s", user['token_id'])
-            self._deactivate_token(user['token_id'])
-
-    log.error("-- Unknown Facebook Error", exec_info=True)
-----
-
-If they change their error messages then this might stop working, which would be a problem. Codes that
-do not change are a much more sensible way to go about this.
-
-.If Facebook added codes and documentation links to GraphAPI error responses.",]lang=json}
+.An improved version of that error message, with an error code and a link
+[source,javascript]
 ----
 {
   "error": {
+    "message": "Message describing the error",
     "type": "OAuthException",
-    "code": "ERR-01234",
-    "message": "Session has expired at unix time 1385243766. The current unix time is 1385848532."
+    "code": 190,
+    "error_subcode": 460,
+    "error_user_title": "A title",
+    "error_user_msg": "A message",
+    "fbtrace_id": "EJplcsCHuLu"
+  }
+}
+----
+
+They explain the structure of the error object in their documentation.
+
+[quote,Facebook GraphAPI Documentation,https://developers.facebook.com/docs/graph-api/using-graph-api/error-handling]
+____
+- *message:* A human-readable description of the error.
+- *code:* An error code. Common values are listed below, along with common recovery tactics.
+- *error_subcode:* Additional information about the error. Common values are listed below.
+- *error_user_msg:* The message to display to the user. The language of the message is based on the locale of the API request.
+- *error_user_title:* The title of the dialog, if shown. The language of the message is based on the locale of the API request.
+- *fbtrace_id:* Internal support identifier. When reporting a bug related to a Graph API call, include the fbtrace_id to help us find log data for debugging.
+____
+
+=== Know Your Audience
+
+Making errors be useful for client users (not just client developers) can be a
+powerful thing. Clients can build their interface around the expectation that a link in an error
+will help their users out, without needing to know specifically what the actual
+error is.
+
+Whenever possible try to avoid creating an API error that you would not want to
+show to a user. Often a client will create a filter that checks for certain
+errors to do something, and anything left can be thrown up as a generic error
+box with the message in it.
+
+Client doing this helps future proof their application. For example, if a new
+validation rules pops up they might not have their UI code written to check for
+that, but an ugly alert box can pop up with instructions to the user and maybe
+that is better than the application just being completely unusable.
+
+Another useful thing to do is put a link for more information.
+
+.Add a href/link/url property to your error object.
+[source,javascript]
+----
+{
+  "error": {
+    ....
     "href": "http://example.org/docs/errors/#ERR-01234"
   }
 }
 ----
 
-## Error or Errors
+In some instances maybe this more information link points to a blog post or some documentation which
+explains that the user should update their application, or take some other action to resolve the situation, or email somebody, or reset their password. 👍
 
-When returning errors, I always used to return just one error. In the case of validation I would return
-them one at a time as an easy way to exit out of a controller. Thinking about it this was probably just
-laziness.
+// TODO show how to create error codes with logical ranges and grouping and potentially locale based thing too
 
-After being forced to work with the JSON-API standard, the use of multiple errors started to feel more natural.
+=== The Trouble with Custom Error Formats
 
-.If Facebook returned multiple errors in a list for GraphAPI responses.
+Everyone starts off building APIs with their own error format. It usually starts
+off as just a string.
+
 [source,javascript]
 ----
 {
-  "errors": [{
-    "type": "OAuthException",
-    "code": "ERR-01234",
-    "message": "Session has expired at unix time 1385243766. The current unix time is 1385848532."
-    "href": "http://example.org/docs/errors/#ERR-01234"
-  }]
+  "error": "A thing went really wrong"
 }
 ----
 
-## Standards for Error Responses
+Then somebody points out if would be nice to have application codes, and new
+versions of the API (or some different APIs built in the same architecture)
+start using a slightly modified format.
 
-So far, this chapter has used entirely home-grown formats for errors. It is incredibly common, even with
-the most popular APIs to build completely arbitrary error formats, so I wanted to teach you the theory
-before forcing you to read complicated standards.
+[source,javascript]
+----
+{
+  "error": {
+    "code": "100110",
+    "message": "A thing went really wrong"
+  }
+}
+----
 
-There are two popular standards that cover error reporting, which are both fairly similar, but sadly
-still in draft at time of writing.
+Guess what happens when a client is expecting the first example of a single
+string, but ends up getting that second example of an object?
 
-=== JSON-API
+.A wild [object Object] appears on Gelato - a discontinued API design and analytics platform acquimerged into Kong.
+image::images/errors-object.jpg[An alert box showing the JavaScript to string representation of an object, instead of the error message.]
 
-[JSON-API](http://jsonapi.org/format/#errors) is discussed in a few sections of this book and is a
+These errors happened at WeWork all the time, because every API had a totally different error format. I remember writing a bunch of code that would check for various properties, if error is a string, if error is an object, if error is an object containing foo, if error is an object containing bar....
+
+=== Standard Error Formats
+
+There are two common standards out there for API errors which you should
+consider using for your next API, or maybe even consider adding to your existing
+APIs.
+
+==== Problem Details for HTTP APIs
+
+https://tools.ietf.org/html/rfc7807[RFC 7807] is a brilliant standard from Mark
+Nottingham, Eric Wilde, and Akamai, released through the IETF.
+
+[quote,Internet Engineering Task Force (IETF),https://tools.ietf.org/html/rfc7807]
+This document defines a "problem detail" as a way to carry machine- readable
+details of errors in a HTTP response to avoid the need to define new error
+response formats for HTTP APIs.
+
+The goal of this RFC is to give a standard structure for errors in HTTP APIs
+that use JSON (`application/problem+json`) or XML (`application/problem+xml`).
+
+The standard was only released as a final RCC in 2016 and as such there are not
+many popular APIs using it yet. This is part of a common stalemate problem where
+people do not implement until large companies do, and as such they just roll
+their own solutions, making the standard less popular, so the large companies do
+not bother to support it.
+
+Many large companies are able to enforce standards, and have enough people
+around with enough experience to avoid a lot of the common problems around, but
+smaller teams should defer to standards to help them out. If you are Facebook
+then certainly roll your own error format, but if you are not then RFC 7807 will
+point you in the right direction, and implementations make it easy.
+
+* [crell/api-problem] for PHP
+
+[crell/api-problem]: https://github.com/Crell/ApiProblem
+
+==== JSON:API
+
+[JSON:API](http://jsonapi.org/format/#errors) is discussed in a few sections of this book and is a
 standard outlining the general format of requests and responses in JSON when working with HTTP APIs. It
 has a section on errors, which I quite like.
 
-The following is an excerpt from the JSON-API standard at time of writing.
+The following is an excerpt from the JSON:API standard at time of writing.
 
 > An error object MAY have the following members:
 
@@ -167,47 +252,39 @@ The following is an excerpt from the JSON-API standard at time of writing.
 
 > Additional members MAY be specified within error objects.
 
-When constructing your API error responses, you pretty much just need to make an array with items that looks a bit
-like this:
+// TODO everything below here aint done
 
-----
-{
-  "errors": [{
-    "code": "ERR-01234",
-    "title": "OAuth Exception",
-    "details": "Session has expired at unix time 1385243766. The current unix time is 1385848532.",
-    "href": "http://example.org/docs/errors/#ERR-01234"
-  }]
-}
-----
 
-See how that Facebook example has been slightly tweaked to follow the standard? Nice and easy.
+=== Validation
 
-=== Problem Details for HTTP APIs
+Some folks want to treat errors and validation like two different things, but
+really a validation message is a validation error, so just an error. There is no
+need to try and differentiate between the two.
 
-This is currently a [draft RFC], which at the
-time of writing was on Draft 7.
+If a client is trying to create a resource and it is not created, then it is an
+error. It really does not matter to the client much if that happened because a
+plane landing on the data center, or the date being entered in an unsupported
+format, they want to see errors come back. They know if its a server error or
+client error based on the HTTP status, and they know if it can be retried or
+not, and those are the only differentiations that matter to the client.
 
-The goal of this RFC is to define a "problem detail", like we have been doing throughout this chapter,
-but in a standard way (to avoid inventing new formats for each and every HTTP API). It is being headed up
-by Mark Nottingham.
+If you as an API developer are luck enough to have OpenAPI or JSON Schema
+contract files already written up, you can make the art of validation incredibly easy,
+and avoid writing a bunch of code to handle the validation rules, just by implementing an
+OpenAPI/JSON Schema validator in your controllers, or as middleware.
 
-Mark wrote a [tutorial about problem details], which will explain the standard a little better.
-
-If you are interested in implementing this standard then there are tools to make it easy:
-
-* [crell/api-problem] for PHP
-
-[draft RFC]: http://tools.ietf.org/html/draft-nottingham-http-problem
-[tutorial about Problem Details]: https://www.mnot.net/blog/2013/05/15/http_problem
-[crell/api-problem]: https://github.com/Crell/ApiProblem
-
+These validation tools can often be convinced to speak in one of the two common standard error formats, or you can create your own snowflake error format.
 
 == Common Pitfalls
 
 === 200 OK and Error Code
 
 If you return an HTTP status code of 200 with an error code, then Chuck Norris will roundhouse your door in, destroy your computer, instantly 35-pass wipe your backups, cancel your Dropbox account, and block you from GitHub. HTTP 4xx or 5xx codes alert the client that something bad happened, and error codes provide specifics of the exact issue if the client is interested.
+
+.The folks over at CommitStrip.com know what's up.
+image::images/errors-200-ok.jpeg[This monster has got his API responding with HTTP Status 200 OK despite the request failing.]
+
+
 
 === Non-Existent, Gone, or Hiding?
 
@@ -221,18 +298,6 @@ In all of these situations, the ideal solution is to complement the HTTP status 
 
 Do not do what Google does — supply a list of error codes while having other error codes that are not documented _anywhere_ — because if I see that, I will come for you.
 
-== FIN
-
-
-
-The worst crime you can commit as an API designer is to return errors on a HTTP 200 OK status.
-
-
-.The folks over at CommitStrip.com know what's up.
-image::images/errors-200-ok.jpeg[This monster has got his API responding with HTTP Status 200 OK despite the request failing.]
-
-RFC 7087
-JSON API Errors
 
 == GraphQL
 

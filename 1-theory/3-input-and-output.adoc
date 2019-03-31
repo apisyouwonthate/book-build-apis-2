@@ -1,4 +1,4 @@
-= Input and Output
+ca= Input and Output
 
 Most of the whole idea of an API is "input" and "output", and in HTTP an input
 comes in the form of "requests", and output comes in the form of "responses".
@@ -86,24 +86,46 @@ There are a bunch of HTTP methods you might run into:
 - OPTIONS
 - TRACE
 
-Some of these methods might look familiar from your favourite web application
-frameworks routing layer.
+These methods might look familiar from your favourite web application frameworks
+routing layer, as pretty much every framework offers HTTP method based routing.
 
-Some frameworks like Rails push their super magical routing to abstract away
-from manually declaring these routes, so if you are a Rails developer who is
-unfamiliar with these routes, try typing `rails routes` to see what shows up.
+.Rails example of using HTTP-based routes.
+[source,ruby]
+----
+get 'photos', to: 'photos#index'
+post 'photos', to: 'photos#create'
+get 'photos/:id', to: 'photos#show'
+put 'photos/:id', to: 'photos#update_full'
+delete 'photos/:id', to: 'photos#index'
+----
 
-There are a more HTTP methods floating around, but the idea is that they all
-have very specific defined behavior. Lazy people can pick the wrong method and
-misuse it, which cocks up a lot of various HTTP tools, but theoretically if used
-properly tools will know what to do in a lot of scenarios you might not have
-thought of.
+.Express (NodeJS) example of using HTTP-based routes.
+[source,javascript]
+----
+app.get('/photos', (req, res) => { ... })
+app.post('/photos', (req, res) => { ... })
+----
+
+
+That said some like Rails (Ruby) and Laravel (PHP) heavily market their
+automagical routing conventions to abstract away from manually declaring these
+routes. These two frameworks and probably others do have command line utilities
+for printing out the routes it is generating, which are `$ rails routes` and
+`$ php artisan route:list` respectively.
+
+==== Conventions are Important
+
+Over the years a lot of people have tried to suggest that HTTP methods do not
+matter, and anyone who suggests using the right one for the right job is just
+doing a "Well Actually..." and should spend their time working on something more
+useful. If you are not using HTTP to its full extent, that stance might be
+partially true, but when you start to leverage the full power of HTTP that
+opinion is totally false.
 
 For example, many tools will know that they can cache a GET request, but know
 that caching a POST would be spooky and problematic. They will know they can
 retry a PUT or a DELETE, but better not retry a PATCH. These conventions allow a
 lot of tools that do not have direct knowledge of each other to work together.
-
 
 === HTTP Methods
 
@@ -476,6 +498,9 @@ checkin[place_id]=1&checkin[message]=This is a bunch of text.&checkin[with_frien
 
 This makes me upset _and_ angry. Do not do it in your API.
 
+.Mandrill API is having a rough time.
+image::images/input-encoded-madness.jpg[Mandril API supports form encoded payloads and this seems to also be urlencoded and everyone is sad.]
+
 Finally, do not try to be clever by mixing JSON with form data:
 
 .This is nonsense. Do not do it.
@@ -494,19 +519,25 @@ json="{
 }"
 ----
 
-Who is the developer trying to impress with stuff like that?
+This actually happens surprisingly often in the wild.
 
-=== JSON and XML
+image::images/input-output-json-json.jpg[]
+
+Some folks even
+
+=== Why many prefer JSON to XML
 
 Any modern API you interact with will support JSON, or there is some fancy
 binary format being used. Sometimes APIs will support XML too, especially if the
-API is maintained by an older financial services company. XML is generally a
-big old mess of tags, and the size of an XML file containing the same data
-as a JSON file is often much larger.
+API is maintained by an older financial services company. XML generally takes
+more memory to convey the same amount of data as JSON, as its similarity to HTML
+means it requires both a start and an end tag containing the same name.
 
-Beyond purely the size of the data being stored, XML is horribly bad at storing
-type. That might not worry dynamic language developers all that much, but look at this:
+Beyond purely the size of the data being stored, XML is rather terrible with
+handling different data types. That might not worry dynamic language developers
+all that much, but look at this:
 
+.An example of a bunch of different data types in JSON.
 [source,javascript]
 ----
 {
@@ -520,8 +551,7 @@ type. That might not worry dynamic language developers all that much, but look a
 }
 ----
 
-That response in XML:
-
+.The same example but in XML.
 [source,xml]
 ----
 <places>
@@ -546,10 +576,11 @@ JSON is fine.
 
 CSV can be pretty handy as an export format too, especially if your API is
 offering data for any sort of "Reports".
-<<<<<<< HEAD
-=======
 
-Whatever you decide to offer, make it very clear on your documentation what formats are supported. HTTP clients can request a specific `Content-Type` be used for the response by placing it in the `Àccept` header on the request, and if that type is not available you can return a 4XX Not Acceptable response, which is one of many errors an API can return when a request goes wrong.
+Whatever you decide to offer, make it very clear on your documentation what
+formats are supported. HTTP clients can request a specific `Content-Type` be
+used for the response by placing it in the `Accept` header on the request, and
+if that type is not available you can return a 406 Not Acceptable response,
+which is one of many errors an API can return when a request goes wrong.
 
-// TODO cant download http.cat right now which code is not acceptable
->>>>>>> 🚢🛳⛴
+image::images/406.jpg[406 - Not Acceptable - Kitty does not want a bath.]

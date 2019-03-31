@@ -22,6 +22,10 @@ https://blog.apollographql.com/new-features-in-graphql-batch-defer-stream-live-a
 brief mention of "if calling other peoples APIs use damn timeouts" but thats
 explained more in surviving other peoples apis aint doing it twice
 
+Firing a field into a black hole: at Ride we were sending is_foo cant remember
+what and it was important we counted how many signed up with that field, but the
+API was not saving it!!!
+
 Talk about specs later a bit more:
 - https://inspector.swagger.io/builder
 - https://blog.apisyouwonthate.com/creating-api-specifications-from-bulls-t-f5a54c005135
@@ -29,5 +33,109 @@ Talk about specs later a bit more:
 testing...
 https://www.toolsqa.com/postman/assertions-in-postman-with-chai-assertion-library/
 
+whole caching thread
+https://twitter.com/philsturgeon/status/1050043229800976384
+
 hypermedia cache pattern
 https://tools.ietf.org/html/draft-kelly-json-hal-08#section-8.3
+
+
+
+
+- real time APIs
+web hooks / callbacks / sockets
+
+pass messages not objects
+
+- API load testing and the best ways to monitor API
+Catchpoint.com - more of a geo-monitor & requests performance tool
+Loader.io
+* https://goreplay.org/ to re-play prod traffic into any server
+* jmeter and friends
+* https://gatling.io/
+
+https://github.com/newsapps/beeswithmachineguns = DIY
+
+
+- Errors should have documentation so you can link to em
+http://www.twilio.com/docs/errors/reference
+Great for API Problems
+
+
+- PATCH/PUT/POST returning content, maaaaybe it should be Content-Location instead of a direct return
+Felix Sandström [05:43]
+What (if anything) do you return in the response body for POST, PUT and PATCH?
+
+
+Simone Fumagalli [05:47]
+I usually return the resource just create/modfied
+but some for `POST` return a `201` with the link to the new resource in the `Location` header
+
+Mika Tuupola [06:47]
+Same as @Simone Fumagalli except with `POST` I return `201` and both the created resource and the `Location` header. (edited)
+
+
+Adam Quaile [06:55]
+In some cases, I just use `204` with no content and assume the client knows enough about the resource because it just created it
+
+
+Felix Sandström [09:31]
+We’re also thinking about returning the modified resource in our API, so this might be a good way to go then ￼
+
+
+Phil Sturgeon [09:46]
+@felixsand you have to think, if you have server-computed fields, are they mostly computed on save, or after save. because if you have no fields being computed, what @adamquaile said is true, and the client already knows enough because it just did the thing.
+
+
+[09:47]
+if they’re created on save (potentially slow watch out!) then returning the body, and if they’re computed later, well a Location is probably a fantastic idea because by the time they go fetch it maybe the fields have been computed
+
+
+[09:47]
+now obviously dont go mixing styles randomly around in different resources!
+
+
+[09:48]
+`Content-Location` on a POST is nice because if you’re using Cache Control headers then it gets a cached response for that thing into the cache server or client cache rather quickly, a chunk of JSON in the POST does not.
+
+
+[09:49]
+PUT: no need to return anything because dog the whole body of that document should have been in the payload so you _know_ what that is. Content-Location can be used all the same for consistency.
+
+
+[09:50]
+PATCH: Yeah if you just tweaked 1 thing then surely the client should know, but unfortunately maybe another client tweaked another thing, and… well if they follow that `Content-Location` maybe they’ll get an update
+
+- DONT OVERLOAD FIELD MEANING TO GIVE SPECIAL FLAGS AND STATUSES
+single fields with multiple meanings (location_uuid = nil = anywhere)
+
+- Add ACL / scopes
+I would have preferred it to touch a bit more on the topic of ACL and role based control through the API request itself.
+
+- Chapter Suggestions
+
+Do you discuss API management and API gateways? What is covered? Messaging
+protocols (e.g. HTTP, WebSockets), Message exchange patterns (e.g. sync vs.
+async, pub/sub), Granularity best practices (i.e. scope of API), Authentication,
+Exception handling, Documentation, Chatty vs. Chunky, Orchestrating/connecting
+multiple API calls, etc.?
+
+
+
+
+FROM OTHER BOOK
+
+
+- What can go wrong Use runscope as a proxy whilst you’re developing, and do it
+in staging to see whats up. Honestly we’ve used it in production for a while
+too, and had clients retry on the direct URL if runscope was unavailable. This
+was never an issue but paranoia.
+
+- Performance
+Make the most efficient HTTP calls you can. You might be making HTTP calls with
+a network library built into the language, or one built by somebody else. Either
+way, ensure it’s using HTTP/1.1 with keep alive on it, and if possible use a
+HTTP/2 client library. HTTP/1.1 keep alive can knock 20% off of repeated
+connections to the same host depending on how that connection is maintained.
+HTTP/2 is baller and async is cool. If they dont use HTTP/2 you can give
+yourself some with a proxy.
