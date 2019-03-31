@@ -82,8 +82,7 @@ total nonsense, you would get the same type, and a different string.
 {
   "error": {
     "type": "OAuthException",
-    "message": "Session has expired at unix time 1385243766.
-The current unix time is 1385848532."
+    "message": "Session has expired at unix time 1385243766. The current unix time is 1385848532."
   }
 }
 ----
@@ -96,8 +95,8 @@ account. When the token is just nonsense (a totally invalid token) then a
 different action needs to be taken.
 
 These days Facebook have a far more robust error object in their Graph API, with
-error codes and even "sub-codes", so the client developer has enough information to
-react programmatically to various errors.
+error codes and even "sub-codes", so the client developer has enough information
+to react programmatically to various errors.
 
 .An improved version of that error message, with an error code and a link
 [source,javascript]
@@ -130,9 +129,9 @@ ____
 === Know Your Audience
 
 Making errors be useful for client users (not just client developers) can be a
-powerful thing. Clients can build their interface around the expectation that a link in an error
-will help their users out, without needing to know specifically what the actual
-error is.
+powerful thing. Clients can build their interface around the expectation that a
+link in an error will help their users out, without needing to know specifically
+what the actual error is.
 
 Whenever possible try to avoid creating an API error that you would not want to
 show to a user. Often a client will create a filter that checks for certain
@@ -151,14 +150,16 @@ Another useful thing to do is put a link for more information.
 ----
 {
   "error": {
-    ....
+    ...
     "href": "http://example.org/docs/errors/#ERR-01234"
   }
 }
 ----
 
-In some instances maybe this more information link points to a blog post or some documentation which
-explains that the user should update their application, or take some other action to resolve the situation, or email somebody, or reset their password. 👍
+In some instances maybe this more information link points to a blog post or some
+documentation which explains that the user should update their application, or
+take some other action to resolve the situation, or email somebody, or reset
+their password. 👍
 
 // TODO show how to create error codes with logical ranges and grouping and potentially locale based thing too
 
@@ -194,7 +195,10 @@ string, but ends up getting that second example of an object?
 .A wild [object Object] appears on Gelato - a discontinued API design and analytics platform acquimerged into Kong.
 image::images/errors-object.jpg[An alert box showing the JavaScript to string representation of an object, instead of the error message.]
 
-These errors happened at WeWork all the time, because every API had a totally different error format. I remember writing a bunch of code that would check for various properties, if error is a string, if error is an object, if error is an object containing foo, if error is an object containing bar....
+These errors happened at WeWork all the time, because every API had a totally
+different error format. I remember writing a bunch of code that would check for
+various properties, if error is a string, if error is an object, if error is an
+object containing foo, if error is an object containing bar....
 
 === Standard Error Formats
 
@@ -204,8 +208,9 @@ APIs.
 
 ==== Problem Details for HTTP APIs
 
-https://tools.ietf.org/html/rfc7807[RFC 7807] is a brilliant standard from Mark
-Nottingham, Eric Wilde, and Akamai, released through the IETF.
+https://tools.ietf.org/html/rfc7807[Problem Details for HTTP APIs (RFC 7807)] is
+a brilliant standard from Mark Nottingham, Eric Wilde, and Akamai, released
+through the IETF.
 
 [quote,Internet Engineering Task Force (IETF),https://tools.ietf.org/html/rfc7807]
 This document defines a "problem detail" as a way to carry machine- readable
@@ -215,91 +220,290 @@ response formats for HTTP APIs.
 The goal of this RFC is to give a standard structure for errors in HTTP APIs
 that use JSON (`application/problem+json`) or XML (`application/problem+xml`).
 
-The standard was only released as a final RCC in 2016 and as such there are not
-many popular APIs using it yet. This is part of a common stalemate problem where
-people do not implement until large companies do, and as such they just roll
-their own solutions, making the standard less popular, so the large companies do
-not bother to support it.
+----
+HTTP/1.1 403 Forbidden
+Content-Type: application/problem+json
+Content-Language: en
 
-Many large companies are able to enforce standards, and have enough people
-around with enough experience to avoid a lot of the common problems around, but
-smaller teams should defer to standards to help them out. If you are Facebook
-then certainly roll your own error format, but if you are not then RFC 7807 will
-point you in the right direction, and implementations make it easy.
+{
+  "type": "https://example.com/probs/out-of-credit",
+  "title": "You do not have enough credit.",
+  "detail": "Your current balance is 30, but that costs 50.",
+  "instance": "/account/12345/msgs/abc",
+  "balance": 30,
+  "accounts": ["/account/12345", "/account/67890"]
+}
+----
 
-* [crell/api-problem] for PHP
+This example from the RFC shows the user was forbidden from taking that action,
+because the balance did not have enough credit. 403 would not have conveyed that
+(it could have meant the user was banned, or all sorts of things) but there is
+text, and there is a type, which is just an error code in the form of a URL.
 
-[crell/api-problem]: https://github.com/Crell/ApiProblem
+[quote,Internet Engineering Task Force (IETF),https://tools.ietf.org/html/rfc7807]
+____
+Note that this requires each of the sub-problems to be similar enough
+to use the same HTTP status code. If they do not, the 207 (Multi-
+Status) [RFC4918] code could be used to encapsulate multiple status
+messages.
+
+A problem details object can have the following members:
+
+- "type" (string) - A URI reference [RFC3986] that identifies the problem type.
+This specification encourages that, when dereferenced, it provide human-readable
+documentation for the problem type (e.g., using HTML [W3C.REC-html5-20141028]).
+When this member is not present, its value is assumed to be "about:blank".
+
+- "title" (string) - A short, human-readable summary of the problem type.  It
+SHOULD NOT change from occurrence to occurrence of the problem, except for
+purposes of localization (e.g., using proactive content negotiation; see
+[RFC7231], Section 3.4).
+
+- "status" (number) - The HTTP status code ([RFC7231], Section 6) generated by
+the origin server for this occurrence of the problem.
+
+- "detail" (string) - A human-readable explanation specific to this occurrence
+of the problem.
+
+- "instance" (string) - A URI reference that identifies the specific occurrence
+of the problem.  It may or may not yield further information if dereferenced.
+____
+
+Remembering all of this might be a little tricky, and asking every API developer
+to go read and memorize an RFC might not be particularly successful. As with
+most things, there are implementations that can be slotted into place for
+languages and web application frameworks to make the whole thing easier.
+
+- *PHP:* https://github.com/zendframework/zend-problem-details[zendframework/zend-problem-details]
+- *Java:* https://github.com/zalando/problem[problem] & https://github.com/zalando/problem-spring-web[problem-spring-web]
+- *Python:* https://github.com/cbornet/python-httpproblem
 
 ==== JSON:API
 
-[JSON:API](http://jsonapi.org/format/#errors) is discussed in a few sections of this book and is a
-standard outlining the general format of requests and responses in JSON when working with HTTP APIs. It
-has a section on errors, which I quite like.
+[JSON:API](http://jsonapi.org/format/#errors) is a standard for a lot more than
+just errors, it attempts to help with a lot of design choices for HTTP APIs,
+outlining the general format of requests and responses in JSON when working with
+HTTP APIs. In general it labels itself an anti-bikeshedding tool, and this is
+pretty accurate. HTTP API developers often feel like there are infinite
+possibilities, which can lead to a lot of discissions and arguments, so using
+implementations like JSON:API can get folks on the same page. It will be covered
+in a few sections of this book, but for now we can just look at the errors
+section
 
 The following is an excerpt from the JSON:API standard at time of writing.
 
-> An error object MAY have the following members:
+[quote,Internet Engineering Task Force (IETF),https://tools.ietf.org/html/rfc7807]
+____
+An error object MAY have the following members:
 
->  * `"id"` - A unique identifier for this particular occurrence of the problem.
->  * `"href"` - A URI that MAY yield further details about this particular occurrence of the problem.
->  * `"status"` - The HTTP status code applicable to this problem, expressed as a string value.
->  * `"code"` - An application-specific error code, expressed as a string value.
->  * `"title"` - A short, human-readable summary of the problem. It SHOULD NOT change from occurrence to occurrence of the problem, except for purposes of localization.
->  * `"detail"` - A human-readable explanation specific to this occurrence of the problem.
->  * `"links"` - Associated resources, which can be dereferenced from the request document.
->  * `"path"` - The relative path to the relevant attribute within the associated resource(s). Only appropriate for problems that apply to a single resource or type of resource.
+- *"id"* - A unique identifier for this particular occurrence of the problem.
+- *"href"* - A URI that MAY yield further details about this particular occurrence of the problem.
+- *"status"* - The HTTP status code applicable to this problem, expressed as a string value.
+- *"code"* - An application-specific error code, expressed as a string value.
+- *"title"* - A short, human-readable summary of the problem. It SHOULD NOT change from occurrence to occurrence of the problem, except for purposes of localization.
+- *"detail"* - A human-readable explanation specific to this occurrence of the problem.
+- *"links"* - Associated resources, which can be dereferenced from the request document.
+- *"path"* - The relative path to the relevant attribute within the associated resource(s). Only appropriate for problems that apply to a single resource or type of resource.
 
-> Additional members MAY be specified within error objects.
+Additional members MAY be specified within error objects.
+____
 
-// TODO everything below here aint done
+Pretty familiar stuff here! Whilst RFC 7807 has an interface that suggests one
+error object be returned with multiple problems provided using extra properties,
+JSON:API errors are an array of error objects.
 
+[source,text]
+----
+HTTP/1.1 422 Unprocessable Entity
+Content-Type: application/vnd.api+json
 
-=== Validation
+{
+  "errors": [
+    {
+      "source": { "pointer": "/data/attributes/firstName" },
+      "title": "Invalid Attribute",
+      "detail": "First name must contain at least three characters."
+    },
+    {
+      "source": { "pointer": "/data/attributes/firstName" },
+      "title": "Invalid Attribute",
+      "detail": "First name must contain an emoji."
+    }
+  ]
+}
+----
 
-Some folks want to treat errors and validation like two different things, but
-really a validation message is a validation error, so just an error. There is no
-need to try and differentiate between the two.
+That "pointer" is a https://tools.ietf.org/html/rfc6901[JSON Pointer (RFC 6901)],
+and can be used to point to the specific location in the HTTP request body that
+failed.
 
-If a client is trying to create a resource and it is not created, then it is an
-error. It really does not matter to the client much if that happened because a
-plane landing on the data center, or the date being entered in an unsupported
-format, they want to see errors come back. They know if its a server error or
-client error based on the HTTP status, and they know if it can be retried or
-not, and those are the only differentiations that matter to the client.
+This is great for client developers who have a UI. They probably already have
+some logic which maps their form inputs to request data, so if they use that
+pointer they can trace the error back to a form input, and show custom
+validation errors even if they had not built that validation into their
+frontend.
 
-If you as an API developer are luck enough to have OpenAPI or JSON Schema
-contract files already written up, you can make the art of validation incredibly easy,
-and avoid writing a bunch of code to handle the validation rules, just by implementing an
-OpenAPI/JSON Schema validator in your controllers, or as middleware.
+NOTE: Clients love copying validation rules into their applications and that
+leads to all sorts of problems. We will look at how you can avoid that with JSON
+Schema later.
 
-These validation tools can often be convinced to speak in one of the two common standard error formats, or you can create your own snowflake error format.
+There are a lot of https://jsonapi.org/implementations/[implementations for
+JSON:API]. To be frank, some are better than others, by which I mean some are
+amazing and some are truly terrible. Check a few out.
 
-== Common Pitfalls
+=== Should You Use a Standard?
+
+RFC 7807 was only released as a final RFC in 2016, and JSON:API is also fairly
+recent in the grand schema of the Internet. As such there are not many popular
+APIs using them. This is a common stalemate scenario where people do not
+implement standards until they see buy-in from a majority of the API community,
+or wait for a large company to champion it, and seeing as everyone is waiting
+for everyone else to go first nobody does anything. The end result of this
+stalemate is that most people roll their own solutions, making a standard less
+popular, and the vicious cycle continues.
+
+Many large companies are able to ignore these standards because they can create
+their own effective internal standards, and have enough people around with
+enough experience to avoid a lot of the common problems around.
+
+Smaller teams are not in this privileged position, should can benefit from
+differing to standards written by people who have more context on the task at
+hand. If you are Facebook then certainly roll your own error format, but if you
+are not then RFC 7807 will point you in the right direction, and implementations
+make it easy.
 
 === 200 OK and Error Code
 
-If you return an HTTP status code of 200 with an error code, then Chuck Norris will roundhouse your door in, destroy your computer, instantly 35-pass wipe your backups, cancel your Dropbox account, and block you from GitHub. HTTP 4xx or 5xx codes alert the client that something bad happened, and error codes provide specifics of the exact issue if the client is interested.
+HTTP 4XX or 5XX codes alert the client, monitoring systems, caching systems, and
+all sorts of other network components that something bad happened.
 
 .The folks over at CommitStrip.com know what's up.
 image::images/errors-200-ok.jpeg[This monster has got his API responding with HTTP Status 200 OK despite the request failing.]
 
-
+If you return an HTTP status code of 200 with an error code, then Chuck Norris
+will roundhouse your door in, destroy your computer, instantly 35-pass wipe your
+backups, cancel your Dropbox account, and block you from GitHub.
 
 === Non-Existent, Gone, or Hiding?
 
-404 is drastically overused in APIs. People use it for "never existed", "no longer exists", "you can't view it" and "it is deactivated", which is way too vague. That can be split up into 404, 403 and 410 but this is still vague.
+404 is drastically overused in APIs. People use it for "never existed", "no
+longer exists", "you can't view it" and "deactivated", which is way too
+vague. That can be split up into 403, 404 and 410 but this is still vague.
 
-If you get a 403, this could be because the requesting user is not in the correct group to see the requested content. Should the client suggest you upgrade your account somehow? Are you not friends with the user whose content you are trying to view? Should the client suggest you add them as a friend?
+If you get a 403, this could be because the requesting user is not in the
+correct group to see the requested content. Should the client suggest you
+upgrade your account somehow? Are you not friends with the user whose content
+you are trying to view? Should the client suggest you add them as a friend?
 
-A 410 on a resource could be due to a user deleting that entire piece of content, or it could be down to the user deleting their entire account.
+A 410 on a resource could be due to a user deleting that entire piece of
+content, or it could be down to the user deleting their entire account.
 
-In all of these situations, the ideal solution is to complement the HTTP status code with an error code, which can be whatever you want as long as they are unique within your API and documented somewhere.
+=== GraphQL
 
-Do not do what Google does — supply a list of error codes while having other error codes that are not documented _anywhere_ — because if I see that, I will come for you.
+GraphQL has an error object format defined, so no choice needs to go into selecting one. It has a message and a location, the location being useful for GraphIQL and other visual query tools to help show which line the error was on.
+
+[source,javascript]
+----
+{
+  "errors": [
+    {
+      "message": "Field \"name\" must not have a selection since type \"String!\" has no subfields.",
+      "locations": [
+        {
+          "line": 4,
+          "column": 10
+        }
+      ]
+    }
+  ]
+}
+----
+
+There is also a `path` property made available in some error responses:
+
+[source,text]
+----
+"path": [
+  "name"
+],
+----
+
+At first this may appear to be similar to the JSON:API pointer (JSON Pointer) approach, but is actually considerably more complex.
+
+[source,Lee Byron,https://github.com/graphql/graphql-spec]
+____
+If an error can be associated to a particular field in the GraphQL result, it
+must contain an entry with the key `path` that details the path of the
+response field which experienced the error. This allows clients to identify
+whether a `null` result is intentional or caused by a runtime error.
+
+This field should be a list of path segments starting at the root of the
+response and ending with the field associated with the error. Path segments
+that represent fields should be strings, and path segments that
+represent list indices should be 0-indexed integers. If the error happens
+in an aliased field, the path to the error should use the aliased name, since
+it represents a path in the response, not in the query.
+
+For example, if fetching one of the friends' names fails in the following
+query:
+
+  {
+    hero(episode: $episode) {
+      name
+      heroFriends: friends {
+        id
+        name
+      }
+    }
+  }
+
+The response might look like:
+
+  {
+    "errors": [
+      {
+        "message": "Name for character with ID 1002 could not be fetched.",
+        "locations": [ { "line": 6, "column": 7 } ],
+        "path": [ "hero", "heroFriends", 1, "name" ]
+      }
+    ],
+    "data": {
+      "hero": {
+        "name": "R2-D2",
+        "heroFriends": [
+          {
+            "id": "1000",
+            "name": "Luke Skywalker"
+          },
+          {
+            "id": "1002",
+            "name": null
+          },
+          {
+            "id": "1003",
+            "name": "Leia Organa"
+          }
+        ]
+      }
+    }
+  }
+____
 
 
-== GraphQL
+As you might have noticed here, GraphQL has an interesting spin on errors. With
+most HTTP APIs you are either trying to do something and succeed, or you fail,
+and it is usually rather binary.
+
+NOTE: An exception to that rule might be trying to fetch a collection of things,
+searching, etc. and getting an empty result, but that is not an error, that is a
+fetch returning an empty result.
+
+If a request is invalid the message fails. In GraphQL they
+
+Due to the batch-based
+nature of GraphQL (trying to do many things in a single request) there are
+situations where data and errors can come back at the same time.
+
 
 [source,javascript]
 ----
@@ -324,3 +528,27 @@ Do not do what Google does — supply a list of error codes while having other e
   ]
 }
 ----
+
+
+
+== Validation
+
+Some folks want to treat errors and validation like two different things, but
+really a validation message is a validation error, so just an error. There is no
+need to try and differentiate between the two.
+
+If a client is trying to create a resource and it is not created, then it is an
+error. It really does not matter to the client much if that happened because a
+plane landing on the data center, or the date being entered in an unsupported
+format, they want to see errors come back. They know if its a server error or
+client error based on the HTTP status, and they know if it can be retried or
+not, and those are the only differentiations that matter to the client.
+
+If you as an API developer are luck enough to have OpenAPI or JSON Schema
+contract files already written up, you can make the art of validation incredibly
+easy, and avoid writing a bunch of code to handle the validation rules, just by
+implementing an OpenAPI/JSON Schema validator in your controllers, or as
+middleware.
+
+These validation tools can often be convinced to speak in one of the two common
+standard error formats, or you can create your own snowflake error format.

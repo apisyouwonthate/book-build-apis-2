@@ -136,8 +136,10 @@ Let's take a quick peruse through the HTTP methods.
 Just fetch some stuff. Don't trigger any destructive changes anywhere else as
 result. This should be repeatable.
 
-SIDEBAR: They can technically have a body some servers and tools will start
+NOTE: They can technically have a body some servers and tools will start
 acting a bit wonky, meaning people generally avoid creating GETs with bodies.
+
+// TODO Idempotent gets, should not have destructive effects
 
 ==== POST
 
@@ -166,7 +168,7 @@ already had an image or not, if the request is a success they will have one. If
 the upload fails that is fine, another request can be set, and it will be
 overridden.
 
-SIDEBAR: Some folks get a bit concerned about this being a "create or update"
+NOTE: Some folks get a bit concerned about this being a "create or update"
 action, but their concern comes from a misplaced sense that HTTP verbs
 correspond to a specific CRUD action. If somebody complains at you about this,
 politely point them at this section.
@@ -584,3 +586,8 @@ if that type is not available you can return a 406 Not Acceptable response,
 which is one of many errors an API can return when a request goes wrong.
 
 image::images/406.jpg[406 - Not Acceptable - Kitty does not want a bath.]
+
+// TODO when to return a body
+// - PATCH/PUT/POST returning content, maaaaybe it should be Content-Location
+// instead of a direct return
+// What (if anything) do you return in the response body for POST, PUT and PATCH?
