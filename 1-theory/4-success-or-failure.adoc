@@ -162,6 +162,7 @@ take some other action to resolve the situation, or email somebody, or reset
 their password. 👍
 
 // TODO show how to create error codes with logical ranges and grouping and potentially locale based thing too
+// https://www.twilio.com/docs/api/errors
 
 === The Trouble with Custom Error Formats
 
@@ -400,7 +401,9 @@ content, or it could be down to the user deleting their entire account.
 
 === GraphQL
 
-GraphQL has an error object format defined, so no choice needs to go into selecting one. It has a message and a location, the location being useful for GraphIQL and other visual query tools to help show which line the error was on.
+GraphQL has an error object format defined, so no choice needs to go into
+selecting one. It has a message and a location, the location being useful for
+GraphIQL and other visual query tools to help show which line the error was on.
 
 [source,javascript]
 ----
@@ -428,7 +431,8 @@ There is also a `path` property made available in some error responses:
 ],
 ----
 
-At first this may appear to be similar to the JSON:API pointer (JSON Pointer) approach, but is actually considerably more complex.
+At first this may appear to be similar to the JSON:API pointer (JSON Pointer)
+approach, but is actually considerably more complex.
 
 [source,Lee Byron,https://github.com/graphql/graphql-spec]
 ____
@@ -498,57 +502,52 @@ NOTE: An exception to that rule might be trying to fetch a collection of things,
 searching, etc. and getting an empty result, but that is not an error, that is a
 fetch returning an empty result.
 
-If a request is invalid the message fails. In GraphQL they
+GraphQL has a different take, and it tries to provide as much data back even
+when a request contained incorrectness. It usually seems more like GraphQL considers
+errors to be merely warnings, which is why you can have data and also have errors, and
+that not be an issue.
 
-Due to the batch-based
-nature of GraphQL (trying to do many things in a single request) there are
-situations where data and errors can come back at the same time.
+When trying to work out where people should put their own errors, there are a
+lot of disparate instructions. Some folks saying things like:
 
+[source,Matt Krick,https://itnext.io/the-definitive-guide-to-handling-graphql-errors-e0c58b52b5e1]
+____
+If the viewer should see the error, include the error as a field in the response payload. For example, if someone uses an expired invitation token and you want to tell them the token expired, your server shouldn’t throw an error during resolution. It should return its normal payload that includes the error field. It can be as simple as a string or as complicated as you desire:
 
-[source,javascript]
-----
-{
-  "data": {
-    "repository": null
-  },
-  "errors": [
-    {
-      "type": "NOT_FOUND",
-      "path": [
-        "repository"
-      ],
-      "locations": [
-        {
-          "line": 7,
-          "column": 3
-        }
-      ],
-      "message": "Could not resolve to a Repository with the name 'any'."
+  return {
+    error: {
+      id: '123',
+      type: 'expiredToken',
+      subType: 'expiredInvitationToken',
+      message: 'The invitation has expired, please request a new one',
+      title: 'Expired invitation',
+      helpText: 'https://yoursite.co/expired-invitation-token',
+      language: 'en-US'
     }
-  ]
-}
-----
+  }
+____
 
+This is back to creating custom error formats, despite GraphQL having one bundled... Not sure. Accepting feedback on best practices if anyone finds them before this book goes to print.
 
+// TODO PRINT best practices for custom errors? maybe talk about apollo again?
 
-== Validation
+=== gRPC
 
-Some folks want to treat errors and validation like two different things, but
-really a validation message is a validation error, so just an error. There is no
-need to try and differentiate between the two.
+gRPC does not care about how you do errors, do what you want. The official documentation for gRPC Core has written down some https://grpc.io/grpc/core/md_doc_statuscodes.html[pre-defined error codes], but you can invent your own too.
 
-If a client is trying to create a resource and it is not created, then it is an
-error. It really does not matter to the client much if that happened because a
-plane landing on the data center, or the date being entered in an unsupported
-format, they want to see errors come back. They know if its a server error or
-client error based on the HTTP status, and they know if it can be retried or
-not, and those are the only differentiations that matter to the client.
+The official documentation pushes readers towards http://avi.im/grpc-errors/,
+which is a convenient set of SDKs for most of the programming languages gRPC is
+implemented in. The code helps API developers use the status codes defined in
+gRPC Core, and add their own text too.
 
-If you as an API developer are luck enough to have OpenAPI or JSON Schema
-contract files already written up, you can make the art of validation incredibly
-easy, and avoid writing a bunch of code to handle the validation rules, just by
-implementing an OpenAPI/JSON Schema validator in your controllers, or as
-middleware.
+// TODO Validation is coming in another PR, this one is getting too damn big
+// == Validation
 
-These validation tools can often be convinced to speak in one of the two common
-standard error formats, or you can create your own snowflake error format.
+// If you as an API developer are luck enough to have OpenAPI or JSON Schema
+// contract files already written up, you can make the art of validation incredibly
+// easy, and avoid writing a bunch of code to handle the validation rules, just by
+// implementing an OpenAPI/JSON Schema validator in your controllers, or as
+// middleware.
+//
+// GraphQL validation with Yup via graphql-shield
+// https://github.com/maticzav/graphql-shield
