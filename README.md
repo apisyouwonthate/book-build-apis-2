@@ -73,4 +73,4 @@ So far, this feels like how the book is gonna play out:
 
 ## Preview
 
-[PDF Preview](http://htmlpreview.github.com/?https://github.com/apisyouwonthate/book-build-apis-2/blob/master/generated/book.pdf)
+[PDF Preview](https://github.com/apisyouwonthate/book-build-apis-2/raw/master/generated/book.pdf)
