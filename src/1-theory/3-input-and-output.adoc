@@ -1,4 +1,4 @@
-ca= Input and Output
+= Input and Output
 
 Most of the whole idea of an API is "input" and "output", and in HTTP an input
 comes in the form of "requests", and output comes in the form of "responses".
@@ -113,7 +113,8 @@ routes. These two frameworks and probably others do have command line utilities
 for printing out the routes it is generating, which are `$ rails routes` and
 `$ php artisan route:list` respectively.
 
-==== Conventions are Important
+=== HTTP Methods
+
 
 Over the years a lot of people have tried to suggest that HTTP methods do not
 matter, and anyone who suggests using the right one for the right job is just
@@ -127,9 +128,7 @@ that caching a POST would be spooky and problematic. They will know they can
 retry a PUT or a DELETE, but better not retry a PATCH. These conventions allow a
 lot of tools that do not have direct knowledge of each other to work together.
 
-=== HTTP Methods
-
-Let's take a quick peruse through the HTTP methods.
+Let's learn a bit more about these HTTP methods.
 
 ==== GET
 
@@ -188,7 +187,7 @@ and `property2` are `false` in the original response of the GET request.
 
 Updating `property1` to be true.
 
-[source]
+[source,text]
 ====
 PUT /foos/123
 
@@ -202,7 +201,7 @@ PUT /foos/123
 
 Updating `property2` to be true.
 
-[source]
+[source,text]
 ====
 PUT /foos/123
 

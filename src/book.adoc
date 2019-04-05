@@ -7,8 +7,6 @@ Philip Sturgeon <phil@apisyouwonthate.com>
 :source-highlighter: coderay
 :toc:
 
-ifndef::ebook-format[:leveloffset: 1]
-
 include::0-stuff/author.adoc[]
 
 include::0-stuff/introduction.adoc[]
