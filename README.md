@@ -20,8 +20,6 @@ So far, this feels like how the book is gonna play out:
     - Pagination
     - Filtering
     - Caching
-  - Authentication
-  - Security
   - Hypermedia Controls (HATEOAS)
     - Layers of abstraction on top of RPC
     - Next available actions
@@ -36,6 +34,7 @@ So far, this feels like how the book is gonna play out:
     - WebSockets
     - Message Brokers (AMQP, Kafka, etc.)
   - Authentication
+  - Security
 
 - Part Two: Planning & Design
   - Editors
