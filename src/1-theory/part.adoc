@@ -1,0 +1,8 @@
+[part]
+= Part One: Theory
+
+include::1-apis-services-microservices.adoc[]
+
+include::2-different-paradigms.adoc[]
+
+include::3-api-contracts.adoc[]

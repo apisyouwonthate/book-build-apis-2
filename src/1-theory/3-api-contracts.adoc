@@ -170,7 +170,7 @@ you can do a whole bunch of stuff:
 - Automated Postman/Paw Collections
 
 An early example of that would be SOAP, which used something called a WSDL,
-something discussed in <<theory-paradigms,the previous chapter>>.
+something discussed in the previous chapter.
 
 [quote, Wikipedia]
 ____

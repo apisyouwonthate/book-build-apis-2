@@ -48,7 +48,7 @@ service is just "any code that didn't fit into a model, view, or controller".
 When folks talk about services in API-land, they are usually talking about
 "Service-oriented Architecture".
 
-[quote,Wikipedia,https://wikipedia.org/wiki/Service-oriented_architecture]
+[quote,Wikipedia]
 ____
 Service-oriented architecture (SOA) is a style of software design where services
 are provided to the other components by application components, through a
@@ -153,7 +153,6 @@ some form of API, but not all APIs are a service.*
 Some APIs could have a more descriptive name than service: like function, or
 database.
 
-.https://twitter.com/adamralph[Adam Ralph] at https://ndcporto.com/[NDC Porto 2019]. Photo credit https://twitter.com/dhelper[Dror Helper].
 image::./images/service-is-not.jpg[Adam Ralph points out that a service with the only functionality bering a function is not a service, its a function. A service which only exposes data is a database. Adding some HTTP in front does not change its name.]
 
 Throughout the book we will use the terms service, function and database
@@ -163,7 +162,7 @@ accordingly. Attempts will be made to disambiguate if it gets confusing.
 
 Microservices as a term was coined around 2011. It is meant to be an off-shoot
 of SoA, with more emphasis on isolation and autonomy, like the UNIX philosophy of single responsibility. Like any popular term, over time there has been
-https://martinfowler.com/bliki/SemanticDiffusion.html[semantic diffusion] of the original meaning, and now there is literally meanings, common meanings, etc.
+semantic diffusion of the original meaning, and now there is literally meanings, common meanings, etc.
 
 Some folks define microservice by some objective metric, like number of
 endpoints or methods - which is essentially confusing them with functions.
@@ -173,7 +172,7 @@ It is understandable, as hearing service and microservice makes you think one is
 meant to be "smaller", but size in this context is not counted by the surface
 area of the interface, or even the size of the entire dependency chart.
 
-[quote,Martin Fowler and James Lewis,https://martinfowler.com/articles/microservices.html]
+[quote,Martin Fowler and James Lewis]
 ____
 In short, the microservice architectural style [1] is an approach to developing a single application as a suite of small services, each running in its own process and communicating with lightweight mechanisms, often an HTTP resource API. These services are built around business capabilities and independently deployable by fully automated deployment machinery. There is a bare minimum of centralized management of these services, which may be written in different programming languages and use different data storage technologies.
 ____
