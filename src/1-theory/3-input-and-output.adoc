@@ -132,19 +132,20 @@ Let's learn a bit more about these HTTP methods.
 
 ==== GET
 
-Just fetch some stuff. Don't trigger any destructive changes anywhere else as
-result. This should be repeatable.
+Just fetch some stuff from the server. This is the best example of an "idempotent" action, and this is a word which pops up a bit in API land.
+
+Idempotent means you can do this thing over and over again, and it happening two
+or more times won't result in  different outcomes. If you GET the thing, but the
+request fails or times out, and you GET it again, the end result is that you got
+it. Nothing was deleted, or removed, or changed in any lasting way, so if this
+thing is got a bunch of times it is the same as being got once.
 
 NOTE: They can technically have a body some servers and tools will start
 acting a bit wonky, meaning people generally avoid creating GETs with bodies.
 
-// TODO Idempotent gets, should not have destructive effects
-
 ==== POST
 
 Often used purely for "creates" but can be used for any non-idempotent action.
-Idempotent means you can do this thing over and over again, and it happening two
-or more times won't create different outcomes.
 
 Creating something is a good example of a non-idempotent action, because if you
 send two requests to create a thing, you now have two things. You could also be
