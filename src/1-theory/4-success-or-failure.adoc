@@ -12,6 +12,9 @@ tricky.
 HTTP status codes are part of the picture, they can define a category of issue,
 but they are never going to explain the whole story.
 
+Two examples from a carpooling application which whad a "simulated savings" endpoint, to let folks know how much they might save picking up a passenger on their daily commute:
+
+.This error let the client know the coordinates were too close together, meaning it is not even worth driving let alone trying to pick anyone else up.
 [source,text]
 ----
 HTTP/1.1 400 Bad Request
@@ -24,6 +27,7 @@ HTTP/1.1 400 Bad Request
 }
 ----
 
+.This carpool driver is trying to create a trip from Colombia to Paris.
 [source,text]
 ----
 HTTP/1.1 400 Bad Request
@@ -31,11 +35,10 @@ HTTP/1.1 400 Bad Request
 {
   "errors" : [{
     "code"   : 20010,
-    "title"  : "Invalid geopoints for simulated savings."
+    "title"  : "Invalid geopoints for possible trip."
   }]
 }
 ----
-
 
 This is often touted as a failing of the HTTP status code concept, but it was
 never intended to cover every single possible application specific error
@@ -539,15 +542,3 @@ The official documentation pushes readers towards http://avi.im/grpc-errors/,
 which is a convenient set of SDKs for most of the programming languages gRPC is
 implemented in. The code helps API developers use the status codes defined in
 gRPC Core, and add their own text too.
-
-// TODO Validation is coming in another PR, this one is getting too damn big
-// == Validation
-
-// If you as an API developer are luck enough to have OpenAPI or JSON Schema
-// contract files already written up, you can make the art of validation incredibly
-// easy, and avoid writing a bunch of code to handle the validation rules, just by
-// implementing an OpenAPI/JSON Schema validator in your controllers, or as
-// middleware.
-//
-// GraphQL validation with Yup via graphql-shield
-// https://github.com/maticzav/graphql-shield

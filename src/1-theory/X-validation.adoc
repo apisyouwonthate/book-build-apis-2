@@ -1,0 +1,10 @@
+== Validation
+
+If you as an API developer are luck enough to have OpenAPI or JSON Schema
+contract files already written up, you can make the art of validation incredibly
+easy, and avoid writing a bunch of code to handle the validation rules, just by
+implementing an OpenAPI/JSON Schema validator in your controllers, or as
+middleware.
+
+GraphQL validation with Yup via graphql-shield
+https://github.com/maticzav/graphql-shield
