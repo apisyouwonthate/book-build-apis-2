@@ -2,7 +2,7 @@
 
 The API World has changed a lot since 2014, and keeping the original book up-to-date with blog posts and bonus chapters in the ebook is only holding off the inevitable for so long.
 
-Support the development of this book, and [*pre-order on LeanPub!*](https://leanpub.com/build-apis-2/)
+Support the development of this book, and [**pre-order on LeanPub!**](https://leanpub.com/build-apis-you-wont-hate-2/)
 
 ## Outline
 
@@ -22,6 +22,7 @@ So far, this feels like how the book is gonna play out:
     - [ ] Pagination
     - [ ] Filtering
     - [ ] Caching
+  - [ ] Validation
   - [ ] Hypermedia Controls (HATEOAS)
     - [ ] Layers of abstraction on top of RPC
     - [ ] Next available actions
