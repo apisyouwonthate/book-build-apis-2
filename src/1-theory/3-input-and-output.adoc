@@ -107,10 +107,10 @@ app.post('/photos', (req, res) => { ... })
 ----
 
 
-That said some like Rails (Ruby) and Laravel (PHP) heavily market their
+That said some frameworks like Rails (Ruby) and Laravel (PHP) heavily market their
 automagical routing conventions to abstract away from manually declaring these
 routes. These two frameworks and probably others do have command line utilities
-for printing out the routes it is generating, which are `$ rails routes` and
+for printing out the routes they are generating, which are `$ rails routes` and
 `$ php artisan route:list` respectively.
 
 === HTTP Methods
@@ -135,12 +135,12 @@ Let's learn a bit more about these HTTP methods.
 Just fetch some stuff from the server. This is the best example of an "idempotent" action, and this is a word which pops up a bit in API land.
 
 Idempotent means you can do this thing over and over again, and it happening two
-or more times won't result in  different outcomes. If you GET the thing, but the
+or more times won't result in different outcomes. If you GET the thing, but the
 request fails or times out, and you GET it again, the end result is that you got
 it. Nothing was deleted, or removed, or changed in any lasting way, so if this
 thing is got a bunch of times it is the same as being got once.
 
-NOTE: They can technically have a body some servers and tools will start
+NOTE: GET requests can technically have a body, and some servers and tools will start
 acting a bit wonky, meaning people generally avoid creating GETs with bodies.
 
 ==== POST
@@ -149,8 +149,8 @@ Often used purely for "creates" but can be used for any non-idempotent action.
 
 Creating something is a good example of a non-idempotent action, because if you
 send two requests to create a thing, you now have two things. You could also be
-triggering the sending of an email, paying an invoice, etc., it does not have to
-be a create.
+triggering the sending of an email, paying an invoice, etc. It does not have to
+be a create, but it will result in that action being executed every time you make a request.
 
 ==== PUT
 
@@ -158,14 +158,14 @@ Often incorrectly associated with being an "edit" action, PUT can actually do a
 whole lot more than that. PUT is designed to be an idempotent way to send data
 to a server, where the request contains the entirety of the resource. Whatever
 it says should go, so if the attempt fails for any reason and the client
-retries, there wil be no negative consequence as its said the same thing twice.
+retries, there will be no negative consequence as it's said the same thing twice.
 
 An example of this would be an image upload. An API might have the ability to
 upload an image for a user, which is probably a profile image. A request with
-`PUT /users/jane/image` and a body of either the image contents (or a JSON
+`PUT /users/jane/image` and a body of the image contents (or a JSON
 payload with a URL) could then provide the image. It does not matter if the user
 already had an image or not, if the request is a success they will have one. If
-the upload fails that is fine, another request can be set, and it will be
+the upload fails that is fine, another request can be made, and it will be
 overridden.
 
 NOTE: Some folks get a bit concerned about this being a "create or update"
@@ -181,7 +181,7 @@ cautiously.
 Think about a resource represented with JSON, that has two properties:
 `property1` and `property2`. After getting the initial value of the resource
 with a GET request, two different HTTP clients make requests (Request A and
-(Request B) to update the value of just one property via a PUT. Both `property1`
+Request B) to update the value of just one property via a PUT. Both `property1`
 and `property2` are `false` in the original response of the GET request.
 
 **Request A**
@@ -220,7 +220,7 @@ For partial changes, there is another method.
 
 ==== PATCH
 
-Patch is a more recent condition to HTTP, with its RFC being finalized in 2010.
+Patch is a more recent addition to HTTP, with its RFC being finalized in 2010.
 
 [quote,Internet Engineering Task Force (IETF),https://tools.ietf.org/html/rfc5789]
 ====
@@ -236,7 +236,7 @@ Some folks have never heard of the conflict scenario above, and recommend PATCH
 because it is essentially a performance improvement. Technically they are right:
 sending less stuff over the wire is quicker than sending more stuff.
 
-How exactly PATCH works can vary on which data format you're using. If its JSON
+How exactly PATCH works can vary depending on which data format you're using. If it's JSON
 then there are two popular approaches: https://tools.ietf.org/html/rfc6902[JSON
 Patch] and https://tools.ietf.org/html/rfc7396[JSON Merge Patch].
 
@@ -293,7 +293,7 @@ ____
 ==== HEAD
 
 Pretty much exactly the same as GET in every way, but HEAD responses must not
-contain a body. This is great for checks to see if something exists, and if it
+contain a body. This is great for checks to see if something exists (by inspecting the status code), and if it
 does the client does not have to wait for the entire response body to be
 generated then sent down the wire.
 
@@ -334,7 +334,7 @@ Content-Type: application/json
 }
 ----
 
-First you might notice then `200 OK`, which is a HTTP status code that says things worked as expected. No issues here buddy. Then there is the `Content-Type`, which just says the data is JSON.
+First you might notice the `200 OK`, which is an HTTP status code that says things worked as expected. No issues here buddy. Then there is the `Content-Type`, which just says the data is JSON.
 
 === HTTP Status Codes
 
@@ -357,7 +357,7 @@ response a status code as defined in the RFC have a number from `200` to
 definition. Most server-side languages, frameworks, etc., default to
 `200 OK`.
 
-Status codes are grouped into a few different categories:, with the
+Status codes are grouped into a few different categories, with the
 first number being an identifier of the category of thing that happened.
 
 === 2XX is all about success
@@ -387,7 +387,7 @@ resource that no longer exists, or done something else wrong which needs fixing.
 
 With these status codes, the API, or some network component like a load
 balancer, web server, application server, etc. is indicating that something went
-wrong in their side. For example, a database connection failed, or another
+wrong on their side. For example, a database connection failed, or another
 service was down. Typically, a client application can retry the request. The
 server can even specify when the client should retry, using a `Retry-After` HTTP
 header.
@@ -412,12 +412,12 @@ exist
 you)
 * 409 - Conflict (Maybe somebody else just changed some of this data, or
 status cannot change from e.g: "published" to "draft")
-* 410 - Data has been deleted, deactivated, suspended, etc.
+* 410 - Gone - Data has been deleted, deactivated, suspended, etc.
 * 415 - The request had a `Content-Type` which the server does not know
 how to handle
 * 429 - Rate Limited, which means take a breather, sleep a bit, try
 again
-* 500 - Something unexpected happened, and it is the APIs fault
+* 500 - Something unexpected happened, and it is the API's fault
 * 503 - API is not here right now, please try again later
 
 You might spot others popping up from time to time, so check on
@@ -447,7 +447,7 @@ wholeheartedly.
 foo=something&bar=1&baz=0
 ----
 
-Another issue with form data is similar to how XML suffers a lack of obvious
+One issue with form data is similar to how XML suffers a lack of obvious
 data types. For example, to handle a boolean a client has to send `1` or `0`,
 because `bar=true` would be `string("true")` on the server-side.
 
@@ -579,7 +579,7 @@ JSON is fine.
 CSV can be pretty handy as an export format too, especially if your API is
 offering data for any sort of "Reports".
 
-Whatever you decide to offer, make it very clear on your documentation what
+Whatever you decide to offer, make it very clear in your documentation what
 formats are supported. HTTP clients can request a specific `Content-Type` be
 used for the response by placing it in the `Accept` header on the request, and
 if that type is not available you can return a 406 Not Acceptable response,
