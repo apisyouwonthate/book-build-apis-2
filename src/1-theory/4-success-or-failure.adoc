@@ -12,7 +12,7 @@ tricky.
 HTTP status codes are part of the picture, they can define a category of issue,
 but they are never going to explain the whole story.
 
-Two examples from a carpooling application which whad a "simulated savings" endpoint, to let folks know how much they might save picking up a passenger on their daily commute:
+Two examples from a carpooling application which had a "simulated savings" endpoint, to let folks know how much they might save picking up a passenger on their daily commute:
 
 .This error let the client know the coordinates were too close together, meaning it is not even worth driving let alone trying to pick anyone else up.
 [source,text]
