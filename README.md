@@ -37,6 +37,11 @@ So far, this feels like how the book is gonna play out:
     - [ ] Message Brokers (AMQP, Kafka, etc.)
   - [ ] Authentication
   - [ ] Security
+  - [ ] Horror Stories
+    - [ ] Deadly Faith In Strangers (The Keycard Troubles of 2016)
+    - [ ] Stampeding Herds
+    - [ ] Denial of Service Attacking Yourself
+    - [ ] Firing Data into Blackholes
 
 - [ ] Part Two: Planning & Design
   - [x] Editors
@@ -69,6 +74,7 @@ So far, this feels like how the book is gonna play out:
 - [ ] Part Five: Further Theory
   - [ ] Picking Paradigms
   - [ ] Common Architectures
+    - [ ] GraphQL as a Monolith
     - [ ] REST wrapping Microservices
     - [ ] Backend for Frontends (BFFs)
 
