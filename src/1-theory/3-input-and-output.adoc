@@ -140,7 +140,7 @@ request fails or times out, and you GET it again, the end result is that you got
 it. Nothing was deleted, or removed, or changed in any lasting way, so if this
 thing is got a bunch of times it is the same as being got once.
 
-NOTE: GET requests can technically have a body, and some servers and tools will start
+NOTE: GET requests can technically have a body, but some servers and tools will start
 acting a bit wonky, meaning people generally avoid creating GETs with bodies.
 
 ==== POST
@@ -477,7 +477,7 @@ Content-Type: application/json
 
 {
     "checkin": {
-        "place_id" : 1,
+        "place_id": 1,
         "message": "This is a bunch of text.",
         "with_friends": [1, 2, 3, 4, 5]
     }
@@ -518,7 +518,7 @@ Content-Type: application/x-www-form-urlencoded
 
 json="{
     \"checkin\": {
-        \"place_id\" : 1,
+        \"place_id\": 1,
         \"message\": \"This is a bunch of text.\",
         \"with_friends\": [1, 2, 3, 4, 5]
     }
