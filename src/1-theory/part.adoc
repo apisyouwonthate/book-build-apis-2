@@ -10,3 +10,13 @@ include::3-input-and-output.adoc[]
 include::4-success-or-failure.adoc[]
 
 include::5-api-contracts.adoc[]
+
+include::6-design.adoc[]
+
+include::7-validation.adoc[]
+
+include::8-hypermedia.adoc[]
+
+include::9-http.adoc[]
+
+include::10-async.adoc[]

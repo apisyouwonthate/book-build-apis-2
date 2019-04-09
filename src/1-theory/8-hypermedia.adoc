@@ -1,0 +1,5 @@
+= Hypermedia Controls (HATEOAS)
+
+Coming soon.
+
+// http://restfuljson.org/

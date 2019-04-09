@@ -15,11 +15,11 @@ include::0-stuff/introduction.adoc[]
 
 :imagesdir: 1-theory
 
-include::1-theory/part.adoc[]
+include::1-theory/part.adoc[leveloffset=+1]
 
 :imagesdir: 2-planning
 
-include::2-planning/part.adoc[]
+include::2-planning/part.adoc[leveloffset=+1]
 
 // [part]
 // = Part Three: Testing & Monitoring

@@ -1,0 +1,109 @@
+= Asynchronous Paradigms
+
+So far the discussion of these paradigms has probably seemed rather similar,
+they are all following a request and response structure.
+
+Getting a response from a request is one way to do things, but there are lots of
+situations where a client might expect more than one response, or a response with
+more information later as more work happens on the server side.
+
+In the example of a HTTP API where a user is buying something from your site. They make
+a payment, and they want to know if it has been accepted or not.
+
+.A completely synchronous approach to handling a payment from a GUI, with your API accepting the information and sending it off to an external API acting as a payment gateway.
+[plantuml]
+---------------------------------------------------------------------
+@startuml
+
+title The Blocking Serial Way
+
+actor User
+boundary "Web GUI" as GUI
+control "API"
+boundary "Payment Gateway" as PG
+
+User -> API: POST /payments
+API -> PG: POST /submitPaymentAttempt
+PG -> PG: May take 30-60s to confirm
+API <- PG: HTTP 200 OK
+GUI <- API: Web GUI gets the confirmation
+User <- GUI: User gets confirmation
+
+@enduml
+---------------------------------------------------------------------
+
+If the world was a perfect place, this would be fine. All messages would somehow move faster than the speed of light, all servers would alway be responding perfectly, and no messages would be lost in transit, meaning the user gets a nice, quick, consistent experience and the user interface does not leave them guessing.
+
+== Job Queues
+
+Sadly none of this is true, but people seem to  design their data flows like it might be. The above flow will leave the user sat there twiddling their thumbs for however long it takes that API gateway to respond.
+
+There is one issue here that the user is twiddling their thumbs for 30 seconds, but a bigger issue is that the API server is twiddling its thumbs for 30 seconds. Your API only has so many threads available to do stuff, so if you are wasting one of them sitting around for 30-60 seconds, that is a lot of other requests not being handled. More on that later.
+
+One way to avoid the user and/or API server twiddling literal or figurative thumbs, is to have the API immediately pass that work off to a a job queue like RabbitMQ, Sidekiq, etc. This lets the API respond with a "we are working on it" response, then have the server respond with a "Yeah yeah we're working on it" response.
+
+In HTTP this is done with a `201 Created`, or `202 Accepted` response code, which lets the client know they should look for some sort of link to get their updates.
+
+.Letting the API do a bit less work up front, shiting the waiting work to a job queue, and letting the GUI check for updates.
+[plantuml]
+----
+@startuml
+
+title Long Polling and Job Queues
+
+actor User
+boundary "Web GUI" as GUI
+control "API"
+control Worker
+boundary "Payment Gateway" as PG
+
+User -> API: POST /payments
+API -> Worker: Queue Job
+GUI <- API: HTTP 201 Accepted (with a URL to poll)
+User <- GUI: User sees "payment in progress"
+GUI -> GUI: Sets a timer to start calling the API every X seconds
+
+alt payment gateway not ready
+    GUI -> API: GET /payments/abc
+    GUI <- API: HTTP 200 OK { status: pending }
+else payment gateway has approved the payment
+    Worker --> PG: POST /submitPaymentAttempt
+    PG -> PG: May take 30-60s to confirm
+    Worker <- PG: HTTP 200 OK
+    Worker -> API: Update payment status
+    GUI -> API: GET /payments/abc
+    GUI <- API: HTTP 200 OK { status: approved }
+    User <- GUI: User gets confirmation
+end
+
+@enduml
+----
+
+This is the very first step in using APIs asynchronously in your architecture, and job queues are amazingly useful for more than just this especially in the world of microservices. We will get to that, but first, what is wrong with the approach in the diagram?
+
+== Long Polling
+
+The client is having to consistently ask if the thing is ready, which... is annoying. Making HTTP requests you don't need to make is going to drain the battery of mobile devices, add unnecessary load to the API server, and is usually pretty avoidable.
+
+Some people think that long polling is inherintly part of how some APIs (like REST) are meant to work, but there are loads of alternatives to this very primitive paradigm. For starters, Web Hooks (a.k.a Callbacks)
+
+== Web Hooks / Callbacks
+
+These are two pretty common names for the same thing. The idea is, a client can register a URL for an API to fire a payload at when updates happen to something they are interested in. This usually takes the form of a HTTP POST request, and is common in most APIs.
+
+- https://api.slack.com/incoming-webhooks[Slack API > Incoming Webhooks]
+- https://stripe.com/docs/webhooks[Stripe API > Webhooks]
+
+Webhooks are great for integrating server-to-server, where an API wants to let another server (maybe an API, maybe just an application) know that something has happened. This would improve our user experience if the GUI in our example was a server-side backed application, but if it is a JavaScript application sitting in the users browser we cannot just fire stuff at their IP address and hope it works (it won't).
+
+Callbacks do however improve the right hand side of this diagram a bit, if our payment gateway provider is using them.
+
+Thankfully most payment gateways do not work like this. For example, Stripe will respond with a qiuck response (this information looks fairly valid) but we will let you know if the bank approved the transaction for this card.
+
+
+
+// Mercure
+// https://t.co/Cyul12p1Sb
+
+// Avro / Kafka
+// https://twitter.com/libel_vox/status/1103637802678403072?s=12
