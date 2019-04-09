@@ -67,7 +67,7 @@ A well designed API error will have at the very least:
 - A human readable short summary: `Cannot checkout with an empty shopping cart`
 - A human readable message: `It looks like you have tried to check out but there is nothing in your...`
 - An application-specific error code relating to the problem: `ERRCARTEMPTY`
-- Links to a documentation page or knowledge based where a client or user of the client can figure out what to do next
+- Links to a documentation page or knowledge base where a client or user of the client can figure out what to do next
 
 This will help humans and machines to figure out what is happening. Missing out
 the error code means clients need to implement substring matching, which is
@@ -141,8 +141,8 @@ show to a user. Often a client will create a filter that checks for certain
 errors to do something, and anything left can be thrown up as a generic error
 box with the message in it.
 
-Client doing this helps future proof their application. For example, if a new
-validation rules pops up they might not have their UI code written to check for
+Clients doing this help future proof their application. For example, if a new
+validation rule pops up they might not have their UI code written to check for
 that, but an ugly alert box can pop up with instructions to the user and maybe
 that is better than the application just being completely unusable.
 
@@ -179,7 +179,7 @@ off as just a string.
 }
 ----
 
-Then somebody points out if would be nice to have application codes, and new
+Then somebody points out it would be nice to have application codes, and new
 versions of the API (or some different APIs built in the same architecture)
 start using a slightly modified format.
 
@@ -217,7 +217,7 @@ a brilliant standard from Mark Nottingham, Eric Wilde, and Akamai, released
 through the IETF.
 
 [quote,Internet Engineering Task Force (IETF),https://tools.ietf.org/html/rfc7807]
-This document defines a "problem detail" as a way to carry machine- readable
+This document defines a "problem detail" as a way to carry machine-readable
 details of errors in a HTTP response to avoid the need to define new error
 response formats for HTTP APIs.
 
@@ -292,7 +292,7 @@ pretty accurate. HTTP API developers often feel like there are infinite
 possibilities, which can lead to a lot of discissions and arguments, so using
 implementations like JSON:API can get folks on the same page. It will be covered
 in a few sections of this book, but for now we can just look at the errors
-section
+section.
 
 The following is an excerpt from the JSON:API standard at time of writing.
 
@@ -370,7 +370,7 @@ Many large companies are able to ignore these standards because they can create
 their own effective internal standards, and have enough people around with
 enough experience to avoid a lot of the common problems around.
 
-Smaller teams are not in this privileged position, should can benefit from
+Smaller teams that are not in this privileged position, can benefit from
 differing to standards written by people who have more context on the task at
 hand. If you are Facebook then certainly roll your own error format, but if you
 are not then RFC 7807 will point you in the right direction, and implementations
