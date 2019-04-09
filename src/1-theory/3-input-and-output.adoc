@@ -441,15 +441,19 @@ cut out early on.
 only seems to be used by PHP developers. Luckily most other folks ignore this
 wholeheartedly.
 
-.Form data doesn't really have data types, just awkward strings.
-[source]
-----
-foo=something&bar=1&baz=0
-----
-
 One issue with form data is similar to how XML suffers a lack of obvious
 data types. For example, to handle a boolean a client has to send `1` or `0`,
-because `bar=true` would be `string("true")` on the server-side.
+because sending `property=true` would be a literal true on the server side: `string("true")`.
+
+.Form data doesn't really have data types, just awkward strings.
+[source,text]
+----
+POST /example HTTP/1.1
+Host: api.example.org
+Content-Type: application/x-www-form-urlencoded
+
+propertyString=something&propertyTrue=1&propertyFalse=0&propertyEmpty=
+----
 
 Data types are important, so let's not just throw them out the window for the
 sake of "easy access to our data", especially as most web application frameworks
@@ -482,9 +486,9 @@ Content-Type: application/json
 
 This is a perfectly valid HTTP body for a checkin. You know what they are
 saying. You know who the user is from their auth token. You know who they are
-with and you get the benefit of having it wrapped up in a single `checkin` key
-for simple documentation, and, easy "You sent a checkin object to the user
-settings page, muppet." responses.
+with, and some API developers like having it wrapped up in a single `checkin`
+key for making it clear the client should be sending a checkin object, not some
+other object.
 
 That same request using form data is a mess.
 
@@ -525,7 +529,7 @@ This actually happens surprisingly often in the wild.
 
 image::images/input-output-json-json.jpg[]
 
-Some folks even
+// TODO I wrote "Some folks even"... then totally forgot what I was writing about. Did I have a point? Maybe
 
 === Why many prefer JSON to XML
 

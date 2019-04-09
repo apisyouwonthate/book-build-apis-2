@@ -1,10 +1,14 @@
+KAT The point about URLs having a limit could be good to mention. It bit us when we
+worked with Magento's API and they wanted a ton of stuff posted as a form, and
+the descriptions of products can get quite long... took me a while to work out
+the browser was just cutting it off after ~2000 chars!
+(https://stackoverflow.com/questions/417142/what-is-the-maximum-length-of-a-url-in-different-browsers)
+
 difference between public and private. Whoever has a token?
 
 self ddosing - When A calls B and B secretly calls back to A, which causes them
 both to slow down so much they both slow each other down MORE ANDE GUESS WHAT
 EVERYTHING IS ON FUCKING FIRE
-
-The Keycard Situation of 2016
 
 Three-way syncs, where A, B and C all have different god damn validation rules,
 so something could be in A and B but not C, or B and C but not A, or...

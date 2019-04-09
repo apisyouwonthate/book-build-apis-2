@@ -11,3 +11,17 @@ also probably (and if not here, it will go in evolvability)
 https://blog.apollographql.com/graphql-schema-design-building-evolvable-schemas-1501f3c59ed5
 
 Where should we mention that Autoincrementing ids are bad
+
+Collections
+
+KAT what to return when the resource exists but it's empty? Eg. a list of products that has no products in it at the mo. I've seen some people return 404 when I think it should have been 200 with an empty body, no? I think it's a common mistake / source of confusion.
+
+Serialization
+
+Deserialization
+
+Pagination
+
+Filtering
+
+Caching
