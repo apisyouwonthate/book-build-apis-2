@@ -59,7 +59,7 @@ boundary "Payment Gateway" as PG
 
 User -> API: POST /payments
 API -> Worker: Queue Job
-GUI <- API: HTTP 201 Accepted (with a URL to poll)
+GUI <- API: HTTP 202 Accepted (with a URL to poll)
 User <- GUI: User sees "payment in progress"
 GUI -> GUI: Sets a timer to start calling the API every X seconds
 
@@ -100,7 +100,8 @@ Callbacks do however improve the right hand side of this diagram a bit, if our p
 
 Thankfully most payment gateways do not work like this. For example, Stripe will respond with a qiuck response (this information looks fairly valid) but we will let you know if the bank approved the transaction for this card.
 
-
+// TODO somewhere mention OAuth 3.0 supports defining callbacks
+// Also mention requestbin and ngrok
 
 // Mercure
 // https://t.co/Cyul12p1Sb
