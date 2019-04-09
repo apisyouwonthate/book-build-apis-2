@@ -1,4 +1,0 @@
-http://www.commitstrip.com/en/2018/08/24/http-headers-ftw/
-
-RFC 7087
-JSON API Errors
