@@ -28,7 +28,11 @@ explained more in surviving other peoples apis aint doing it twice
 
 Firing a field into a black hole: at Ride we were sending is_foo cant remember
 what and it was important we counted how many signed up with that field, but the
-API was not saving it!!!
+API was not saving it!!! you dont want production errors for extra fields (that
+means if you deprecate and carefully remove one you get errors, or if a client
+starts sending one a little bit before your API starts listening to it, etc) and
+just generally means you have lock step deployments. Error in testing perhaps.
+Logging those oddities is a good idea
 
 Talk about specs later a bit more: - https://inspector.swagger.io/builder -
 https://blog.apisyouwonthate.com/creating-api-specifications-from-bulls-t-f5a54c005135
