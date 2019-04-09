@@ -16,9 +16,6 @@ build-pdf:
 	asciidoctor-pdf -r asciidoctor-diagram -D generated src/book.adoc
 
 build-epub:
-	#export XML_CATALOG_FILES=/usr/local/etc/xml/catalog
-	#a2x src/book.adoc -r asciidoctor-diagram -v -fepub -dbook --no-xmllint
-	#mkdir generated/epub && mv book.epub generated/epub/
 	asciidoctor-epub3 -D generated src/book.adoc
 
 build-mobi:
