@@ -38,8 +38,9 @@ So far, this feels like how the book is gonna play out:
   - [ ] Authentication
   - [ ] Security
   - [ ] Horror Stories
-    - [ ] Deadly Faith In Strangers (The Keycard Troubles of 2016)
+    - [ ] Third Parties Gone Wild (The Keycard Troubles of 2016)
     - [ ] Stampeding Herds
+    - [ ] "Syncing" in Microservices
     - [ ] Denial of Service Attacking Yourself
     - [ ] Firing Data into Blackholes
 
