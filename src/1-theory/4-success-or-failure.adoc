@@ -533,7 +533,7 @@ ____
 This is back to creating custom error formats, despite GraphQL having one bundled... Not sure. Accepting feedback on best practices if anyone finds them before this book goes to print.
 
 // TODO PRINT best practices for custom errors? maybe talk about apollo again?
-
+// Yup, the answer is apollo again: https://www.apollographql.com/docs/apollo-server/features/errors
 === gRPC
 
 gRPC does not care about how you do errors, do what you want. The official documentation for gRPC Core has written down some https://grpc.io/grpc/core/md_doc_statuscodes.html[pre-defined error codes], but you can invent your own too.
