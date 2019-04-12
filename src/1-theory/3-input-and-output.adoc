@@ -14,11 +14,12 @@ GET /places?lat=40.759211&lon=-73.984638 HTTP/1.1
 Host: api.example.org
 ----
 
-Here `GET` is the method, and the part of the URL usually referred to as the "endpoint" is `/places`, and the query
-string is `lat=40.759211&lon=-73.984638`. The HTTP version in use is HTTP/1.1,
-and the host name is defined to complete the URL. This is how a request to fetch
-data from `http://api.example.org/places` looks, and is almost exactly what your
-browser does when you go to any website.
+Here `GET` is the method, and the part of the URL usually referred to as the
+"endpoint" is `/places`, and the query string is `lat=40.759211&lon=-73.984638`.
+The HTTP version in use is HTTP/1.1, and the host name is defined to complete
+the URL. This is how a request to fetch data from
+`http://api.example.org/places` looks, and is almost exactly what your browser
+does when you go to any website.
 
 [source,http]
 ----
@@ -212,9 +213,18 @@ PUT /foos/123
 }
 ====
 
-Both properties started at `false`, and both clients were only trying to update one property, but little do they know they are clobbering the results and essentially reverting the updates from other clients. Instead of ending up with both values being `true`, the API will just hold whatever the most recent request was, which is going to be `"property1": false` and `"property2": true`.
+Both properties started at `false`, and both clients were only trying to update
+one property, but little do they know they are clobbering the results and
+essentially reverting the updates from other clients. Instead of ending up with
+both values being `true`, the API will just hold whatever the most recent
+request was, which is going to be `"property1": false` and `"property2": true`.
 
-Some folks consider this to be a feature, but others consider it a bug because if they only want to update one property, why do they need to send everything? People in the second camp decide to just send the relevant properties they want to change, which is a flagrant misuse of how PUT is supposed to work and can lead to confusion with tools that expect PUT to contain an entire resource, not just partial changes.
+Some folks consider this to be a feature, but others consider it a bug because
+if they only want to update one property, why do they need to send everything?
+People in the second camp decide to just send the relevant properties they want
+to change, which is a flagrant misuse of how PUT is supposed to work and can
+lead to confusion with tools that expect PUT to contain an entire resource, not
+just partial changes.
 
 For partial changes, there is another method.
 
@@ -293,9 +303,9 @@ ____
 ==== HEAD
 
 Pretty much exactly the same as GET in every way, but HEAD responses must not
-contain a body. This is great for checks to see if something exists (by inspecting the status code), and if it
-does the client does not have to wait for the entire response body to be
-generated then sent down the wire.
+contain a body. This is great for checks to see if something exists (by
+inspecting the status code), and if it does the client does not have to wait for
+the entire response body to be generated then sent down the wire.
 
 ==== DELETE
 
@@ -334,7 +344,9 @@ Content-Type: application/json
 }
 ----
 
-First you might notice the `200 OK`, which is an HTTP status code that says things worked as expected. No issues here buddy. Then there is the `Content-Type`, which just says the data is JSON.
+First you might notice the `200 OK`, which is an HTTP status code that says
+things worked as expected. No issues here buddy. Then there is the
+`Content-Type`, which just says the data is JSON.
 
 === HTTP Status Codes
 

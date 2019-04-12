@@ -217,9 +217,13 @@ APIs (REST, RESTish, some RPC), GraphQL and gRPC.
 
 == Introduction to API Description Languages
 
-Any generic HTTP API can use the same description languages, but the modern implementations which the conventions of HTTP to roll their own approach require their own specific description languages.
+Any generic HTTP API can use the same description languages, but the modern
+implementations which the conventions of HTTP to roll their own approach require
+their own specific description languages.
 
-Here we use the term "HTTP APIs" to group REST, RESTish, and regular RPC when it's just interacting over HTTP (GET, POST, etc) without some other set of conventions like gRPC getting involved.
+Here we use the term "HTTP APIs" to group REST, RESTish, and regular RPC when
+it's just interacting over HTTP (GET, POST, etc) without some other set of
+conventions like gRPC getting involved.
 
 === HTTP APIs: OpenAPI & JSON Schema
 
@@ -228,7 +232,10 @@ Blueprint], https://raml.org/[RAML], and OpenAPI (at the time called Swagger),
 but for years the tooling was a bit lacking, and mostly only allowed for
 outputting as documentation.
 
-OpenAPI v3.0 popped in 2015 up which solved a lot of problems with OpenAPI v2.0, and beat the heck out of the other description formats. It took a few years for tooling to catch up, but by 2018 pretty much everything supported OpenAPI v3.0, and this description format settled as the mainstream favourite.
+OpenAPI v3.0 popped in 2015 up which solved a lot of problems with OpenAPI v2.0,
+and beat the heck out of the other description formats. It took a few years for
+tooling to catch up, but by 2018 pretty much everything supported OpenAPI v3.0,
+and this description format settled as the mainstream favourite.
 
 ----
 The OpenAPI Specification (OAS) defines a standard, programming
@@ -350,7 +357,7 @@ distribute the files to them ahead of time.
 ====
 One more note on OpenAPI and its old name Swagger. You still see the word Swagger floating around a lot. SmartBear, the original authors of the "Swagger" API description language, still use the word Swagger in a lot of their tooling because they have the brand recognition. The description language itself was renamed to OpenAPI and handed over to the OpenAPI Initiative.
 
-Since 2015, anyone calling it Swagger is out of date, and the fact that folks keep using the word Swagger in 2019 is still a huge source of confusion. If you look for "Swagger tools" you will only find those from SmartBear, or really really out of date ones. Call it OpenAPI, search for OpenAPI, and we don't need to keep saying OpenAPI/Swagger like they yare two alternative but equally valid things.
+Since 2015, anyone calling it Swagger is out of date, and the fact that folks keep using the word Swagger in 2019 is still a huge source of confusion. If you look for "Swagger tools" you will only find those from SmartBear, or really really out of date ones. Call it OpenAPI, search for OpenAPI, and we don't need to keep saying OpenAPI/Swagger like they are two alternative but equally valid things.
 ====
 
 OpenAPI and JSON Schema are a fantastic pair, and we will show how to combine the two throughout the book.
