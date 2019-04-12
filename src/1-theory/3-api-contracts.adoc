@@ -350,7 +350,7 @@ distribute the files to them ahead of time.
 ====
 One more note on OpenAPI and its old name Swagger. You still see the word Swagger floating around a lot. SmartBear, the original authors of the "Swagger" API description language, still use the word Swagger in a lot of their tooling because they have the brand recognition. The description language itself was renamed to OpenAPI and handed over to the OpenAPI Initiative.
 
-Since 2015, anyone calling it Swagger is out of date, and the fact that folks keep using the word Swagger in 2019 is still a huge source of confusion. If you look for "Swagger tools" you will only find those from SmartBear, or really really out of date ones. Call it OpenAPI, search for OpenAPI, and we don't need to keep saying OpenAPI/Swagger like they yare two alternative but equally valid things.
+Since 2015, anyone calling it Swagger is out of date, and the fact that folks keep using the word Swagger in 2019 is still a huge source of confusion. If you look for "Swagger tools" you will only find those from SmartBear, or really really out of date ones. Call it OpenAPI, search for OpenAPI, and we don't need to keep saying OpenAPI/Swagger like they are two alternative but equally valid things.
 ====
 
 OpenAPI and JSON Schema are a fantastic pair, and we will show how to combine the two throughout the book.
