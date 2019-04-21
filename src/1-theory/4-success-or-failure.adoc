@@ -280,6 +280,7 @@ languages and web application frameworks to make the whole thing easier.
 
 - *PHP:* https://github.com/zendframework/zend-problem-details[zendframework/zend-problem-details]
 - *Java:* https://github.com/zalando/problem[problem] & https://github.com/zalando/problem-spring-web[problem-spring-web]
+- *Node:* https://www.npmjs.com/package/problem-json
 - *Python:* https://github.com/cbornet/python-httpproblem
 
 ==== JSON:API
@@ -289,14 +290,14 @@ just errors, it attempts to help with a lot of design choices for HTTP APIs,
 outlining the general format of requests and responses in JSON when working with
 HTTP APIs. In general it labels itself an anti-bikeshedding tool, and this is
 pretty accurate. HTTP API developers often feel like there are infinite
-possibilities, which can lead to a lot of discissions and arguments, so using
+possibilities, which can lead to a lot of discussions and arguments, so using
 implementations like JSON:API can get folks on the same page. It will be covered
 in a few sections of this book, but for now we can just look at the errors
 section.
 
 The following is an excerpt from the JSON:API standard at time of writing.
 
-[quote,Internet Engineering Task Force (IETF),https://tools.ietf.org/html/rfc7807]
+[quote,JSON:API,https://jsonapi.org/format/#errors]
 ____
 An error object MAY have the following members:
 
@@ -542,3 +543,6 @@ The official documentation pushes readers towards http://avi.im/grpc-errors/,
 which is a convenient set of SDKs for most of the programming languages gRPC is
 implemented in. The code helps API developers use the status codes defined in
 gRPC Core, and add their own text too.
+
+// TODO Talk about responsibilities of client v server in showing good errors
+// https://twitter.com/philsturgeon/status/1119259353398358016
