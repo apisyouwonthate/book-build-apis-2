@@ -13,7 +13,7 @@ build-html:
 	mkdir -p generated/html/2-planning && cp -r src/2-planning/images generated/html/2-planning/
 
 build-pdf:
-	asciidoctor-pdf -r asciidoctor-diagram -D generated src/book.adoc
+	asciidoctor-pdf -r asciidoctor-diagram -a data-uri -D generated src/book.adoc
 
 build-epub:
 	asciidoctor-epub3 -D generated src/book.adoc

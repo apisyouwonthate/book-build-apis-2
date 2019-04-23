@@ -7,6 +7,8 @@ Philip Sturgeon <phil@apisyouwonthate.com>
 :source-highlighter: coderay
 :toc:
 
+:plantumlconfig: plantuml.cfg
+
 include::0-stuff/author.adoc[]
 
 include::0-stuff/introduction.adoc[]
