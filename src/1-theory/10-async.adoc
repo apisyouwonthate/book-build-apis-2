@@ -405,3 +405,5 @@ There are a lot of implementations, super-sets and alternatives out there. Here 
 
 - **Mercure:** https://mercure.rocks/
 - **Kafka:** https://kafka.apache.org/
+
+// TODO passing messages vs objects (fat vs skinny + request)
