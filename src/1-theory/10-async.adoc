@@ -93,9 +93,9 @@ port        ENV['PORT']     || 3000
 environment ENV['RACK_ENV'] || 'development'
 ----
 
-If there was only one dyno running (a.k.a instance, pod, whatever) then 2 * 5 =
-10 and thats only 10 cake orders happening at the same time and you've run out of
-threads for other things, like accepting payments, or registering a user.
+If there was only one web server running then 2 * 5 = 10 and thats only 10 cake
+orders happening at the same time and you've run out of threads for other
+things, like accepting payments, or registering a user.
 
 Even having a slightly bulkier setup, with more dynos, and more processes, and more threads,
 it's simply a numbers game where you are just throwing more money / resources at the situation. There are better ways to scale long-term.
@@ -110,48 +110,48 @@ a payload at that URL, which usually takes the form of a HTTP
 POST request.
 
 .Examples of Web Hooks in popular APIs.
+- https://developer.github.com/webhooks/[GitHub API > Webhooks]
 - https://api.slack.com/incoming-webhooks[Slack API > Incoming Webhooks]
 - https://stripe.com/docs/webhooks[Stripe API > Webhooks]
 
 A few years ago my friend and I made a website that sold silly programmer joke
 t-shirts. We created the whole thing over beers, and we made some whopping
-mistakes. Our payment acceptance sequence looked like the synchronous one above, as
-we didn't care about speed at that early stage. The biggest mistake was that
-when the payment API gave us a positive response to the `POST` request, we
-immediately considered the payment good and marked the shirts for dispatch.
+mistakes. Everything was written in a synchronous fashion as we didn't care
+about speed at that early stage. The biggest mistake was that when the payment
+API gave us a positive response to the `POST` request, we immediately considered
+the payment good and marked the shirts for dispatch.
 
 It turns out there was a web hook we were meant to listen out for, and this
 would confirm if the payment had been accepted, or not... Seeing as we totally
 ignored that, there were a few t-shirts that went out for free! Oops.
 
-This was simple enough, we added a `/callback` endpoint, registered it with the
-payment gateway, and they would fire updates at it a few seconds or minutes
-after a payment attempt was made. We simply marked orders as pending in the mean
-time, made a order status page, and they would get an email later. We could have
-added 30 second short polling on the status page if we cared, or just had the
-page refresh, but it was midnight and the bartender had just opened the whiskey.
+This was simple enough to fix, we added a `/callback` endpoint, registered it
+with the payment gateway, and they would fire updates at it once the payment was
+confirmed. We simply marked orders as pending in the meantime and only marked
+them for dispatch (and sent emails to the customers) once we received the
+confirmation via web hooks.
 
-Web hooks are often thought of as a bit of a dark art, because they happen outside of the normal
-request/response stuff that API developers are used to. It can be hard to see them happen,
-tricky to confirm they are sending what you think, and they used to be tricky to document.
+Web hooks are often thought of as a bit of a dark art, because they happen
+outside of the normal request/response stuff that API developers are used to. It
+can be hard to see them happen, tricky to confirm they are sending what you
+think, and they used to be tricky to document.
 
 These days there are loads of awesome tools around to help. OpenAPI v3.0 added support for
-https://swagger.io/docs/specification/callbacks/[Callbacks].
-
-NOTE: It makes me sad that this is called callbacks when it should be called web
-hooks, and it's on the swagger.io website when the specification has been renamed
-to OpenAPI. Ahh well.
+https://swagger.io/docs/specification/callbacks/[Callbacks], which is another common name
+for web hooks (seeing as the payload is fired at a "Callback URL").
 
 Tools to help with this stuff:
 
 - https://pipedream.com/[PipeDream] - Formerly known as RequestBin, create an endpoint and register that as the callback URL, and see what traffic is coming in. Then maybe copy that to use in a test suite
 - https://ngrok.com/[ngrok] - Create a tunnel to your locally running application and register your local app as the callback URL
 
-That ngrok mention might have made you notice an issue with web hooks: you need
-some sort of DNS or known IP address to fire the payload at. If the client is
-written in PHP, Java, Node, Ruby, etc. and running behind a web server then
-yeah, it will probably have one of those, but if the client is a JavaScript
-application running in the user's browser then that isn't going to work.
+
+That ngrok mention might have made you notice an issue with web hooks: some sort
+of DNS or known IP address of the specific machine to fire the payload at. If
+the client is written in PHP, Java, Node, Ruby, etc. and running behind a web
+server then yeah, it will probably have one of those, but if the client is a
+JavaScript application running in the users browser then that isn't going to
+work.
 
 For that we need another approach, and that is... 🥁
 
@@ -202,7 +202,7 @@ https://developer.mozilla.org/en-US/docs/Web/API/WebSockets_API#Tools[a list of
 WebSocket tools] for folks interested in giving it a try, including web servers
 that support them.
 
-You can punt figuring out how to run a WebSocket server entirely, but using
+You can punt figuring out how to run a WebSocket server entirely, by using
 hosted solutions like https://pusher.com/[Pusher] and
 https://www.pubnub.com/websockets/[PubNub].
 
@@ -222,14 +222,18 @@ messages off to "subscribers" who can get things done.
 A more simplistic approach for job queues is to use tooling like Sidekiq (a
 popular Ruby tool for handling job queues), or the more recent polyglot version
 Faktory. These sorts of solutions are popular because they just run off of Redis
-as the queue, and often run in the same codebase just on different threads. This
-makes the setup a bit less confusing for many.
+as the queue, and often run in the same codebase just on different threads.
+
+For example, in rails you often have `app/workers` sat next to `app/controllers`
+and all your other regular code, so you can use the same database connection
+logic, hit the same libraries and dependencies, etc. This makes the setup a bit
+less confusing for many.
 
 Whatever message broker / job worker / do it later approach you use, you need to
-let the client know that work is being done in the background. For an HTTP API
-this is usually done with a `201 Created`, or `202 Accepted` response code,
-which also lets the client know they should look for some sort of link to get
-their updates.
+let  the client know that work is being done in the background. For an HTTP API
+this is usually done with a `202 Accepted` response code, which also lets the
+client know they should look out for some sort of link in the body or headers to
+get their updates, in whatever way you normally offer hypermedia controls.
 
 == Real World Examples
 
@@ -290,7 +294,7 @@ boundary "Payment Gateway" as PG
 
 GUI -> API: POST /payments
 API -> Worker: Queue Job
-GUI <-- API: HTTP 201 Created (with a URL to poll)
+GUI <-- API: HTTP 202 Accepted (with a URL to poll)
 GUI -> GUI: Sets a timer to start calling the API every X seconds
 
 loop
@@ -326,7 +330,7 @@ boundary "Payment Gateway" as PG
 
 GUI -> API: POST /payments
 API -> Worker: Queue Job
-GUI <-- API: HTTP 201 Created (with a wss:// URL)
+GUI <-- API: HTTP 202 Accepted (with a wss:// URL)
 GUI -> API: Establish wss:// connection
 Worker -> PG: POST /submitPaymentAttempt
 PG -> PG: May take 30-60s to confirm
@@ -358,10 +362,10 @@ boundary "Payment Gateway" as PG
 
 GUI -> API: POST /payments
 API -> Worker: Queue Job
-GUI <-- API: HTTP 201 Created (with a wss:// URL)
+GUI <-- API: HTTP 202 Accepted (with a wss:// URL)
 GUI -> API: Establish wss:// connection
 Worker -> PG: POST /submitPaymentAttempt
-Worker <-- PG: HTTP 201 Created
+Worker <-- PG: HTTP 202 Accepted
 GUI <- Worker: event triggered: waiting for response from payment gateway
 PG -> PG: May take 30-60s to confirm
 API <- PG: HTTP POST /callback
