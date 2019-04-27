@@ -16,7 +16,7 @@ build-pdf:
 	asciidoctor-pdf -r asciidoctor-diagram -a data-uri -D generated src/book.adoc
 
 build-epub:
-	asciidoctor-epub3 -D generated src/book.adoc
+	asciidoctor-epub3 -r asciidoctor-diagram -D generated src/book.adoc
 
 build-mobi:
-	asciidoctor-epub3 -D generated -a ebook-format=kf8 src/book.adoc
+	asciidoctor-epub3 -r asciidoctor-diagram -D generated -a ebook-format=kf8 src/book.adoc
