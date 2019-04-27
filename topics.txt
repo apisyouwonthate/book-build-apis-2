@@ -28,13 +28,15 @@ explained more in surviving other peoples apis aint doing it twice
 
 Firing a field into a black hole: at Ride we were sending is_foo cant remember
 what and it was important we counted how many signed up with that field, but the
-API was not saving it!!!
+API was not saving it!!! you dont want production errors for extra fields (that
+means if you deprecate and carefully remove one you get errors, or if a client
+starts sending one a little bit before your API starts listening to it, etc) and
+just generally means you have lock step deployments. Error in testing perhaps.
+Logging those oddities is a good idea
 
 Talk about specs later a bit more: - https://inspector.swagger.io/builder -
 https://blog.apisyouwonthate.com/creating-api-specifications-from-bulls-t-f5a54c005135
 
-testing...
-https://www.toolsqa.com/postman/assertions-in-postman-with-chai-assertion-library/
 
 whole caching thread https://twitter.com/philsturgeon/status/1050043229800976384
 
@@ -42,16 +44,12 @@ hypermedia cache pattern
 https://tools.ietf.org/html/draft-kelly-json-hal-08#section-8.3
 
 
-- real time APIs web hooks / callbacks / sockets
-pass messages not objects
-
 - API load testing and the best ways to monitor API Catchpoint.com - more of a
 geo-monitor & requests performance tool Loader.io
 * https://goreplay.org/ to re-play prod traffic into any server
 * jmeter and friends
 * https://gatling.io/
-* https://github.com/newsapps/beeswithmachineguns = DIY
-
+* https://artillery.io/
 
 
 

@@ -462,6 +462,7 @@ because sending `property=true` would be a literal true on the server side: `str
 ----
 POST /example HTTP/1.1
 Host: api.example.org
+Authorization: Bearer adsjakbsd
 Content-Type: application/x-www-form-urlencoded
 
 propertyString=something&propertyTrue=1&propertyFalse=0&propertyEmpty=
@@ -485,6 +486,7 @@ _without_ anything being in the body...
 ----
 POST /checkins HTTP/1.1
 Host: api.example.org
+Authorization: Bearer adsjakbsd
 Content-Type: application/json
 
 {
@@ -497,7 +499,7 @@ Content-Type: application/json
 ----
 
 This is a perfectly valid HTTP body for a checkin. You know what they are
-saying. You know who the user is from their auth token. You know who they are
+saying. You know who the current user is from their auth token. You know who they are
 with, and some API developers like having it wrapped up in a single `checkin`
 key for making it clear the client should be sending a checkin object, not some
 other object.

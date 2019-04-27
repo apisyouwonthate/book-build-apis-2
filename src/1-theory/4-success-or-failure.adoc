@@ -213,7 +213,7 @@ APIs.
 ==== Problem Details for HTTP APIs
 
 https://tools.ietf.org/html/rfc7807[Problem Details for HTTP APIs (RFC 7807)] is
-a brilliant standard from Mark Nottingham, Eric Wilde, and Akamai, released
+a brilliant standard from Mark Nottingham and Erik Wilde, released
 through the IETF.
 
 [quote,Internet Engineering Task Force (IETF),https://tools.ietf.org/html/rfc7807]

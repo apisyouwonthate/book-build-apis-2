@@ -1,0 +1,414 @@
+= Asynchronous Paradigms
+
+So far the discussion of these paradigms has probably seemed rather similar,
+they are all following a request and response structure. Getting a response from
+a request is one way to do things, but there are lots of situations where a
+client might expect more than one response, or a response with more information
+later as more work happens on the server side.
+
+// First, some terminology!
+
+// **Synchronous** -
+// **Asynchronous** -
+// **Concurrency** -
+// **Parallelagram** -
+
+// push v pull
+
+== Client-Server "Real-Time" Models
+
+Let's have a quick run through some of the common models for doing
+asynchronous stuff. Even though you might not want to use some of these, it is
+good to know what they are, even if that is only so you can recommend not doing
+it when somebody else brings them up in a planning meeting.
+
+=== Short Polling
+
+The first approach that often gets mentioned is short polling, which is the
+client-server equivalent of a child in the backseat of the car asking "are we
+there yet? are we there yet? are we there yet?". The client is making the same
+GET request to the same resource every few seconds, waiting for some sort of
+change in the answer.
+
+[quote,sp3c1,https://stackoverflow.com/questions/4642598/short-polling-vs-long-polling-for-real-time-web-applications]
+----
+00:00:00 C-> Is the cake ready?
+00:00:01 S-> No, wait.
+00:00:01 C-> Is the cake ready?
+00:00:02 S-> No, wait.
+00:00:02 C-> Is the cake ready?
+00:00:03 S-> Yeah. Have some.
+00:00:03 C-> Is the other cake ready? ...
+----
+
+The only benefit of short polling is that it is _very_ easy to implement. The
+client can just write a while loop that makes a request, checks for a response,
+then sleeps for a few seconds before making another request.
+
+The main downside with short polling is that it's a very chatty approach, which
+makes it awful to scale. The more clients you have making these requests the
+more load your API has to handle, and it can grow exponentially. Conditional
+network caching can help a bit here, but even then it sucks the battery life on
+mobile devices.
+
+Generally short polling is rubbish, and you should try to avoid it.
+
+=== Long Polling
+
+A slight tweak on the concept of short polling, long polling maintains an open
+connection with the server until the answer comes in.
+
+[quote,sp3c1,https://stackoverflow.com/questions/4642598/short-polling-vs-long-polling-for-real-time-web-applications]
+----
+00:00:00 C-> Is the cake ready?
+* some time later *
+00:00:03 S-> Yeah. Have some.
+00:00:03 C-> Is the other cake ready?
+----
+
+See here that instead of answering immediately, the server waited 3 seconds
+before responding with a single update.
+
+Generally folks recommend long polling when the client is only waiting for one
+answer, so if they are ordering a single cake and it might be ready soon, then
+great, let that thread focus on replying about the one cake, and when that cake
+is done the connection is closed. If the client wants multiple status updates,
+or is interested in multiple cakes, this might not be the way to go.
+
+Personal experiences tell me this sort of blocking activity can lead to quite a
+mess when you have more than a smattering of users. Blocking an entire web
+thread for 3 seconds can certainly be a problem when you have a lot of clients
+asking about a lot of cakes.
+
+For example, in Rails land this is a pretty common server config:
+
+[source,ruby]
+----
+workers Integer(ENV['WEB_CONCURRENCY'] || 2)
+threads_count = Integer(ENV['RAILS_MAX_THREADS'] || 5)
+threads threads_count, threads_count
+
+rackup      DefaultRackup
+port        ENV['PORT']     || 3000
+environment ENV['RACK_ENV'] || 'development'
+----
+
+If there was only one web server running then 2 * 5 = 10 and thats only 10 cake
+orders happening at the same time and you've run out of threads for other
+things, like accepting payments, or registering a user.
+
+Even having a slightly bulkier setup, with more dynos, and more processes, and more threads,
+it's simply a numbers game where you are just throwing more money / resources at the situation. There are better ways to scale long-term.
+
+=== Web Hooks
+
+Both these polling approaches are essentially a pull model, so lets look at a
+push model: Web Hooks. Clients register a "callback URL" through a
+GUI or API, and they may also specify specific types of information they are
+interested in receiving. When relevant events happen on the server, it will fire
+a payload at that URL, which usually takes the form of a HTTP
+POST request.
+
+.Examples of Web Hooks in popular APIs.
+- https://developer.github.com/webhooks/[GitHub API > Webhooks]
+- https://api.slack.com/incoming-webhooks[Slack API > Incoming Webhooks]
+- https://stripe.com/docs/webhooks[Stripe API > Webhooks]
+
+A few years ago my friend and I made a website that sold silly programmer joke
+t-shirts. We created the whole thing over beers, and we made some whopping
+mistakes. Everything was written in a synchronous fashion as we didn't care
+about speed at that early stage. The biggest mistake was that when the payment
+API gave us a positive response to the `POST` request, we immediately considered
+the payment good and marked the shirts for dispatch.
+
+It turns out there was a web hook we were meant to listen out for, and this
+would confirm if the payment had been accepted, or not... Seeing as we totally
+ignored that, there were a few t-shirts that went out for free! Oops.
+
+This was simple enough to fix, we added a `/callback` endpoint, registered it
+with the payment gateway, and they would fire updates at it once the payment was
+confirmed. We simply marked orders as pending in the meantime and only marked
+them for dispatch (and sent emails to the customers) once we received the
+confirmation via web hooks.
+
+Web hooks are often thought of as a bit of a dark art, because they happen
+outside of the normal request/response stuff that API developers are used to. It
+can be hard to see them happen, tricky to confirm they are sending what you
+think, and they used to be tricky to document.
+
+These days there are loads of awesome tools around to help. OpenAPI v3.0 added support for
+https://swagger.io/docs/specification/callbacks/[Callbacks], which is another common name
+for web hooks (seeing as the payload is fired at a "Callback URL").
+
+Tools to help with this stuff:
+
+- https://pipedream.com/[PipeDream] - Formerly known as RequestBin, create an endpoint and register that as the callback URL, and see what traffic is coming in. Then maybe copy that to use in a test suite
+- https://ngrok.com/[ngrok] - Create a tunnel to your locally running application and register your local app as the callback URL
+
+
+That ngrok mention might have made you notice an issue with web hooks: some sort
+of DNS or known IP address of the specific machine to fire the payload at. If
+the client is written in PHP, Java, Node, Ruby, etc. and running behind a web
+server then yeah, it will probably have one of those, but if the client is a
+JavaScript application running in the users browser then that isn't going to
+work.
+
+For that we need another approach, and that is... 🥁
+
+=== WebSocket
+
+WebSocket is a whole other protocol to HTTP, that operates over TCP directly.
+Instead of a client asking the server over and over again, or making a blocking
+connection to the web server, the client establishes a connection to the server,
+and then the two parties can send messages back and forth in real-time, and the
+server doesn't need to know the IP address of the client because the client
+initiated the connection. Cool!
+
+[quote,Wikipedia,https://en.wikipedia.org/wiki/WebSocket]
+----
+Both protocols are located at layer 7 in the OSI model and depend on TCP at layer 4. Although
+they are different, RFC 6455 states that WebSocket "is designed to work over
+HTTP ports 80 and 443 as well as to support HTTP proxies and intermediaries"
+thus making it compatible with the HTTP protocol. To achieve compatibility, the
+WebSocket handshake uses the HTTP Upgrade header to change from the HTTP
+protocol to the WebSocket protocol.
+----
+
+Basically whatever client and server side code you are using, it will do the same
+thing: the server provides a WebSocket URL to the client, and they connect, and
+messages can then go either way. Just like HTTP has `http://` and `https://`,
+there is `ws://` and `wss://`.
+
+[source,javascript]
+____
+// Create WebSocket connection
+const socket = new WebSocket('ws://localhost:8080/cakes/abc123');
+
+// Connection opened
+socket.addEventListener('open', function (event) {
+    socket.send('Hello Server!');
+});
+
+// Listen for messages
+socket.addEventListener('message', function (event) {
+    console.log('update RE that cake ', event.data);
+});
+____
+
+The fact that HTTP and WS are quite similar in many ways, and that they are
+compatible in general, makes it really easy to add WebSocket's into your HTTP API
+by using a web server that has it built in. MDN maintain
+https://developer.mozilla.org/en-US/docs/Web/API/WebSockets_API#Tools[a list of
+WebSocket tools] for folks interested in giving it a try, including web servers
+that support them.
+
+You can punt figuring out how to run a WebSocket server entirely, by using
+hosted solutions like https://pusher.com/[Pusher] and
+https://www.pubnub.com/websockets/[PubNub].
+
+=== Message Brokers & Job Queues
+
+One important idea here is the server being able to "do stuff later",
+without having the client twiddle their thumbs waiting for updates. How exactly do
+we do that? Generally the idea is to push an event into a job queue, and then
+some sort of worker process will pick up that message and "work on the job".
+
+Sometimes this is done with tools based on AMQP or MQTT, two protocols designed
+for "Message Brokering" in general. That is a whole topic by itself, and job
+queues are just one of many possible use cases that message brokers can cover.
+These tools run their own server which acts as a "broker", and they send the
+messages off to "subscribers" who can get things done.
+
+A more simplistic approach for job queues is to use tooling like Sidekiq (a
+popular Ruby tool for handling job queues), or the more recent polyglot version
+Faktory. These sorts of solutions are popular because they just run off of Redis
+as the queue, and often run in the same codebase just on different threads.
+
+For example, in rails you often have `app/workers` sat next to `app/controllers`
+and all your other regular code, so you can use the same database connection
+logic, hit the same libraries and dependencies, etc. This makes the setup a bit
+less confusing for many.
+
+Whatever message broker / job worker / do it later approach you use, you need to
+let  the client know that work is being done in the background. For an HTTP API
+this is usually done with a `202 Accepted` response code, which also lets the
+client know they should look out for some sort of link in the body or headers to
+get their updates, in whatever way you normally offer hypermedia controls.
+
+== Real World Examples
+
+Alrighty, that was a lot of text, even for the Theory part of the book, so let's
+get some visuals in here.
+
+Let's start accepting payments with a HTTP API, where a user is buying
+something from your website. Once they make a payment, they want to know if
+it has been accepted or not, so they know if they are getting their hilarious
+t-shirt.
+
+.A completely synchronous approach to handling a payment from a GUI, with your API accepting the information and sending it off to an external API acting as a payment gateway.
+[plantuml]
+---------------------------------------------------------------------
+@startuml
+
+title Accepting Payments: Blocking the GUI and Synchronous
+
+boundary "Web GUI" as GUI
+control "API"
+boundary "Payment Gateway" as PG
+
+GUI -> API: POST /payments
+API -> PG: POST /submitPaymentAttempt
+PG -> PG: May take 30-60s to confirm
+API <-- PG: HTTP 200 OK
+GUI <-- API: HTTP 200 OK
+
+@enduml
+---------------------------------------------------------------------
+
+If the world was a perfect place, this would be fine. All messages would somehow
+move faster than the speed of light, all servers would always be responding
+perfectly, and no messages would be lost in transit, meaning the user gets a
+nice, quick, consistent experience and the user interface does not leave them
+guessing.
+
+Sadly none of this is true, but people seem to design their data flows like it
+might be. The above flow will leave the user sat there twiddling their thumbs
+for however long it takes that API gateway to respond.
+
+There is one issue here that the user is twiddling their thumbs for 30 seconds,
+but a bigger issue is that the API server is twiddling its thumbs for 30
+seconds (rather than serving other requests). You realize that the payment gateway is too slow to use synchronous
+requests to talk to them, so you decide to shift that to a worker.
+
+.Letting the API do a bit less work up front, shifting the waiting work to a job queue, and letting the GUI short poll for updates.
+[plantuml]
+----
+@startuml
+
+title Accepting Payments: Short Polling and Job Queues
+
+boundary "Web GUI" as GUI
+control "API"
+control Worker
+boundary "Payment Gateway" as PG
+
+GUI -> API: POST /payments
+API -> Worker: Queue Job
+GUI <-- API: HTTP 202 Accepted (with a URL to poll)
+GUI -> GUI: Sets a timer to start calling the API every X seconds
+
+loop
+    alt payment gateway not ready
+        GUI -> API: GET /payments/abc
+        GUI <-- API: HTTP 200 OK { status: pending }
+    else payment gateway has approved the payment
+        Worker -> PG: POST /submitPaymentAttempt
+        PG -> PG: May take 30-60s to confirm
+        Worker <-- PG: HTTP 200 OK
+        Worker -> API: Update payment status
+        GUI -> API: GET /payments/abc
+        GUI <-- API: HTTP 200 OK { status: approved }
+    end
+end
+
+@enduml
+----
+
+Alright, better. Our client is a bit chatty and is generating a lot of overheard, but hey they are getting relatively real time updates. Maybe this is good enough, but maybe we want to improve this even more with a WebSocket.
+
+.Removing the short polling from the client using a WebSocket.
+[plantuml]
+----
+@startuml
+
+title Accepting Payments: WebSocket and Job Queues
+
+boundary "Web GUI" as GUI
+control "API"
+control Worker
+boundary "Payment Gateway" as PG
+
+GUI -> API: POST /payments
+API -> Worker: Queue Job
+GUI <-- API: HTTP 202 Accepted (with a wss:// URL)
+GUI -> API: Establish wss:// connection
+Worker -> PG: POST /submitPaymentAttempt
+PG -> PG: May take 30-60s to confirm
+Worker <-- PG: HTTP 200 OK
+Worker -> API: Update payment status
+GUI <-- Worker: event triggered: payment being attempted now
+GUI <-- Worker: event triggered: payment success
+
+@enduml
+----
+
+Now the client is getting real time updates, and not just "is it done or not" but actual progress on various things happening. Also the background worker is able to talk directly to the client, instead of just updating the state in the API and hoping the client checks for a change.
+
+Again this might be just fine, but the last remaining bottleneck is the interaction with this slow third party API. Even though the slowness is in the background worker, maybe the worker is backing up a bunch, due to high demand. During Black Friday this might mean your workers are so backed up they're taking 20 minutes to get to updating, because most of them are spending all the CPU cycles just waiting.
+
+Maybe the company providing this payment gateway realized that 30-60 sync requests are daft, and implemented Web Hooks on their end. Let's update our approach to support that.
+
+.Removing the short polling from the client using a WebSocket.
+[plantuml]
+----
+@startuml
+
+title Accepting Payments: WebSocket and Job Queues
+
+boundary "Web GUI" as GUI
+control "API"
+control Worker
+boundary "Payment Gateway" as PG
+
+GUI -> API: POST /payments
+API -> Worker: Queue Job
+GUI <-- API: HTTP 202 Accepted (with a wss:// URL)
+GUI -> API: Establish wss:// connection
+Worker -> PG: POST /submitPaymentAttempt
+Worker <-- PG: HTTP 202 Accepted
+GUI <- Worker: event triggered: waiting for response from payment gateway
+PG -> PG: May take 30-60s to confirm
+API <- PG: HTTP POST /callback
+API -> GUI: event triggered: payment success
+
+@enduml
+----
+
+Some notable differences here, mostly that the worker is just responsible for passing on the job to the payment gateway. Seeing as the API has registered a callback URL, the payment gateway can fire a HTTP POST payload right at our API, and the API can push the message into the WebSocket to update the client.
+
+Why would you still want to use a worker if the third-party payment gateway is doing things asynchronously itself? Well, if that third party gateway goes down, or is acting slowly, your API will also fail, or perform slowly. Chucking a background worker in there adds a bit of resilience to your system, especially as most background workers have automatic retry logic for failed jobs.
+
+== Asynchronous REST APIs
+
+Some people think that polling is inherently part of how some APIs (like
+REST) are meant to work, but that is not really the case. The REST dissertation does talk
+about REST being a pull model, and it is, but it can absolutely be supplanted with push too.
+
+[quote,Roy Fielding,https://www.ics.uci.edu/~fielding/pubs/dissertation/rest_arch_style.htm]
+----
+The interaction method of sending representations of resources to consuming components has some parallels with event-based integration (EBI) styles. The key difference is that EBI styles are push-based. The component containing the state (equivalent to an origin server in REST) issues an event whenever the state changes, whether or not any component is actually interested in or listening for such an event. In the REST style, consuming components usually pull representations. Although this is less efficient when viewed as a single client wishing to monitor a single resource, the scale of the Web makes an unregulated push model infeasible.
+----
+
+You can use any of these methods in your REST API, or any other HTTP API. As mentioned before, using HATEOAS you can return links in your API data (or headers), and those links can be to whatever protocol you like. Give the client a link to a `wss://` and they'll know to connect to a WebSocket, or provide a HTTP link and they can poll it. Or both! Choice is fun.
+
+== Asynchronous GraphQL APIs
+
+GraphQL has a special `subscription` keyword equal to `query` and `mutation`.
+There is no information on how these work on the GraphQL.org website at time of
+writing, but third-party vendors explain the situation fairly well.
+
+Basically GraphQL subscriptions add real-time functionality to GraphQL
+_somehow_, and that somehow is usually implemented via WebSockets. Apollo have
+some docs on how they suggest
+https://www.apollographql.com/docs/graphql-subscriptions[implementing GraphQL
+subscriptions in their documentation], but if you are using something other than
+Apollo you will have to work that one out for yourself.
+
+== Further Reading
+
+There are a lot of implementations, super-sets and alternatives out there. Here are some pieces of technology that you should know about, that are not being covered in the book at this point.
+
+- **Mercure:** https://mercure.rocks/
+- **Kafka:** https://kafka.apache.org/
+
+// TODO passing messages vs objects (fat vs skinny + request)

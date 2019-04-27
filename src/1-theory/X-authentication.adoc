@@ -1,2 +1,4 @@
 OAuth is like a hotel key. You provide primary creedentials (ID + credit card), get a token back that's generic, scoped, revocable, and tied to an expiration...and life's good. - @CaseySoftware #jestphp
 https://twitter.com/iansltx/status/1099065732665614337?s=12
+
+Default to not letting anyone in, then specify the various authenticaton methods allowed per controller or endpoint. DO NOT implement a shitty auth strategy where all endpoints can only have ONE type of entry, or you find yourself duplicating endpoints just to get around that crap.
