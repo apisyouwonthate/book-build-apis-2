@@ -179,6 +179,9 @@ thing: the server provides a WebSocket URL to the client, and they connect, and
 messages can then go either way. Just like HTTP has `http://` and `https://`,
 there is `ws://` and `wss://`.
 
+// TODO: Above you say that we will not open a connection for too long to save valuable time on the webserver, instead we introduce callbacks/webhooks to solve that. Now we get to WebSockets, which does exactly what we wanted to avoid, opening a connection for quite some (probably very long) time :)
+
+
 [source,javascript]
 ____
 // Create WebSocket connection
@@ -412,3 +415,4 @@ There are a lot of implementations, super-sets and alternatives out there. Here 
 - **Kafka:** https://kafka.apache.org/
 
 // TODO passing messages vs objects (fat vs skinny + request)
+// - https://socket.io/
