@@ -546,3 +546,13 @@ gRPC Core, and add their own text too.
 
 // TODO Talk about responsibilities of client v server in showing good errors
 // https://twitter.com/philsturgeon/status/1119259353398358016
+
+// TODO picking failure preferences
+// `Accept: application/problem+json;q=1, application/vnd.error+json;q=0.9, application/json;q=0.8, text/plain;q=0.5`
+// That means:
+// • If you can give me an `application/problem+json` then do that
+// • If not then I'll take `application/vnd.error+json`
+// • If not - e.g. because it's not an error - then I'd prefer `application/json`
+// • If not then I'll take `text/plain` (edited)
+// That fails if the Problem Mime types are also acceptable as Success Mime types
+// Graham
