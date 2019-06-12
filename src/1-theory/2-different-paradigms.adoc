@@ -250,4 +250,4 @@ Let's learn some stuff about GraphQL, and see when its useful, and when its not!
 
 Fair comment. This has been a whirlwind tour of a whole bunch of different topics which will be covered more in depth later. If you are nodding and smiling already then you are going to enjoy this book as we delve deeper, and if you have no idea what's going on then you are in the right place too.
 
-We will cover a lot of specifics about the technical and functional aspects of these various API paradigms and implementations, helping you to figure out when to uses which, and how to build the best possible API whichever of them you chose for a certain use case.
+We will cover a lot of specifics about the technical and functional aspects of these various API paradigms and implementations, helping you to figure out when to use which, and how to build the best possible API whichever of them you chose for a certain use case.
