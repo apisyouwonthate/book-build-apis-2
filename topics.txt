@@ -13,6 +13,11 @@ EVERYTHING IS ON FUCKING FIRE
 Three-way syncs, where A, B and C all have different god damn validation rules,
 so something could be in A and B but not C, or B and C but not A, or...
 
+Two different ID systems "syncing" with each other by for(everyone in the database) { GET /users/123 }
+> Question 2: Are your microservices overly chatty?
+> Each microservice should have a clearly defined purpose that it can execute with minimal communication with other services. If you see a service that has to send many back-and-forth requests to the same downstream services, that’s a red flag.
+https://blog.newrelic.com/engineering/distributed-monolith-vs-microservices/
+
 overloading specific fields with unexpected meaning, like "ID of ABC123F means
 the resource is a special 'foo' type... oh wait also ABC456E also means this...
 oops now theres another one. JUST ADD FUCKING type: 'foo' GAH
@@ -120,3 +125,6 @@ give yourself some with a proxy.
 
 - GraphQL multiple mutations
 https://medium.com/@__xuorig__/graphql-mutation-design-batch-updates-ca2452f92833
+
+- Building which headers to worry about
+https://www.fastly.com/blog/headers-we-dont-want

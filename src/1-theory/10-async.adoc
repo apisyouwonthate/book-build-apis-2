@@ -381,6 +381,8 @@ Some notable differences here, mostly that the worker is just responsible for pa
 
 Why would you still want to use a worker if the third-party payment gateway is doing things asynchronously itself? Well, if that third party gateway goes down, or is acting slowly, your API will also fail, or perform slowly. Chucking a background worker in there adds a bit of resilience to your system, especially as most background workers have automatic retry logic for failed jobs.
 
+// TODO My friends at a ticket selling website would ping the Slack API when a sale was made to post a message, but slack went down, and nobody could buy tickets as the API interaction was sync. they tried to deploy a fix but their deployment system was tied to slack... BAHAHAHA
+
 == Asynchronous REST APIs
 
 Some people think that polling is inherently part of how some APIs (like

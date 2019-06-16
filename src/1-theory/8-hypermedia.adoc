@@ -1,5 +1,8 @@
 = Hypermedia Controls (HATEOAS)
 
-Coming soon.
+// TODO Layers of abstraction on top of RPC
 
+// TODO Next available actions
+
+// TODO Standards (JSON:API, HAL, etc.)
 // http://restfuljson.org/

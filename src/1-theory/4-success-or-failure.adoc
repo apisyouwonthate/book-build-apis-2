@@ -556,3 +556,36 @@ gRPC Core, and add their own text too.
 // • If not then I'll take `text/plain` (edited)
 // That fails if the Problem Mime types are also acceptable as Success Mime types
 // Graham
+
+// Partial Successes...
+// https://twitter.com/sgrove/status/1101271479310725120?s=12
+// There are cases where you're trying to read from multiple sources, and you want best-effort on the results. Transactions are certainly a concern, but orthogonal.
+// Phil
+
+// Still not sure what this means. If you’re trying to make a composite resource from two remote data sources then the data response is just gonna have less data in it if it doesn’t matter, or fail with error code if it does
+
+// So 200 would cover the first of those two cases, right?
+
+// Hrm, the original tweet made me think that you wouldn’t like that (it’s what GraphQL encourages). Sufficiently-ok response is 200 with a data key, but also errors so the client can react appropriately.
+// Phil
+
+// It depends on your intent. If the intent of /foo is to show data, and some of that data is optional, then /foo is fine without some of it by definition. That’s 200 OK.
+
+// If that data is not optional then the whole thing fails.
+
+// I wouldn’t design like this. It’s your use case. :)
+// Phil
+
+// For example, /users/fred hits a local DB and a PII API to get emails, etc. If PII server is down then this is a failure and 5XX.
+
+// If there’s some related data like this users likes, recommendations, or whatever unrequited optional related data, I would make that it’s own resource
+// Phil
+
+// Imagine it like a human conversation. In my original example of payments.
+// Client: Did you make that thousand dollar payment?
+// Server: maybe
+// 😋
+// Well did you or did you not?! Lol. It would be no less annoying here.
+// Client: is this all the data?
+// Server: Perhaps
+// 🙃
