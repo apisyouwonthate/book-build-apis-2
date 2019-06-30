@@ -9,7 +9,7 @@ include::3-input-and-output.adoc[]
 
 include::4-success-or-failure.adoc[]
 
-include::5-api-contracts.adoc[]
+include::5-api-descriptions.adoc[]
 
 include::6-design.adoc[]
 

@@ -13,7 +13,7 @@ So far, this feels like how the book is gonna play out:
   - [x] Understanding Different Paradigms
   - [x] Input and Output
   - [x] Success and Failure
-  - [x] API Contracts
+  - [x] API Descriptions
   - [ ] Design Theory
     - [ ] Resources & Collections (#38)
     - [ ] Serialization

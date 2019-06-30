@@ -1,7 +1,7 @@
-[#theory-contracts]
-= API Contracts
+[#theory-descriptions]
+= API Descriptions
 
-The "I" in "API" means interface, and so writing a contract for that interface
+The "I" in "API" means interface, and so writing a description for that interface
 is the act of writing down what that interface is going to look like, to avoid
 folks having to guess, or go and hunt for some documentation somewhere.
 
@@ -32,7 +32,7 @@ Height and weight, I guess there is no imperial and metric in the game just
 units, but what is order all about? The order that pokemon is sat in my current
 party? That Ash bumped into in the cartoon? In order of cuteness? What?!
 
-An API contract can help answer most of the questions and more for anyone
+An API description can help answer most of the questions and more for anyone
 wanting to understand how an API is meant to work.
 
 - Which resources or methods are available and how do you interact with them?
@@ -42,29 +42,41 @@ wanting to understand how an API is meant to work.
 - Which of those properties are required or optional?
 - What other validation rules can be applied to those properties?
 
+NOTE
+====
+Some people use the term "API Specifications" to describe all this, but
+the word "specification" is used to mean a lot of different things. HTTP has a
+specification, most programming languages have a specification, many people 
+even use "message formats" or "hypermedia formats" like JSON:API, HAL, or Protobuf,
+all of which also have their own specification.
+
+If we keep in mind that there are lot of types of specifications involved with APIs,
+it can be less confusing if we categorize the type of specification we are talking 
+about, and refer to "API Descriptions".
+====
+
+Sometimes they are also referred to as "contracts", usually in the context of
+"contract testing" (this is covered in later chapters), and a contract is a good
+way to think about what an API description is. 
+
 [quote, The American Heritage Dictionary of the English Language]
 ____
 A contract is an agreement between two or more parties, especially one that is written and enforceable by law.
 ____
 
-Thinking about writing an API contract might sound a bit odd if you just think
-about an API as sharing some data or as a convenient way to trigger commands on
-another server, but people need to know what that data is, or what arguments
-they should send to those commands.
+Thinking about writing a contract for how the API will work might sound a bit
+odd if you just think about an API as sharing some data or as a convenient way
+to trigger commands on another server, but people need to know what that data
+is, or what arguments they should send to those commands.
 
-The enforceable bit is important too. We can use those contracts in our test
+The enforceable bit is important too. We can use those descriptions in our test
 suite to confirm that our actual APIs are following the rules of the contract.
-
-NOTE: Some people use the term "API Specifications" to describe all this, but
-the word "specification" is used to mean a lot of different things. We just used
-it in the last chapter for something totally different, so let's stick to API
-Contracts to avoid confusion.
 
 Written down exactly from an early point (and agreed upon) means that there are
 far fewer surprises throughout the API life-cycle, from planning, through
 development, and into usage by clients.
 
-Having a good contract means that API developers can be confident that:
+Having a good description means that API developers can be confident that:
 
 1. The interface is doing what they intend
 2. The interface is going to be useful for client developers
@@ -72,17 +84,17 @@ Having a good contract means that API developers can be confident that:
 4. The interface is not changing accidentally when code changes
 
 This confidence will save everyone a lot of time, money and frustration. Having
-no contract in place leads to slower rollout of the initial version, loads more
+no descriptions in place leads to slower rollout of the initial version, loads more
 time spent testing subsequent deployments, and wasted developer time having
 loads of meetings to explain things that could have been written down and clear
 to everyone already.
 
-== What forms can an API Contract take?
+== What forms can an API Description take?
 
 Some folks might think "That sounds like documentation", others might think
 "That sounds like tests". The answer is both, and more.
 
-An API contract can exist in several forms, some more useful than others.
+API descriptions can exist in several forms, some more useful than others.
 
 === The Dreaded Verbal Contract
 
@@ -121,11 +133,11 @@ issue... They might also have quit.
 When folks rely on a verbal contract, two common things happen:
 
 1. Developers waste time writing a new endpoint out of fear of using the old one
-2. Developers waste time trying to guess the contract, and might guess wrong
+2. Developers waste time trying to guess the interface, and might guess wrong
 
-=== Shoddy Human Contracts
+=== Shoddy Manual Descriptions
 
-When folks first start thinking about contracts, it often takes the form of
+When folks first start thinking about descriptions, it often takes the form of
 rudimentary API Reference Documentation. This might be dumped into a Google Doc,
 shoved in a wiki, or written up in finger blistering HTML. These formats are
 usually fairly painstaking to create, because you are focusing on formatting
@@ -135,7 +147,7 @@ over time. API developers would not settle for writing software like this, but
 apparently when it comes to documentation it's accepted as the norm.
 
 This whole slow, manual approach is probably why many people forgo writing
-contracts this way, and opt for verbal contracts instead. It probably would not
+descriptions this way, and opt for verbal contracts instead. It probably would not
 be a huge jump to say the "startup mindset" (and "agile") are one of a few
 potential driving factors in this "just get on with it" approach. There are many
 technical leaders inexperienced in this area telling their team "We'll write
@@ -144,7 +156,7 @@ clarity is slowing down initial development, client integrations, increasing
 testing efforts, and causing bizarre production issues and throughout their
 ecosystem.
 
-Anyway, aside from this medium of API contracts being time consuming, it is also
+Anyway, aside from this medium of API descriptions being time consuming, it is also
 impossible to enforce. After you have spent the time writing up a Google
 Doc/HTML/Wiki, the only output of that is going to be... a Google Doc/HTML/Wiki
 and maybe a PDF if you want to go wild. You can't exactly jam that Google Doc
@@ -153,9 +165,9 @@ whatever is written in there.
 
 There is another way.
 
-=== Description Languages
+=== Description Formats
 
-A description language can be text based or look a bit like a programming
+A description format can be text based or look a bit like a programming
 language. This format lets you describe an API in a reusable way, which means
 you can do a whole bunch of stuff:
 
@@ -184,10 +196,10 @@ language.
 ____
 
 WSDLs were only used for SOAP, and not many paradigms or implementations seemed
-to bother with this sort of description language for a long time. Luckily that
+to bother with this sort of description format for a long time. Luckily that
 has all changed over the last few years.
 
-Before we look at how various description languages are used today, lets learn
+Before we look at how various description formats are used today, lets learn
 another bit of theory.
 
 == Service Model & Data Model
@@ -209,17 +221,17 @@ The data model is used to describe the contents of the message, which is
 probably what you find in the HTTP body. The word "schema" is often associated
 with the data model too. They are often just two different terms describing the
 same concept, but often the term "schema" is used to represent the actual
-technical file containing the description language, and the term data model is
+technical file containing the description format, and the term data model is
 more theoretical.
 
-With this in mind, lets go look at how contracts are written for endpoint-based
+With this in mind, lets go look at how descriptions are written for endpoint-based
 APIs (REST, RESTish, some RPC), GraphQL and gRPC.
 
-== Introduction to API Description Languages
+== Introduction to API Description Formats
 
-Any generic HTTP API can use the same description languages, but the modern
+Any generic HTTP API can use the same description formats, but the modern
 implementations which the conventions of HTTP to roll their own approach require
-their own specific description languages.
+their own specific description formats.
 
 Here we use the term "HTTP APIs" to group REST, RESTish, and regular RPC when
 it's just interacting over HTTP (GET, POST, etc) without some other set of
@@ -333,7 +345,7 @@ hide them under lock and key, which makes absolutely no damned sense as they are
 meta-data only. Most "hackers" could probably figure out that you keep your list
 of companies under `GET /companies`, so just don't make that a publicly
 available endpoint and you're gonna be ok. PayPal, Microsoft, and other
-companies make their OpenAPI contracts available to anyone who wants to download
+companies make their OpenAPI descriptions available to anyone who wants to download
 them, and this approach can help folks integrate with your APIs.
 
 You can imagine an OpenAPI file growing to be rather unwieldy once its got 50+
@@ -355,7 +367,7 @@ distribute the files to them ahead of time.
 
 [[NOTE]]
 ====
-One more note on OpenAPI and its old name Swagger. You still see the word Swagger floating around a lot. SmartBear, the original authors of the "Swagger" API description language, still use the word Swagger in a lot of their tooling because they have the brand recognition. The description language itself was renamed to OpenAPI and handed over to the OpenAPI Initiative.
+One more note on OpenAPI and its old name Swagger. You still see the word Swagger floating around a lot. SmartBear, the original authors of the "Swagger" API description format, still use the word Swagger in a lot of their tooling because they have the brand recognition. The description format itself was renamed to OpenAPI and handed over to the OpenAPI Initiative.
 
 Since 2015, anyone calling it Swagger is out of date, and the fact that folks keep using the word Swagger in 2019 is still a huge source of confusion. If you look for "Swagger tools" you will only find those from SmartBear, or really really out of date ones. Call it OpenAPI, search for OpenAPI, and we don't need to keep saying OpenAPI/Swagger like they are two alternative but equally valid things.
 ====
@@ -452,35 +464,35 @@ and distributed with client code. Then usually things are kept backwards
 compatible until the clients have upgraded whatever client code brought the
 `.proto` files their way.
 
-== When Are Contracts Written, And By Who?
+== When Are Descriptions Written, And By Who?
 
-At what stage these contracts are written, and by who, is very much up to the
+At what stage these descriptions are written, and by who, is very much up to the
 culture of the organization. In some organizations the culture is "We dont
 bother at all" and I've been there. I spent two years helping teams fix the
 issues that came up from being vague about this stuff, and witnessed a lot of my
-friends and colleagues waste time (and the companies time) guessing contracts.
+friends and colleagues waste time (and the companies time) guessing interfaces.
 
-When I first got to that company, the culture relating to API contracts was:
+When I first got to that company, the culture relating to API descriptions was:
 
 ====
 That's the thing that Phil keeps going on about, I think? Just ignore him. We've got unstable, untested, undocumented APIs full of problems to try and sort out, and they're being misused by clients. No time for any of that contract-first planning, or contract-later nonsense.
 ====
 
 Two years later and that culture had changed substantially, to the point where
-most older APIs had contracts written down, and new ones invariably had
-contracts written before the work was started. Don't make me come to your office
-and shout at you for two years, just start planning your APIs properly now.
+most older APIs had descriptions written down, and new ones invariably had
+descriptions written before the work was started. Don't make me come to your office
+and shout at you for two years, just start designing your APIs properly now.
 
-Who should create and maintain contracts? Everyone.
+Who should create and maintain descriptions? Everyone.
 
 When they should be created? As early as possible.
 
 If one person is tasked with developing an API, then that is the one person who
-should be writing the contracts as a planning stage, before they start working
-on the actual API code.
+should be writing the descriptions as part of the design phase, all of which 
+should happen long before they start writing any code.
 
 If a whole team is tasked with developing an API, then that team should split up
-the planning work between them.
+the design work between them.
 
 The planning process involved getting out a whiteboard, getting a few of your
 clients in a room so you can listen to their needs (instead of just dictating
@@ -489,38 +501,32 @@ average developer does (everyone thinks they're an expert), and hash out some
 ideas.
 
 When those ideas start to solidify, start writing things down, and turn those
-notes into API contracts. When they're ready, get them into a GitHub pull
+notes into API descriptions. When they're ready, get them into a GitHub pull
 request, or some other collaborative place, and folks on your team can start to
 review them.
 
 Sometimes you would even see full service and data models written up and
-attached to the JIRA tasks!footnote:[JIRA is a 'popular' piece of project management software from Atlassian].
+attached to the Jira tasks!footnote:[Jira is a 'popular' piece of project management software from Atlassian].
 
-=== Contract-First vs Contract-Later
+=== Design-First vs Design-Later
 
-Whenever the topic of contract-first API development comes up, somebody will say "Damn, that sounds pretty good, but we already have an API written, and we didn't write down the contract!"
+Whenever the topic of API design-first comes up, somebody will say "Damn, that
+sounds pretty good, but we already have an API written, and we didn't write down
+the contract!"
 
 // TODO I dont want to have a fight about why annotations are utterly useless most of the time, how they require you to write your code before you can plan or mock it, or why "putting annotations near code mean devs will keep it up to date" is a horse shit argument that means nothing.
 
 Fear not. Some more strict languages like Go and Java have annotation-based
 systems which can allow you to sprinkle some syntax around your applications to
-generate some API contracts. This approach does not work so well for dynamic
+generate some API descriptions. This approach does not work so well for dynamic
 programming languages like Ruby because anything can be anything and you end up
-having to write so much in manually that you might as well just be writing
-proper API contracts.
+having to write so much into comments and annotations, that you might as well
+just be writing proper API descriptions.
 
-There are a few tools out there which will help you create contracts by
-reading your JSON requests and responses.
-
-
+There are a few tools out there which will help you create descriptions by
+reading your HTTP traffic and inferring description from what it sees..
 
 == Summary
-
-The terms "API Contract" and "API Specifications" often mean the same thing
-depending on the context, but the term specification is used to describe a lot
-of other things in this space too. If you are talking about planning, building,
-or documenting an API and somebody mentions "API specifications", then they are
-talking about this stuff.
 
 The terms "schema", and "data model", are usually closely related. In the terms
 of an HTTP API, the data model describes the body of the HTTP message, and the
@@ -531,17 +537,17 @@ Ask a bunch of different people and you will get a lot of difference answers,
 but these terms will be used throughout the book just so there is one standard
 way of talking.
 
-Writing down contracts might seem like a lot of work, but these days it should
+Writing down descriptions might seem like a lot of work, but these days it should
 no longer be considered as an optional step. Flinging around arbitrary JSON and
 hoping people and other applications are all using it properly over time is just
 reckless, selfish, and actually makes work considerably more mundane. Seeing as
-API contracts are not just for creating documentation, writing the contract down
-with a decent description language increases productivity throughout the
+API descriptions are not just for creating documentation, writing the description down
+with a decent description format increases productivity throughout the
 life-cycle of the API. Then reference documentation appears for free as one of
-many outputs of the description language using documentation generators.
+many outputs of the description format using documentation generators.
 
-Later chapters will cover exactly how contracts can get involved at various
-points, like how we can use the contracts to get feedback, and specific tools we
+Later chapters will cover exactly how descriptions can get involved at various
+points, like how we can use the descriptions to get feedback, and specific tools we
 can use to collaborate on this stuff.
 
 This introduction will most likely have left you with questions, and they will

@@ -79,9 +79,9 @@ developers add different properties, etc. It's good for quick and dirty demos,
 but is probably not something you will want to use in anger.
 
 How about instead of manually maintaining `db.json`, a tool could be pointed at
-API contracts, and a mock server was automagically created?! Then it could
+API descriptions, and a mock server was automagically created?! Then it could
 figure out its own examples based on the examples/default values supplied in the
-contract, and if the description language has validation rules it could even
+description, and if the description format has validation rules it could even
 apply those too!
 
 Thankfully loads of folks in the API ecosystem thought about this, and there is a wide selection of tooling.
@@ -140,4 +140,4 @@ Find the instance of the mock server, then point your HTTP/GraphQL/gRPC client a
 
 == Next
 
-Hopefully you have managed to get a mock server running for your API contracts, and can interact with it.
+Hopefully you have managed to get a mock server running for your API descriptions, and can interact with it.

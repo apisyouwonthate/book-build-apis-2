@@ -22,8 +22,8 @@ language. These should always be accompanied by guides and tutorials at a later
 stage, but early on you will want to provide at least the reference
 documentation to folks.
 
-Thankfully you have chosen to write down how it all works with contracts, so
-this will be easy. All we need to do is turn those contract files (probably
+Thankfully you have chosen to write down how it all works with descriptions, so
+this will be easy. All we need to do is turn those description documents (probably
 `.json`, `.yaml`, `.proto`, .etc) into some human-readable documentation for
 them to point their faces at. Usually HTML to be thrown on a web server, or
 questionably PDF files for emailing around.
