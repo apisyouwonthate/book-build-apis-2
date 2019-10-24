@@ -128,3 +128,8 @@ https://medium.com/@__xuorig__/graphql-mutation-design-batch-updates-ca2452f9283
 
 - Building which headers to worry about
 https://www.fastly.com/blog/headers-we-dont-want
+
+
+- SDKs - Relying on community to build SDKs is great until you make changes to
+your API they dont like and decide to stop maintaining them
+https://twitter.com/rdohms/status/1168079635554304000?s=12
