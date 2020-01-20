@@ -62,7 +62,7 @@ GEM
     public_suffix (3.0.3)
     rake (12.3.2)
     ruby-rc4 (0.1.5)
-    rubyzip (1.2.2)
+    rubyzip (2.0.0)
     safe_yaml (1.0.5)
     thread_safe (0.3.6)
     treetop (1.5.3)
