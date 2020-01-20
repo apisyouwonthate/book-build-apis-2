@@ -225,7 +225,7 @@ GraphQL is essentially a RPC-based query language system, where the client is re
 .GraphQL Request (left) and the corresponding response (right).
 image::images/graphql-query-example.png[Example of a GraphQL query being made, requesting first the hero (this is a Star Wars example), then the names of the friends for that hero.]
 
-Any sort of RPC action which is intended to cause modifications is done with a "Mutation". SO to handle creates, updates, deletes, etc. you would create a mutation.
+Any sort of RPC action which is intended to cause modifications is done with a "Mutation". So to handle creates, updates, deletes, etc. you would create a mutation.
 
 .Definition of a mutation (top left), the mutation request (bottom left), and the response (right).
 image::images/graphql-mutation-example.png[Example of a GraphQL Mutation definition, then being called with arguments]
