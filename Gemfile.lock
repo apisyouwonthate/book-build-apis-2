@@ -36,7 +36,7 @@ GEM
       rake
       rubyzip
     mini_portile2 (2.4.0)
-    nokogiri (1.10.4)
+    nokogiri (1.10.8)
       mini_portile2 (~> 2.4.0)
     pdf-core (0.7.0)
     pdf-reader (2.2.0)
