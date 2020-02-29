@@ -60,7 +60,7 @@ GEM
       pdf-reader (~> 2.0)
       prawn (~> 2.2)
     public_suffix (3.0.3)
-    rake (12.3.2)
+    rake (13.0.1)
     ruby-rc4 (0.1.5)
     rubyzip (2.0.0)
     safe_yaml (1.0.5)
