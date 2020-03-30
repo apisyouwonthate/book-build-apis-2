@@ -69,7 +69,7 @@ integrated foundational management services and then business process-type
 services based upon units of work ...
 ____
 
-Service-oriented architecture is essentially the idea of breaking various
+SOA is essentially the idea of breaking various
 modules out of your application, possibly putting them on different servers, with a
 network interface or socket facilitating communication.
 
@@ -77,7 +77,7 @@ For example, instead of having one application that handles user directories,
 billing, messaging, shipping, inventories, etc., you have multiple applications
 which handle one of those things independently.
 
-// TODO Diagram of example SoA, with a web app, mobile app, billing, user service, messaging service, etc.
+// TODO Diagram of example SOA, with a web app, mobile app, billing, user service, messaging service, etc.
 
 When talking about services you will often hear the term "monolith" pop up. Some
 people use monolith to describe a mega application that includes the frontend
@@ -91,7 +91,7 @@ thinks it does too many things). For example a service which was intended to han
 permissions, groups, messaging, friends, mail routing, etc. will probably be
 called a monolith by somebody.
 
-There are a few benefits to SoA over creating one single giant application, so
+There are a few benefits to SOA over creating one single giant application, so
 long as your team is qualified in handling the complications that come with it.
 
 One commonly cited benefit is the ability to write services in all sorts of
