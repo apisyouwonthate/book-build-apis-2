@@ -125,7 +125,7 @@ cranking along, deploying multiple times a day, because the infection of SOX had
 not spread to their services.
 
 The positives are fairly clear, but an often overlooked problem with
-service-oriented architecture is the complexity of managing multiple services,
+SOA is the complexity of managing multiple services,
 and not just the complications of handling "more servers". Managing two services
 is not twice as hard as managing a single application, it is infinitely more
 complex, and you need people who know how to handle these issues.
