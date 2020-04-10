@@ -1,4 +1,4 @@
-# Build APIs You Won't Hate #2: This Time It's Serious
+# Design APIs You Won't Hate
 
 The API World has changed a lot since 2014, and keeping the original book up-to-date with blog posts and bonus chapters in the ebook is only holding off the inevitable for so long.
 
