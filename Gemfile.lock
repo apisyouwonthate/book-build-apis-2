@@ -28,16 +28,17 @@ GEM
     concurrent-ruby (1.1.5)
     css_parser (1.7.0)
       addressable
-    gepub (1.0.3)
-      nokogiri (>= 1.8.2, < 1.11)
-      rubyzip (>= 1.1.1)
+    gepub (1.0.13)
+      nokogiri (>= 1.8.2, < 1.12)
+      rubyzip (> 1.1.1, < 2.4)
     hashery (2.1.2)
     kindlegen (3.0.3)
       rake
       rubyzip
-    mini_portile2 (2.4.0)
-    nokogiri (1.10.8)
-      mini_portile2 (~> 2.4.0)
+    mini_portile2 (2.5.1)
+    nokogiri (1.11.4)
+      mini_portile2 (~> 2.5.0)
+      racc (~> 1.4)
     pdf-core (0.7.0)
     pdf-reader (2.2.0)
       Ascii85 (~> 1.0.0)
@@ -60,9 +61,10 @@ GEM
       pdf-reader (~> 2.0)
       prawn (~> 2.2)
     public_suffix (3.0.3)
+    racc (1.5.2)
     rake (13.0.1)
     ruby-rc4 (0.1.5)
-    rubyzip (2.0.0)
+    rubyzip (2.3.0)
     safe_yaml (1.0.5)
     thread_safe (0.3.6)
     treetop (1.5.3)
@@ -79,7 +81,7 @@ DEPENDENCIES
   asciidoctor-pdf (~> 1.5.pre)
   coderay
   kindlegen (~> 3.0)
-  nokogiri (~> 1.10)
+  nokogiri (~> 1.11)
 
 BUNDLED WITH
    2.0.1
