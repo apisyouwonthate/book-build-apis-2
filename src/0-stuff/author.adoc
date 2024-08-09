@@ -1,6 +1,33 @@
 [authorblurb]
 = About the Author
 
-You can contact {author} at {email}.
+Phil has been programming since ~2000, fighting up through the ranks of the PHP
+community to being a core contributor, and getting stuck into standards on the
+PHP-FIG trying to get various web frameworks to play nice. Being a backend
+engineer APIs were always on his mind, starting with the CodeIgniter-REST
+library which was basic and rubbish but also used by every major company in tech
+around 2010 for some reason (confirmed sightings in Apple and Google).
 
-Some sort of bio in here. Bikes bikes bikes. Turtles.
+Tech startups took Phil from Bristol to New York, managing APIs and building
+distributed systems for "SoLoMo" (Social, Local, Mobile) apps which were popular
+at the time, a quick attempt at reducing cars on the road with a carpooling
+startup, eventually settling at WeWork as an internal API consultant,
+identifying and resolving issues with distributed systems, solve architectural
+issues, and setting up API Governance programs.
+
+Phil left the States in 2019 and went digital nomad consultant, cycling around
+Europe for a few years speaking at conferences and consulting with companies
+from Barcelona to Stockholm. One of the main clients was building and
+implementing OpenAPI tooling at Stoplight, helping them create some of the best
+API Design & Governance tooling around, pushing the API Design and API
+Governance spaces from a mere concept to being a standard part of API discourse.
+
+These days Phil has semi-retired from tech to work on his reforestation charity
+Protect Earth, where they're helping farmers and landowners plant more trees,
+managing hundreds of acres, and aggressively buying more to try and put a dent
+in the climate and biodiversity crises, but APIs remain involved in that day to
+day life, so in between planting hundreds of trees and cutting down invasive
+species, Phil writes articles for the APIs You Won't Hate blog, and write books
+like this one, and Surviving Other People's APIs to help people get their jobs
+done quicker and with more confidence, so they can get on with something more
+meaningful.
