@@ -1,8 +1,8 @@
-# Design APIs You Won't Hate
+# Build APIs You Won't Hate 2: Oops I Did It Again!
 
-The API World has changed a lot since 2014, and keeping the original book up-to-date with blog posts and bonus chapters in the ebook is only holding off the inevitable for so long.
+The API World has changed a lot since _["Build APIs You Won't Hate"](https://apisyouwonthate.com/books/build-apis-you-wont-hate/)_ was published in 2014, and keeping the original book up-to-date with [blog posts](https://apisyouwonthate.com/blog) and bonus chapters in the ebook is only holding off the inevitable for so long.
 
-Support the development of this book, and [**pre-order on LeanPub!**](https://leanpub.com/build-apis-you-wont-hate-2/)
+Support the development of this book, and [**pre-order on LeanPub!**](https://leanpub.com/build-apis-you-wont-hate-2/), as we pick up rewriting in mid 2024. We're publishing new chapters as we go, but the price goes up. The earlier you buy the cheaper it will be, but you'll still get all the new chapters as they're released.
 
 ## Outline
 
@@ -15,13 +15,12 @@ So far, this feels like how the book is gonna play out:
   - [x] Success and Failure
   - [x] API Contracts
   - [ ] Design Theory
-    - [ ] Resources
-    - [ ] Collections
+    - [ ] Resources & Collections (#38)
     - [ ] Serialization
     - [ ] Deserialization
-    - [ ] Pagination
+    - [ ] Pagination (#32)
     - [ ] Filtering
-    - [ ] Caching
+    - [ ] Caching (#39)
   - [ ] Validation
   - [ ] Hypermedia Controls (HATEOAS)
     - [ ] Layers of abstraction on top of RPC
@@ -44,7 +43,7 @@ So far, this feels like how the book is gonna play out:
   - [x] Editors
   - [x] Mocking
   - [x] Documentation
-  - [ ] Style Guides
+  - [ ] Style Guides (#33)
 
 - [ ] Part Three: Building & Testing
   - [ ] Building Blocks
@@ -53,7 +52,7 @@ So far, this feels like how the book is gonna play out:
   - [ ] Integration Testing
   - [ ] Contract Testing
   - [ ] End to End / Acceptance Testing
-  - [ ] Health Checks
+  - [ ] Health Checks (#36)
   - [ ] Load Testing
   - [ ] Testing in Production
   - [ ] Notes on Deployment
@@ -64,12 +63,12 @@ So far, this feels like how the book is gonna play out:
   - [ ] Gateway Validation
   - [ ] Rate Limiting
   - [ ] Analytics
-  - [ ] Governance (Speccy / Specteral / Stoplight)
-  - [ ] Deprecation
-  - [ ] Versioning & Evolution
+  - [ ] Governance
+  - [ ] Deprecation (#34)
+  - [ ] Versioning & Evolution (#35)
 
 - [ ] Part Five: Further Theory
-  - [ ] Picking Paradigms
+  - [ ] Picking Paradigms (#37)
   - [ ] Common Architectures
     - [ ] GraphQL as a Monolith
     - [ ] REST wrapping Microservices
