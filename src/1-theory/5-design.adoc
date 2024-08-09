@@ -1,0 +1,388 @@
+= Design
+
+The first step to designing an API is figuring out what it actually needs to do. Working out the requirements of an API may not be as easy as you first think. Some people just make one resource per database table, forgetting that databases change over time a lot quick than we'd want our API to change.
+
+Trying to think ahead a bit and create an API which will not need breaking changes every few months involves some planning, and this is usually best done with a whiteboard, a few teammates, and maybe a few potential client developers.
+
+Also trying to plan an entire API all at the same time can be tricky, but luckily there are two parts to an API which we can think about separately.
+
+== Service Model & Data Model
+
+The service model covers things like the URL, HTTP method, headers like content
+type, authentication strategy, etc. It is used to explain all the things outside
+of the message, the stuff peripheral to the actual data. 
+
+In a programming language this would be class names, method names, possible
+exceptions, but would not cover anything about the arguments: type hints,
+possible validations, etc.
+
+image::images/data-model-service-model.png[]
+
+The data model is used to describe the contents of the message, which is
+usually what you find in the HTTP request or response body.
+
+We can plan the service model for an API without needing to think too much about the 
+data model yet. Maybe when we get thinking about the data model we will come back and change the 
+service model, but one thing at a time ey?
+
+== Requirements as a Service Model
+
+Talk to your mobile app developer, your frontend people, talk to anyone who is
+likely to be using your API, or talk to yourself if you are a full-stack
+developer who is building both. 
+
+Finding stakeholders from the business can help too. Whilst they might not have
+too much technical insight, they can probably help get you thinking.
+
+When you have a decent list of things you need the API to do, make a simple list
+of resources, then think about what actions will need to be applied to those resources. If this is literally just going to be a CRUD API (also known as a datastore API), then your list 
+is going to be pretty predictable. Using a basic check-in application as an example:
+
+Places
+- **Create**
+- **Read**
+- **Update**
+- **Delete**
+
+As well as the basic CRUD actions, we will also need paginate-able list of places. Add that to the _list_.
+
+Places
+- Create
+- Read
+- Update
+- Delete
+- **List**
+
+The API will need to offer the ability to search places by location too, but that is not a brand new endpoint. If the API is RPC it would be a `getPlacesByLatAndLon` method, or a getPlaces method with lat and lon as two possible arguments. If this is REST the list would be a "collection", which can take some parameters, so shove them in as a note for later:
+
+Places
+- Create
+- Read
+- Update
+- Delete
+- List **(lat, lon, distance or box)**
+
+NOTE: Adding a few parameters for things like filters can help keep requirements in mind when deciding what methods or endpoints come later. Getting too involved in deciding what properties are gonna be on the model is a bit much right now, save that for later when planning the data model.
+
+There is a good chance that your API is not just a plain-old CRUD API. For example, maybe places have an image upload which could be done via the API. In this example, we are only going to accept one image for a place and a new image overrides the old, so add "Image" to the list. Otherwise you'd add "Images" to the list.
+
+Places
+- Create
+- Read
+- Update
+- Delete
+- List (lat, lon, distance or box)
+- **Image**
+
+Maybe the API needs to let users mark a place as a "favourite" too.
+
+A rough requirements list for an API might look like this:
+
+Categories
+- Create
+- List
+
+Checkins
+- Create
+- Read
+- Update
+- Delete
+- List
+- Image
+
+Places
+- Create
+- Read
+- Update
+- Delete
+- List (lat, lon, distance or box)
+- Image
+- Favourite
+
+Users
+- Create
+- Read
+- Update
+- Delete
+- List (active, suspended)
+- Image
+- Favorites
+- Checkins
+- Follow
+- Followers
+
+That might not contain every resource your API will need, but it will do for now, and there will plenty of chance for feedback before any code gets written.
+
+=== Planning a RPC Service Model
+
+Turning the list of requirements into a service model for most RPC implementations is really simple, as there is no worries about URL or HTTP method, most of the implementations out there just go through a single endpoint and take a method name. 
+
+That means planning a service model for gRPC is a simple case of picking a naming convention and sticking to it.
+
+**Places**
+
+- Create
+- Read
+- Update
+- Delete
+- List (lat, lon, distance or box)
+- Image
+
+becomes:
+
+- createPlace
+- getPlace
+- updatePlace
+- deletePlace
+- getPlaces (lat, lon, distance or box)
+- createPlaceImage
+
+or:
+
+- PlaceCreate
+- PlaceGet
+- PlaceEdit
+- PlaceDelete
+- PlaceList (lat, lon, distance or box)
+- PlaceImageCreate
+
+The list method there is looking a little complex, and this is something which should be figured out. 
+
+Do you want to create a single method which can take a bunch of arguments to filter the results, or do you want to have different methods?
+
+The single method approach might look like `getPlaces(lat, lon, distance, box)`, which can be a bit of a pain as you have to write validation to ensure the client is sending both latitude and longitude, not just one or the other. 
+
+You also need to ensure the client is not sending coordinates and another argument like box. 
+
+Distance is allowed to be sent along with latitude and longitude but is optional, and cannot be sent with box. Ugh. Annoying right? 
+
+The multiple method approach might look like `getPlacesByCoords(lat, lon, distance)` and `getPlacesByBox(box)`, which does make the documentation easier, improves readability, etc. It solves our awkward parameter dependency situations, but it can lead to an explosion of methods if you have a lot of things to filter by.
+
+=== Planning a GraphQL Service Model
+
+Seeing as GraphQL Mutations are literally just RPC, any action which "mutates" (changes) data follows the exact same rules as the RPC service model planning.
+
+
+- createPlace
+- updatePlace
+- deletePlace
+- createPlaceImage
+- getPlace
+- getPlaces (lat, lon, distance or box)
+
+
+=== REST
+
+Turning this action plan into actual endpoints requires knowing a little theory on RPC, RESTful APIs and best practices for naming conventions. There are no right answers here, but some approaches have fewer cons than others. I will try to push you in the direction I have found to be most useful, and highlight the pros and cons of each.
+
+### GET Resources
+
+* `GET /resources` - Some paginated list of stuff, in some logical default order, for that specific data.
+
+* `GET /resources/X` - Just entity X. That can be an ID, hash, slug, username, etc., as long as it's unique to one "resource".
+
+* `GET /resources/X,Y,Z` - The client wants multiple things, so give them multiple things.
+
+It can be hard to pick between subresource URLs or embedded data. Embedded data can be rather difficult to pull off so that will be saved for [Chapter 7: Embedding Data](#chapter-7). For now the answer is "just subresources", but eventually the answer will be "both". This is how subresources look:
+
+* `GET /places/X/checkins` - Find all the checkins for a specific place.
+
+* `GET /users/X/checkins` - Find all the checkins for a specific user.
+
+* `GET /users/X/checkins/Y` - Find a specific checkin for a specific user.
+
+The latter is questionable and not something I have ever personally done. At that point, I would prefer to simply use `/checkins/X`.
+
+W## Auto-Increment is the Devil
+W>
+WIn these examples X and Y can be an auto-incrementing ID as many developers will assume. One important factor with auto-incrementing ID's is that anyone with access to your API will know exactly how many resources you have, which might not be a statistic you want your competitors to have.
+W>
+WConsumers could also write a script which hits `/users/1`, then `/users/2` and `/users/3`, etc., scraping all data as it goes. Sure they could probably do that from the "list" endpoints anyway, but not all resources should have a "get all" approach.
+W>
+WInstead a unique identifier is often a good idea. A universal unique identifier (UUID) seems like a logical thing to do: [ramsey\uuid for PHP](https://github.com/ramsey/uuid), [uuid for Ruby](https://rubygems.org/gems/uuid), [uuid in Python 2.5+](http://docs.python.org/2/library/uuid.html).
+
+### DELETE Resources
+
+Want to delete things? Easy:
+
+* `DELETE /places/X` - Delete a single place.
+
+* `DELETE /places/X,Y,Z` - Delete a bunch of places.
+
+* `DELETE /places` - This is a potentially dangerous endpoint that could be skipped, as it should delete all places.
+
+* `DELETE /places/X/image` - Delete the image for a place, or:
+
+* `DELETE /places/X/images` - If you chose to have multiple images this would remove all of them.
+
+### POST vs PUT: FIGHT!
+
+What about creating and updating? This is where it gets almost religious. There are lots of people who will try to pair the HTTP POST or HTTP PUT verb (verb, i.e. an HTTP method) to a specific CRUD action and always only ever do that one action with that one verb. That sucks and is not productive or functionally scalable.
+
+Generally speaking, PUT is used if you know the entire URL beforehand and the action is idempotent. Idempotent is a fancy word for "can do it over and over again without causing different results".
+
+For example, create _could_ be a PUT if you are creating one image for a place. If you were to do this:
+
+{lang=http}
+~~~~~~~~
+PUT /places/1/image HTTP/1.1
+Host: example.org
+Content-Type: image/jpeg
+~~~~~~~~
+
+That would be a perfect example of when to use a `PUT` because you already know the entire URL ( `/places/1/image` ) and you can do it time and time again.
+
+The API at Kapture used a `POST` to `/checkins` to create the metadata for that new check-in, then returned the URL for us to PUT the image to. You could try checking in multiple times and it would not matter because none of those processes would be complete, but POSTing multiple times is not idempotent because each checkin is different. PUT is idempotent because you are uploading that image to the full URL and you can do it over and over again if you like (for instance, because the upload failed and it has to try again).
+
+So, if you have multiple images for places, maybe you could use the following:
+
+POST /places/X/images
+
+Then multiple attempts would be different images. If you know you are only going to have one image and a new attempt is an override, then the following would be ideal:
+
+PUT /places/X/image
+
+Another example could be user settings:
+
+* `POST /me/settings` - I would expect this to allow me to POST specific fields one at a time, not force me to send the entire body of settings.
+* `PUT /me/settings` - Send me ALL the settings.
+
+It's a tricky difference, but do not try and tie an HTTP Method to one CRUD action only.
+
+### Plural, Singular or Both?
+
+Some developers decide to make all endpoints singular, but I take issue with this. Given `/user/1` and `/user`, which user is that last one returning? Is it "me"? What about `/place`? It returns multiple? Confusing.
+
+I know it can be tempting to create `/user/1` and `/users` because the two endpoints do different things, right? I started off down this route (#pun) originally, but in my experience, this convention grows badly. Sure it works with the example of "users", but what about those fun English words that create exceptions like `/opportunity/1` which when pluralised becomes `/opportunities`. Gross.
+
+I pick plural for everything as it is the most obvious:
+
+* `/places` - "If I run a GET on that, I will get a collection of places"
+* `/places/45` - "Pretty sure I am just talking about place 45"
+* `/places/45,28` - "Ahh, places 45 and 28, got it"
+
+Another solid reason for using plural consistently is that it allows for consistently named subresources:
+
+* `/places`
+* `/places/45`
+* `/places/45/checkins`
+* `/places/45/checkins/91`
+* `/checkins/91`
+
+Consistency is key.
+
+### Verb or Noun?
+
+Traditionally APIs would consist of a series of endpoints that described actions:
+
+~~~~~~~~
+POST /SendUserMessage HTTP/1.1
+Host: example.org
+Content-Type: application/x-www-form-urlencoded
+
+id=5&message=Hello!
+~~~~~~~~
+
+As you might have already gathered, this is not how things are done with REST.
+
+Some API developers consider the following approach to be more RESTful because it uses a subresource:
+
+~~~~~~~~
+POST /users/5/send-message HTTP/1.1
+Host: example.org
+Content-Type: application/json
+
+{ "message" : "Hello!" }
+~~~~~~~~
+
+Nope, because that is still using a verb in the URL. A verb is an action - a doing term - and our API
+only needs one verb - the HTTP Method. All other verbs need to stay out of the URL.
+
+A noun is a _place_ or a _thing_. Resources are things, and a URL becomes the place on the Internet where a thing lives.
+
+This example would be drastically more RESTful:
+
+~~~~~~~~
+POST /users/5/messages HTTP/1.1
+Host: example.org
+Content-Type: application/json
+
+{ "message" : "Hello!" }
+~~~~~~~~
+
+Perfect! We are creating a new message that belongs to a user. The best part about keeping it nice and RESTful like this is that other HTTP actions can be made to the identical URL:
+
+* `GET /users/philsturgeon/messages`
+* `PATCH /users/philsturgeon/messages/xdWRwerG`
+* `DELETE /users/philsturgeon/messages/xdWRwerG`
+
+This is all much easier to document and much easier to understand for both humans and software which is "RESTfully aware."
+
+If, like a freelance client I consulted, you need to send multiple messages to multiple users (potentially hundreds of
+thousands) you could even make messages its own endpoint and send the messages in batches of a few hundred:
+
+~~~~~~~~
+POST /messages HTTP/1.1
+Host: example.org
+Content-Type: application/json
+
+[
+	{
+		"user" : { "id" : 10 },
+		"message" : "Hello!"
+	},
+	{
+		"user" : { "username" : "philsturgeon" },
+		"message" : "Hello!"
+	}
+]
+~~~~~~~~
+
+It would look incredibly similar to create the data as it would to retrieve the data, which is intentional.
+
+
+
+### Methods
+
+When you have listed all of the routes you will need for your application, go and make the corresponding controller methods. Make them all empty and have one of them `return "Oh hai!";`, and check the output. `GET /places` for example should `Oh hai!` in the browser.
+
+You just wrote an API.
+
+
+== Resources
+
+// https://t.co/Vf39To9pu4?ssr=true
+
+// Article about how use cases are more important than just data access. Try to identify the uses cases that clients are going to want, and make firehouse available for applications which are highly rea time and data dependant, because they are never going to be happy polling the crap out of your api.
+
+// https://www.thoughtworks.com/insights/blog/rest-api-design-resource-modeling
+
+// Awesome article about graphql interfaces with a lot of lessons that apply to all resource design
+// https://medium.com/@__xuorig__/graphql-interfaces-not-just-bags-of-fields-1adfcca027e9
+
+// also probably (and if not here, it will go in evolvability)
+// https://blog.apollographql.com/graphql-schema-design-building-evolvable-schemas-1501f3c59ed5
+
+// Where should we mention that Autoincrementing ids are bad
+
+== Collections
+
+// KAT what to return when the resource exists but it's empty?
+
+ Eg. a list of products that has no products in it at the mo. I've seen some people return 404 when I think it should have been 200 with an empty body, no? I think it's a common mistake / source of confusion.
+
+
+
+// TODO Introduce concept of api clients, talk about stakeholders, etc.
+
+
+
+// Serialization
+
+// Deserialization
+
+// Pagination
+
+// Filtering
+
+// Caching
