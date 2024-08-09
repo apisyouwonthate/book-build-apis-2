@@ -26,7 +26,7 @@ Let's use the fantastic https://pokeapi.co/[PokeAPI] as an example.
 
 If we look just at the data, we can deduce that sure, ID is probably an
 auto-incrementing identifier, the name seems to be a lower-cased English string,
-but after that it starts getting a bit odd.
+but after that it starts getting a bit tricky.
 
 Height and weight, I guess there is no imperial and metric in the game just
 units, but what is order all about? The order that pokemon is sat in my current
@@ -115,24 +115,28 @@ whatever is written in there.
 
 There is another way: computer readable API Descriptions! 
 
-=== Description Formats
+=== API Description Formats
 
-A description format can be text based or look a bit like a programming
-language. This format lets you describe an API in a reusable way, which means
-you can do a whole bunch of stuff.
+A description format can be text-based or look a bit like a programming
+language, but whatever form it takes, a description format lets you describe an
+API in a reusable way in a predefined structure which loads of tools can
+support, to make assist with pretty much everything :
 
-- Documentation
+- API Documentation
+- Mock servers
+- Breaking Change Detection
 - Client-side validation
 - Server-side validation
+- Server/Application Code Generation
 - Client-library Generation (SDKs)
 - UI Generation
-- Server/Application generation
-- Mock servers
 - Contract testing
-- Automated Postman/Paw Collections
+- API Consoles / "HTTP Client" Collections
+- Automated Style Guides
+- Security/Compliance Sniffing
 
 Written down exactly from an early point (and agreed upon) means that there are
-far fewer surprises throughout the API life-cycle, from planning, through
+far fewer surprises throughout the API lifecycle, from planning, through
 development and throughout integration feedback.
 
 Having a good description means that API developers can be confident that:
@@ -277,15 +281,16 @@ https://blog.apisyouwonthate.com/openapi-and-json-schema-divergence-part-2-52e28
 second article] explains workarounds and longer term solutions.
 ====
 
-OpenAPI contract files are usually static. They're usually written down along
-with the source code, then sometimes deployed to a file hosting service like S3
-for folks to use. Some managers want to treat these like business secrets and
-hide them under lock and key, which makes absolutely no damned sense as they are
-meta-data only. Most "hackers" could probably figure out that you keep your list
-of companies under `GET /companies`, so just don't make that a publicly
-available endpoint and you're gonna be ok. PayPal, Microsoft, and other
-companies make their OpenAPI descriptions available to anyone who wants to download
-them, and this approach can help folks integrate with your APIs.
+OpenAPI documents are static files. They're usually stored in the same
+repository as the source code, changes as API code is changed, reviewed as one,
+then deployed off to OpenAPI documentation tools or S3 for other uses. Some
+managers want to treat these like business secrets and hide them under lock and
+key, which makes absolutely no damned sense as they are meta-data only. Most
+"hackers" could probably figure out that you keep your list of companies under
+`GET /companies`, so just don't make that a publicly available endpoint and
+you're gonna be ok. PayPal, Microsoft, and other companies make their OpenAPI
+descriptions available to anyone who wants to download them, and this approach
+can help folks integrate with your APIs.
 
 You can imagine an OpenAPI file growing to be rather unwieldy once its got 50+
 endpoints and more complex examples, but have no fear you can spread things
