@@ -11,10 +11,12 @@ So far, this feels like how the book is gonna play out:
 - [ ] Part One: Theory
   - [x] APIs, Services, and Microservices
   - [x] Understanding Different Paradigms
-  - [x] Input and Output
-  - [x] Success and Failure
+  - [ ] API Lifecycle
   - [x] API Descriptions
   - [ ] Design Theory
+    - [ ] What is a URL
+    - [x] Input and Output
+    - [x] Success and Failure
     - [ ] Resources & Collections (#38)
     - [ ] Serialization
     - [ ] Deserialization
