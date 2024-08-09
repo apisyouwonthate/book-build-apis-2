@@ -6,14 +6,16 @@ a request is one way to do things, but there are lots of situations where a
 client might expect more than one response, or a response with more information
 later as more work happens on the server side.
 
-// First, some terminology!
+First, some terminology! Let's go through each of the selected terms and explain their meanings in computer science, particularly in systems architecture and API design:
 
-// **Synchronous** -
-// **Asynchronous** -
-// **Concurrency** -
-// **Parallelagram** -
+- **Synchronous:** In computer science, synchronous refers to a type of execution where each task is performed one after the other in a sequential manner. In systems architecture, synchronous operations block the execution until the task is completed, meaning that the program waits for the operation to finish before moving on to the next task. In API design, synchronous APIs typically provide immediate responses and are easier to reason about since the execution flow is linear.
+- **Asynchronous:** Asynchronous, on the other hand, refers to a type of execution where tasks can be performed independently and concurrently without blocking the execution flow. In systems architecture, asynchronous operations allow the program to continue executing other tasks while waiting for a particular operation to complete. This can improve performance and responsiveness. In API design, asynchronous APIs are often used for long-running or potentially blocking operations, such as network requests or file I/O, to prevent the program from being unresponsive.
+- **Concurrency:** Concurrency refers to the ability of a system to execute multiple tasks simultaneously. In systems architecture, concurrent execution allows multiple tasks to make progress at the same time, even if they are not executing in parallel on separate processors. Concurrency can be achieved through techniques like multithreading or event-driven programming. In API design, concurrent APIs provide mechanisms to handle multiple tasks concurrently, such as thread pools or event loops.
+- **Parallelism:** Parallelism refers to the execution of multiple tasks simultaneously on separate processors or cores. In systems architecture, parallel execution can significantly improve performance by dividing a task into smaller subtasks that can be executed concurrently. Parallelism is often used in computationally intensive tasks or when dealing with large datasets. In API design, parallel APIs provide ways to distribute work across multiple processors or cores, such as parallel processing libraries or frameworks.
 
-// push v pull
+It's important to note that while synchronous and asynchronous refer to the execution flow, concurrency and parallelism refer to the ability to execute tasks simultaneously. They are related concepts but not interchangeable.
+
+// TODO push v pull
 
 == Client-Server "Real-Time" Models
 
