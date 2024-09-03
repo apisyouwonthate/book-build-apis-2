@@ -18,8 +18,7 @@ So far, this feels like how the book is gonna play out:
     - [x] Input and Output
     - [x] Success and Failure
     - [ ] Resources & Collections (#38)
-    - [ ] Serialization
-    - [ ] Deserialization
+    - [ ] Errors
     - [ ] Pagination (#32)
     - [ ] Filtering
     - [ ] Caching (#39)
@@ -46,6 +45,8 @@ So far, this feels like how the book is gonna play out:
 
 - [ ] Part Three: Building & Testing
   - [ ] Building Blocks
+  - [ ] Serialization
+  - [ ] Deserialization
   - [ ] Debugging
   - [ ] Traffic Inspection
   - [ ] Integration Testing
