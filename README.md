@@ -18,7 +18,6 @@ So far, this feels like how the book is gonna play out:
     - [x] Input and Output
     - [x] Success and Failure
     - [ ] Resources & Collections (#38)
-    - [ ] Errors
     - [ ] Pagination (#32)
     - [ ] Filtering
     - [ ] Caching (#39)
