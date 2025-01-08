@@ -66,12 +66,10 @@ GEM
     public_suffix (6.0.1)
     racc (1.8.1)
     rake (13.0.1)
-    rexml (3.3.6)
-      strscan
+    rexml (3.3.9)
     ruby-rc4 (0.1.5)
     rubyzip (2.0.0)
     safe_yaml (1.0.5)
-    strscan (3.1.0)
     treetop (1.6.12)
       polyglot (~> 0.3)
     ttfunk (1.8.0)
