@@ -201,6 +201,8 @@ Without these things, a microservice architecture is likely to be a distributed
 monolith, which has all of the downsides of a regular monolith and a whole lot more
 complications added on top thanks to the joys of networking.
 
+image::./images/forrestbrazeal-distributed-8ball.png["Magic 8-Ball, will a distributed architecture solve all the problems with our app?" by Forrest Brazeal.]
+
 As microservices are meant to be a small part of the full picture, it is pretty
 common to use them internally to a team/department/some sort of context, then
 have larger APIs act as an "aggregate" for these services. That also will be
