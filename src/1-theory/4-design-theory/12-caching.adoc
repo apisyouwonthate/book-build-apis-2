@@ -324,9 +324,9 @@ HTTP caching works well when clients use it, and many do automatically, like web
 
 These tools sit between the server and the client, acting like intelligent gatekeepers:
 
-image::./assets/httpcachemiss.png[A sequence diagram showing a Client, Cache Proxy, and Server. A web request travels from client to proxy, then is sent on to the server, showing a "cache miss". The response then travels back from the server to the cache proxy, and then is sent to the client]
+image::images/design-theory/caching/httpcachemiss.png[A sequence diagram showing a Client, Cache Proxy, and Server. A web request travels from client to proxy, then is sent on to the server, showing a "cache miss". The response then travels back from the server to the cache proxy, and then is sent to the client]
 
-image::./assets/httpcachehit.png[A sequence diagram showing a Client, Cache Proxy, and Server. A web request travels from client to proxy, but does not go to the server, showing show a "cache hit". The response is served from the cache proxy to the client without involving the server]
+image::images/design-theory/caching/httpcachehit.png[A sequence diagram showing a Client, Cache Proxy, and Server. A web request travels from client to proxy, but does not go to the server, showing show a "cache hit". The response is served from the cache proxy to the client without involving the server]
 
 Client-caching like this is certainly useful, but the real power of caching comes when API web traffic is routed through a caching proxy. Using hosted solutions like Fastly or AWS CloudFront, this could be a case of changing DNS settings. For self-hosted options like Varnish, instead of pointing DNS settings to a hosted solution somebody will need to spin up a server to act as the cache proxy.
 
