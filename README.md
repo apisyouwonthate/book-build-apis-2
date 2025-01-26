@@ -22,7 +22,7 @@ So far, this feels like how the book is gonna play out:
     - [ ] Status Codes
     - [ ] Response Data
     - [ ] Pagination
-    - [ ] Filtering
+    - [x] Filtering
     - [ ] Errors
     - [ ] Caching
   - [x] API Descriptions
