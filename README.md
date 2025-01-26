@@ -23,7 +23,7 @@ So far, this feels like how the book is gonna play out:
     - [ ] Response Data
     - [ ] Pagination
     - [ ] Filtering
-    - [ ] Errors
+    - [x] Errors
     - [ ] Caching
   - [x] API Descriptions
   - [x] Hypermedia Controls (HATEOAS)
