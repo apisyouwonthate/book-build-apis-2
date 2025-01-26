@@ -46,7 +46,7 @@ Before various API description formats got popular for HTTP APIs, there were a
 few common ways people would share information about how the API would work and
 what it should do.
 
-=== The Verbal Contract
+== The Verbal Contract
 
 A common case is the verbal contract, where the API developers discuss it with
 the frontend or other client application developers as they go. The backend
@@ -56,9 +56,9 @@ explained out loud over the conference room table, shouted over a hail of nerf
 gun pellets and ping pong, or DMed over Slack chats.
 
 ----
-Fred: Hey Sarah, there’s a new "fudge" field and it can be "blah" or "whatever".
+Fred: Hey Sarah, there's a new "fudge" field and it can be "blah" or "whatever".
 
-Sarah: Great! Thanks I’ll chuck that in now.
+Sarah: Great! Thanks I'll chuck that in now.
 ----
 
 This might seem good enough as the API works, the app runs fine, the
@@ -85,7 +85,7 @@ When folks rely on a verbal contract, two common things happen:
 1. Developers waste time writing a new endpoint out of fear of using the old one
 2. Developers waste time trying to guess the interface, and might guess wrong
 
-=== Shoddy Manual Descriptions
+== Shoddy Manual Descriptions
 
 When folks first start thinking about descriptions, it often takes the form of
 rudimentary API Reference Documentation. This might be dumped into a Google Doc,
@@ -115,7 +115,7 @@ whatever is written in there.
 
 There is another way: computer readable API Descriptions! 
 
-=== API Description Formats
+== API Description Formats
 
 A description format can be text-based or look a bit like a programming
 language, but whatever form it takes, a description format lets you describe an

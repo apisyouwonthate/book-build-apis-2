@@ -152,8 +152,8 @@ Content-Type: application/json
 ~~~~~~~~
 
 This area is yours to do with as you want. There's a lot of freedom in how you
-structure your data, but there are some best practices to follow which you can
-learn more about in the xref:api-collections[API Collections & Resources] guide.
+structure data, but there are some best practices to follow which you can learn
+more about in the xref:theory-collections[API Collections & Resources] guide.
 
 === Request Body
 

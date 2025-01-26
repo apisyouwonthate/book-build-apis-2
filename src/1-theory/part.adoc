@@ -5,18 +5,16 @@ include::1-apis-services-microservices.adoc[]
 
 include::2-different-paradigms.adoc[]
 
-include::3-input-and-output.adoc[]
+include::3-api-lifecycle.adoc[]
 
-include::4-success-or-failure.adoc[]
+include::4-design.adoc[]
 
-include::5-design.adoc[]
+include::4-design-theory/part.adoc[leveloffset=+1]
 
-include::6-api-descriptions.adoc[]
+include::5-api-descriptions.adoc[]
 
-include::7-validation.adoc[]
+include::6-hypermedia.adoc[]
 
-include::8-hypermedia.adoc[]
+include::7-http.adoc[]
 
-include::9-http.adoc[]
-
-include::10-async.adoc[]
+include::8-async.adoc[]
