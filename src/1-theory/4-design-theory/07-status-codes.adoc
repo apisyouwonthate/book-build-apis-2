@@ -1,0 +1,119 @@
+= Using HTTP status codes
+
+Arguments between developers will continue for the rest of time over the
+exact appropriate code to use in any given situation, but these are the
+most important status codes to look out for in an API, and their accepted meanings:
+
+== 2XX is all about success
+
+Whatever your application tried to do was successful, up to the point that the
+response was sent. A `200 OK` means you got your answer, a `201 Created` means
+the thing was created, and a `202 Accepted` is similar but does not say anything
+about the actual result, it only indicates that a request was accepted and is
+being processed asynchronously. It could still go wrong, but at the time of
+responding it was all looking good so far.
+
+The common success status codes and when to use them:
+
+* *200* - Generic everything is OK.
+* *201* - Created something OK.
+* *202* - Accepted but is being processed async (for a video means encoding, for an image means resizing, etc.).
+* *204* - No Content but still a success. Used for a DELETE request, for example.
+
+Example success response
+
+{lang=http}
+~~~~~~~~
+HTTP/1.1 200 OK
+Content-Type: application/json
+
+{
+  "user": {
+    "id": 123,
+    "name": "John Doe"
+  }
+}
+~~~~~~~~
+
+== 3XX is all about redirection
+
+These are all about sending the calling application somewhere else for the
+actual resource. The best known of these are the `303 See Other` and the `301
+Moved Permanently`, which are used a lot on the web to redirect a browser to
+another URL. Usually a redirect will be combined with a `Location` header to
+point to the new location of the content.
+
+== 4XX is all about client errors
+
+Indicate to your clients that they did something wrong. They might have
+forgotten to send authentication details, provided invalid data, requested a
+resource that no longer exists, or done something else wrong which needs fixing.
+
+Key client error codes:
+
+* *400* - Bad Request (should really be for invalid syntax, but some folks use for validation).
+* *401* - Unauthorized (no current user and there should be).
+* *403* - The current user is forbidden from accessing this data.
+* *404* - That URL is not a valid route, or the item resource does not exist.
+* *405* - Method Not Allowed (your framework will probably do this for you.)
+* *406* - Not Acceptable (the client asked for a content type that the API does not support.)
+* *409* - Conflict (Maybe somebody else just changed some of this data, or status cannot change from e.g: "published" to "draft").
+* *410* - Gone - Data has been deleted, deactivated, suspended, etc.
+* *415* - The request had a `Content-Type` which the server does not know how to handle.
+* *429* - Rate Limited, which means take a breather, sleep a bit, try again.
+
+Example error response:
+
+{lang=http}
+~~~~~~~~
+HTTP/1.1 400 Bad Request
+Content-Type: application/json
+
+{
+  "errors": [
+    {
+      "code": "VALIDATION_ERROR",
+      "message": "Email address is not properly formatted",
+      "field": "email"
+    }
+  ]
+}
+~~~~~~~~
+
+== 5XX is all about service errors
+
+With these status codes, the API, or some network component like a load
+balancer, web server, application server, etc. is indicating that something went
+wrong on their side. For example, a database connection failed, or another
+service was down. Typically, a client application can retry the request. The
+server can even specify when the client should retry, using a `Retry-After` HTTP
+header.
+
+Key server error codes:
+
+* *500* - Something unexpected happened, and it is the API's fault.
+* *502* - API is down, but it is not the API's fault.
+* *503* - API is not here right now, please try again later.
+
+Example error response:
+
+{lang=http}
+~~~~~~~~
+HTTP/1.1 500 Internal Server Error
+Content-Type: application/json
+
+{
+  "errors": [
+    {
+      "code": "SERVER_ERROR",
+      "message": "Something went wrong on our end"
+    }
+  ]
+}
+~~~~~~~~
+
+As you can see, there are a whole bunch of HTTP status codes. You don't need to try and use
+them all, but it is good to know what they are and what they mean so you can use
+the right one for the job.
+
+You have two choices, either read the link:https://www.iana.org/assignments/http-status-codes/http-status-codes.xhtml[full list of status codes from the IANA], or swing by link:http://http.cat/[http.cats] and see what the cats have to say about it.
