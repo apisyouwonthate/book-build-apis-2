@@ -19,9 +19,9 @@ So far, this feels like how the book is gonna play out:
     - [x] Resources & Collections
     - [x] Data Formats
     - [x] Request Bodies
-    - [ ] Status Codes
-    - [ ] Response Data
-    - [ ] Pagination
+    - [x] Status Codes
+    - [x] Response Data
+    - [x] Pagination
     - [x] Filtering
     - [x] Errors
     - [x] Caching
