@@ -1,0 +1,286 @@
+= Filtering Collections
+:description: Learn how to filter collections in a REST API.
+
+When building a REST API, the ability to filter potentially large collections of
+data is essential, and sorting can reduce a huge amount of work for both the
+client and server.
+
+== What is Filtering?
+
+Filtering allows API users to request only the data they need, "filtering out"
+irrelevant things on the server-side instead of making them do it themselves on
+the client-side. Reducing the amount of data you're returning and transferring
+reduces server resources and improves performance, which reduces carbon
+emissions and saves money.
+
+== How to Filter
+
+The most straightforward way to filter resources is by using query parameters.
+These are appended to the URL to refine the results of an API request. For
+example:
+
+[,bash]
+----
+GET /products?category=books&price_lt=20
+----
+
+In this case, the request filters products where the `category` is "books", and
+the `price` field is less than 20. The query string is easy for both the API
+designer and users to understand, making it a natural choice for filtering data.
+
+Naming conventions and deciding if or how to use operators will vary depending on
+the implementation, but there are a few common practices and standards to consider.
+
+=== Simple Filtering
+
+Starting with the most basic, you can filter by a single parameter using a query
+parameter with a sensible name.
+
+[,bash]
+----
+GET /products?category=books&status=available
+----
+
+In these examples, the query parameter `category` or `status` is used to remove
+any products that don't match those exact values.
+
+The query parameters in some APIs might be a little busy, as there could be not
+just sorting and pagination, but people do things changing output structures,
+selecting which properties should be returned, or all kinds of functionality
+which are not filtering.
+
+To avoid confusion, it's a good idea to use a consistent naming scheme, like
+`filter_category` or better yet a "filter array", e.g.:
+
+[,bash]
+----
+GET /products?filter[category]=books&filter[status]=available
+----
+
+This makes it clear that these are filtering parameters, keeping it separate from
+pagination, sorting, or any response modifiers which may be present.
+
+Sometimes, users want to combine multiple filters. This is generally done by
+adding more parameters to the URL:
+
+[,bash]
+----
+GET /orders?filter[status]=shipped&filter[customer_id]=123
+----
+
+Using multiple filters is always considered a logical `AND` and the filters
+should be combined. Supporting a logical `OR` is trickier to represent in a
+query string, but one common convention is to allow multiple values for a single
+parameter with a comma-separated list:
+
+[,bash]
+----
+GET /products?category=books,electronics
+----
+
+This would return products in either the "books" or "electronics" categories.
+
+=== Declaring Operators
+
+Simple value matching is the most common form of filtering, but it might not be
+enough depending on the use-cases clients expect. For example, filtering for books with a
+price of `20` will ignore any books that cost `19.99`, which is probably not
+very helpful.
+
+[,bash]
+----
+GET /products?filter[price]=20
+----
+
+To solve this you can use operators to specify the type of comparison, like
+"less than", "greater than", or "not equal". These are usually implemented with
+suffixes or specific words added to the parameter name. For example, `GET
+/products?price_gt=50` would retrieve products where the price is greater than
+
+. Other common operators include:
+
+* `_lt` for less than (e.g., `price_lt=20`)
+* `_gt` for greater than (e.g., `price_gt=100`)
+* `_gte` and `_lte` for greater than or equal to, and less than or equal to, respectively.
+
+Some people are tempted to try and use operators as a prefix for the value, like
+`GET /products?price=<20` but that gets fairly awkward if you try less than or
+equal: `+GET /products?price=<=20+`, everything needs to be escaped, and its
+impossible to read.
+
+Sticking with the filter array approach, you can make this a little more
+readable:
+
+[,bash]
+----
+GET /products?filter[price][lt]=20
+GET /products?filter[price][gt]=99
+GET /products?filter[price][gte]=100
+----
+
+This is a little more verbose, but it's much easier to read and understand.
+
+=== Advanced Filtering
+
+Instead of trying to invent your own approach, there are standards that can be
+used to make this easier for everyone, like
+https://datatracker.ietf.org/doc/html/draft-nottingham-atompub-fiql-00[FIQL],
+https://github.com/jirutka/rsql-parser[RSQL], or
+https://www.odata.org/getting-started/basic-tutorial/#queryData[OData].
+
+As an example, OData is a widely used standard that provides a consistent way to
+query and manipulate data. It uses a specific syntax for filtering, which might
+look like this:
+
+[,bash]
+----
+GET /products?$filter=category eq 'books' and price lt 50
+----
+
+Here, `$filter` is the standard keyword for filtering, and `eq` is used for
+equality, while `lt` means less than. You can combine multiple filters using
+`and`, just like in the example above.
+
+FIQL is a compact, text-based query language used for filtering. It uses
+operators such as `==` for equality, `!=` for not equal, `<` and `>` for less
+than and greater than, and `;` for AND logic. For example, a FIQL filter might
+look like this:
+
+[,bash]
+----
+GET /products?filter=category==books;price<20
+----
+
+This is a concise way to express complex filtering logic, making it useful for
+more advanced APIs.
+
+Another option is RSQL, which is a slightly more modern version of FIQL that is gaining popularity:
+
+[,bash]
+----
+GET /products?filter=category==books,price<50
+----
+
+RSQL uses a comma to separate filters, which is a little more readable than the
+semicolon and doesn't need to be URL encoded. It can make some amazing queries
+like `last_name==foo*,(age=lt=55;age=gt=5)`.
+
+Whichever of these formats you pick will have pros and cons, but the most
+important thing is to pick a standard instead of reinventing the wheel so you
+can leverage existing libraries and tools on both the client-side and the
+server-side. It's important to reuse existing tools for things like this instead
+of wasting infinite time building and maintaining your own custom solutions
+instead of solving genuine problems for your users.
+
+== What is Sorting?
+
+What order should you return resources in a collection?
+
+* Oldest first or newest first?
+* Alphabetical based on the name?
+* Highest price to lowest price?
+
+Whatever you pick at first may be a sensible default, but it's likely that users
+will want to change this.
+
+For APIs, sorting is the process of arranging resources in a specific order
+based on user inputs.
+
+== How to Sort
+
+Sorting is usually done with a query parameter:
+
+[,bash]
+----
+GET /products?sort=name
+----
+
+This sorts products by the `name` property, and by default that will be in ascending order.
+
+Most APIs will also allow clients to specify the order, which is usually done with another query parameter:
+
+[,bash]
+----
+GET /products?sort=price&order=desc
+----
+
+Here if we just had `sort=price` it would be reasonable to assume the client
+wanted the cheapest results, but if we're looking for the most expensive
+products, we can add `order=desc` to return the most expensive first.
+
+This convention is very closely related to the SQL `ORDER BY` clause, which
+takes a database property and an order in exactly the same way. Unlike a
+database query your API does not have to allow clients to sort by every single
+property, you could restrict to a few common use-cases and make sure they are
+well optimized.
+
+== Best Practices
+
+=== Consistency and Documentation
+
+When designing filters for your REST API, it's important to make sure they are
+intuitive and consistent. Use clear, descriptive names for your parameters. For
+example, `price_lt` is much easier to understand than something vague like
+`lower_price`. Providing solid documentation is equally important--developers
+should be able to quickly find information on the available filters and how to
+use them.
+
+=== Validation and Error Handling
+
+Validation is also critical. If a user tries to apply a filter with invalid data
+(like `price=abc`), your API should return a helpful error message rather than
+just failing silently or returning incorrect results. Be sure to handle edge
+cases as well, such as empty values or invalid characters in the query string.
+
+_Learn more about link:/api-design/responses/errors[error handling in REST APIs]._
+
+=== Performance Considerations
+
+The more you allow clients to customize their requests, the harder it becomes to
+set up caching rules and optimize database queries that might be produced.
+
+Anyone using an SQL database will know that the more complex the query, the
+harder it is to optimize. If you're allowing clients to send in completely
+arbitrary queries, it's going to be very hard to optimize your database because
+you wont know what indexes to create. You are left retroactively optimizing
+popular usages, which might be ok for an internal API used by a limited number
+of colleagues who can warn you, but is a nightmare for teams maintaining public
+APIs where an API could be brought down by a single user launching a new
+product.
+
+Rate limiting can help, but it's worth questioning: what is the purpose of this
+API?
+
+Generally an API is not meant to be a database-over-HTTP, so if you feel
+like you're starting to recreate SQL or some other query language, you might be
+going down the wrong path. There are databases which can be used over HTTP that
+do not require you to create a database, like FaunaDB, Firebase, or DynamoDB,
+which might be a better fit.
+
+=== URL Design
+
+Sometimes a filter could or should have been a different endpoint, a
+different parameter, or a different way of structuring the data.
+
+If the clients have asked for the ability to show off some "Hot Bargains",
+instead of telling clients to pick numbers based on price with `GET
+/products?price_lt=20&sort=price`, you could use `GET /products/bargains`.
+
+Cachability is improved, because you can set a 24 hour network cache on that
+which will be shared by all clients.
+
+Consistency is improved, because the web and iOS versions of the same
+application aren't going to pick slightly different numbers for what is
+considered a bargain.
+
+== Conclusion
+
+Filtering is a powerful tool for API designers, allowing users to request only
+the data they need. By using query parameters, operators, and standard query
+languages, you can create a flexible and intuitive filtering system that meets
+the needs of your users, without going overboard and confusing everyone or
+making the API wildlife inefficient and unstable.
+
+When in doubt, start simple, and add things later. It's always easier to add new
+parameters, endpoints, and additional ways of doing things, than it is to take
+them away later.
