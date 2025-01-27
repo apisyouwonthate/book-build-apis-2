@@ -186,3 +186,36 @@ Designing an API for the least experienced user is not necessarily the goal, but
 making things unnecessarily complex isn't the plan either, so stick with "one
 endpoint does one thing" and we can learn more about how to handle file uploads
 and similar later.
+
+== Horror Stories
+
+Here are some examples of what not to do.
+
+.Mandrill API is having a rough time.
+
+An old email sending API called Mandrill (now merged with Mailchimp) would accept form data which had a JSON payload. It was also URL encoded. This is a mess.
+
+image::images/input-encoded-madness.jpg[Mandril API supports form encoded payloads and this seems to also be urlencoded and everyone is sad.]
+
+This seems to happen less often now than in the 2010s, but sometimes people will still do this and they need to be stopped.
+
+[source,http]
+----
+POST /checkins HTTP/1.1
+Host: api.example.org
+Content-Type: application/x-www-form-urlencoded
+
+json="{
+    \"checkin\": {
+        \"place_id\": 1,
+        \"message\": \"This is a bunch of text.\",
+        \"with_friends\": [1, 2, 3, 4, 5]
+    }
+}"
+----
+
+This actually happens surprisingly often in the wild. Here's another example from a ticketing API.
+
+image::images/input-output-json-json.jpg[]
+
+Send JSON. Get JSON. It's a good time.

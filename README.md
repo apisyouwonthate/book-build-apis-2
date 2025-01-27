@@ -12,16 +12,20 @@ So far, this feels like how the book is gonna play out:
   - [x] APIs, Services, and Microservices
   - [x] Understanding Different Paradigms
   - [ ] API Lifecycle
-  - [x] API Descriptions
   - [ ] Design Theory
-    - [ ] What is a URL
-    - [x] Input and Output
-    - [x] Success and Failure
-    - [ ] Resources & Collections (#38)
-    - [ ] Pagination (#32)
+    - [x] Structuring URLs
+    - [x] HTTP Methods
+    - [x] Parameters
+    - [x] Resources & Collections
+    - [x] Data Formats
+    - [x] Request Bodies
+    - [ ] Status Codes
+    - [ ] Response Data
+    - [ ] Pagination
     - [ ] Filtering
-    - [ ] Caching (#39)
-  - [ ] Validation
+    - [ ] Errors
+    - [ ] Caching
+  - [x] API Descriptions
   - [x] Hypermedia Controls (HATEOAS)
   - [ ] HTTP/1, HTTP/2 and HTTP/3
     - [ ] HTTP/2 is a real world thing today use it

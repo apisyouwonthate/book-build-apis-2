@@ -7,3 +7,5 @@ gem 'asciidoctor-pdf', '~> 2.3'
 gem 'asciidoctor-epub3', '~> 2.1'
 gem 'asciidoctor-diagram' # https://github.com/asciidoctor/asciidoctor-diagram
 gem 'coderay' # markdown
+
+gem 'kramdown-asciidoc' # convert markdown to asciidoc
