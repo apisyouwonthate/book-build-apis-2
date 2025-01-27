@@ -195,7 +195,7 @@ Here are some examples of what not to do.
 
 An old email sending API called Mandrill (now merged with Mailchimp) would accept form data which had a JSON payload. It was also URL encoded. This is a mess.
 
-image::images/input-encoded-madness.jpg[Mandril API supports form encoded payloads and this seems to also be urlencoded and everyone is sad.]
+image::images/design-theory/data-formats/input-encoded-madness.jpg[Mandril API supports form encoded payloads and this seems to also be urlencoded and everyone is sad.]
 
 This seems to happen less often now than in the 2010s, but sometimes people will still do this and they need to be stopped.
 
@@ -216,6 +216,6 @@ json="{
 
 This actually happens surprisingly often in the wild. Here's another example from a ticketing API.
 
-image::images/input-output-json-json.jpg[]
+image::images/design-theory/data-formats/input-output-json-json.jpg[]
 
 Send JSON. Get JSON. It's a good time.
