@@ -16,9 +16,9 @@ There are a few methods you can utilize for debugging:
 
 Debugging via the command-line by using tools like `curl` is a great option for some. They tout the benefits of being able to do it from inside a network firewall. Certainly this can be an option for debugging live servers, but for development purposes (which is what we are doing here), using `curl` is just a lot of commands to remember for no reason.
 
-~~~~~~~~
+----
 $ curl -X POST http://localhost/places/fg345d/checkins --data @payload.json
-~~~~~~~~
+----
 
 It is not the most complicated way to initiate a request, but it is not the easiest. You will need to update that `payload.json` every time, or have a bunch of JSON in the CLI, and that can be really messy with multi-line payloads.
 

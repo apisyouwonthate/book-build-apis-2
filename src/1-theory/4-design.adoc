@@ -186,7 +186,7 @@ Turning this action plan into actual endpoints requires knowing a little theory 
 * `GET /resources` - Some paginated list of stuff, in some logical default order, for that specific data.
 * `GET /resources/X` - Just entity X. That can be an ID, hash, slug, username, etc., as long as it's unique to one "resource".
 
-It can be hard to pick between subresource URLs or embedded data. Embedded data can be rather difficult to pull off so that will be saved for [Chapter 7: Embedding Data](#chapter-7). For now the answer is "just subresources", but eventually the answer will be "both". This is how subresources look:
+It can be hard to pick between subresource URLs or embedded data. Embedded data can be rather difficult to pull off so that will be saved for later. For now the answer is "just subresources", but eventually the answer will be "both". This is how subresources look:
 
 * `GET /places/X/checkins` - Find all the checkins for a specific place.
 * `GET /users/X/checkins` - Find all the checkins for a specific user.
@@ -221,12 +221,12 @@ Generally speaking, PUT is used if you know the entire URL beforehand and the ac
 
 For example, create _could_ be a PUT if you are creating one image for a place. If you were to do this:
 
-{lang=http}
-~~~~~~~~
+[source,http]
+----
 PUT /places/1/image HTTP/1.1
 Host: example.org
 Content-Type: image/jpeg
-~~~~~~~~
+----
 
 That would be a perfect example of when to use a `PUT` because you already know the entire URL ( `/places/1/image` ) and you can do it time and time again.
 
@@ -251,7 +251,7 @@ It's a tricky difference, but do not try and tie an HTTP Method to one CRUD acti
 
 Some developers decide to make all endpoints singular, but I take issue with this. Given `/user/1` and `/user`, which user is that last one returning? Is it "me"? What about `/place`? It returns multiple? Confusing.
 
-I know it can be tempting to create `/user/1` and `/users` because the two endpoints do different things, right? I started off down this route (#pun) originally, but in my experience, this convention grows badly. Sure it works with the example of "users", but what about those fun English words that create exceptions like `/opportunity/1` which when pluralised becomes `/opportunities`. Gross.
+I know it can be tempting to create `/user/1` and `/users` because the two endpoints do different things, right? I started off down this route originally (hawhawhaw), but in my experience, this convention grows badly. Sure it works with the example of "users", but what about those fun English words that create exceptions like `/opportunity/1` which when pluralised becomes `/opportunities`. Gross.
 
 I pick plural for everything as it is the most obvious:
 
@@ -273,25 +273,27 @@ Consistency is key.
 
 Traditionally APIs would consist of a series of endpoints that described actions:
 
-~~~~~~~~
+[source,http]
+----
 POST /SendUserMessage HTTP/1.1
 Host: example.org
 Content-Type: application/x-www-form-urlencoded
 
 id=5&message=Hello!
-~~~~~~~~
+----
 
 As you might have already gathered, this is not how things are done with REST.
 
 Some API developers consider the following approach to be more RESTful because it uses a subresource:
 
-~~~~~~~~
+[source,http]
+----
 POST /users/5/send-message HTTP/1.1
 Host: example.org
 Content-Type: application/json
 
 { "message" : "Hello!" }
-~~~~~~~~
+----
 
 Nope, because that is still using a verb in the URL. A verb is an action - a doing term - and our API
 only needs one verb - the HTTP Method. All other verbs need to stay out of the URL.
@@ -300,13 +302,14 @@ A noun is a _place_ or a _thing_. Resources are things, and a URL becomes the pl
 
 This example would be drastically more RESTful:
 
-~~~~~~~~
+[source,http]
+----
 POST /users/5/messages HTTP/1.1
 Host: example.org
 Content-Type: application/json
 
 { "message" : "Hello!" }
-~~~~~~~~
+----
 
 Perfect! We are creating a new message that belongs to a user. The best part about keeping it nice and RESTful like this is that other HTTP actions can be made to the identical URL:
 
@@ -319,7 +322,8 @@ This is all much easier to document and much easier to understand for both human
 If, like a freelance client I consulted, you need to send multiple messages to multiple users (potentially hundreds of
 thousands) you could even make messages its own endpoint and send the messages in batches of a few hundred:
 
-~~~~~~~~
+[source,http]
+----
 POST /messages HTTP/1.1
 Host: example.org
 Content-Type: application/json
@@ -334,7 +338,7 @@ Content-Type: application/json
 		"message" : "Hello!"
 	}
 ]
-~~~~~~~~
+----
 
 It would look incredibly similar to create the data as it would to retrieve the data, which is intentional.
 
@@ -372,15 +376,3 @@ You just wrote an API.
 
 
 // TODO Introduce concept of api clients, talk about stakeholders, etc.
-
-
-
-// Serialization
-
-// Deserialization
-
-// Pagination
-
-// Filtering
-
-// Caching

@@ -22,8 +22,8 @@ The common success status codes and when to use them:
 
 Example success response
 
-{lang=http}
-~~~~~~~~
+[source,http]
+----
 HTTP/1.1 200 OK
 Content-Type: application/json
 
@@ -33,7 +33,7 @@ Content-Type: application/json
     "name": "John Doe"
   }
 }
-~~~~~~~~
+----
 
 == 3XX is all about redirection
 
@@ -64,8 +64,8 @@ Key client error codes:
 
 Example error response:
 
-{lang=http}
-~~~~~~~~
+[source,http]
+----
 HTTP/1.1 400 Bad Request
 Content-Type: application/json
 
@@ -78,7 +78,7 @@ Content-Type: application/json
     }
   ]
 }
-~~~~~~~~
+----
 
 == 5XX is all about service errors
 
@@ -97,8 +97,8 @@ Key server error codes:
 
 Example error response:
 
-{lang=http}
-~~~~~~~~
+[source,http]
+----
 HTTP/1.1 500 Internal Server Error
 Content-Type: application/json
 
@@ -110,7 +110,7 @@ Content-Type: application/json
     }
   ]
 }
-~~~~~~~~
+----
 
 As you can see, there are a whole bunch of HTTP status codes. You don't need to try and use
 them all, but it is good to know what they are and what they mean so you can use

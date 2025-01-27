@@ -19,7 +19,7 @@ users.
 
 API security breaches in 2022 caused losses worth https://www.darkreading.com/application-security/api-security-losses-billions-complicated[$12--$23
 billion]
-in the US and https://techwireasia.com/2022/06/api-vulnerabilities-costing-businesses-up-to-us75-billion-annually/[$41--$75 billion
+in the US and https://techwireasia.com/2022/06/api-vulnerabilities-costing-businesses-up-to-us75-billion-annually/[$41-$75 billion
 globally].
 
 To pick just a few examples, since the introduction of General Data Protection
@@ -114,11 +114,9 @@ to access information and processes not even available in the API.
 *Design Decision*: Set strict rules for which properties are editable, which
 can be returned, and set strict validation rules for these properties.
 
-This can be described in OpenAPI early on utilizing `readOnly`, `writeOnly`,
-`required`, setting `additionalProperties: false`. https://www.speakeasy.com/guides/openapi/additionalproperties[Learn more about
-additionalProperties].
-This means when the API is developed the OpenAPI can be used for integration
-testing to poke and prod to see if extra properties can sneak though.
+I> For those describing APIs with OpenAPI, this can be done early utilizing `readOnly`, `writeOnly`, `required`, setting `additionalProperties: false`, but that will be explained more later on.
+I> This means when the API is developed the OpenAPI can be used for integration
+I> testing to poke and prod to see if extra properties can sneak though.
 
 Comical examples of this was somebody hacking GitHub and Rails to update the
 `created_at` date to have the year 3012. This attack is known as Bender from the
@@ -290,8 +288,6 @@ thresholds for various user roles:
 
 Communicate these limits clearly in API documentation and return appropriate
 status codes like `429 Too Many Requests` when limits are exceeded.
-
-Learn more about link:/api-design/rate-limiting[rate limiting].
 
 == Principle #7: Security through obscurity is not enough
 

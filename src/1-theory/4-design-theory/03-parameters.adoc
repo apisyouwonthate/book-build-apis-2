@@ -12,7 +12,7 @@ There is no concept of a "path parameter" in HTTP RFCs, this is purely a convent
 
 That same URL example has "query parameters" defined in the query string:
 
-{lang=http}
+[source,http]
 ----
 /collections/shoes/products?sort=date&size=10&color=red
 ----
@@ -37,21 +37,21 @@ Everything is a string because the whole URL is a string. Typed languages often 
 
 HTTP Headers (also known as HTTP Header Fields) are metadata for a request, that can have a wide variety of impacts across the API and various network components along the way. You may have spotted this in the same code above.
 
-{lang=http}
+[source,http]
 ----
 Content-Type: application/json
 ----
 
 That lets the API know that the message contains JSON.
 
-{lang=http}
+[source,http]
 ----
 Accept: application/json
 ----
 
 That lets the API know we'd like JSON back too, if it can, we're ready for it.
 
-{lang=http}
+[source,http]
 ----
 If-Modified-Since: Wed, 30 Oct 2024 10:58:31 GMT
 ----
@@ -66,7 +66,7 @@ Various network components like cache proxies will know what to do with an `Auth
 
 Custom headers should be limited to handy but non-vital information, like trying out a new beta feature hiding behind a feature flag.
 
-{lang=http}
+[source,http]
 ----
 Acme-Feature-Toggle: beta-feature=true
 ----

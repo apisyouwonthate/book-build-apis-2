@@ -25,14 +25,14 @@ So far, this feels like how the book is gonna play out:
     - [x] Filtering
     - [x] Errors
     - [x] Caching
+    - [x] Security
   - [x] API Descriptions
-  - [x] Hypermedia Controls (HATEOAS)
+  - [ ] Hypermedia Controls (HATEOAS)
   - [ ] HTTP/1, HTTP/2 and HTTP/3
     - [ ] HTTP/2 is a real world thing today use it
     - [ ] Lets Stop Building Around a Network Hack
   - [x] Asynchronous Methodologies
   - [ ] Authentication
-  - [ ] Security
   - [ ] Horror Stories
     - [ ] Third Parties Gone Wild (The Keycard Troubles of 2016)
     - [ ] Stampeding Herds
