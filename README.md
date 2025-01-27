@@ -24,7 +24,7 @@ So far, this feels like how the book is gonna play out:
     - [ ] Pagination
     - [ ] Filtering
     - [x] Errors
-    - [ ] Caching
+    - [x] Caching
   - [x] API Descriptions
   - [x] Hypermedia Controls (HATEOAS)
   - [ ] HTTP/1, HTTP/2 and HTTP/3
