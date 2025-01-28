@@ -1,44 +1,9 @@
 = Design
 
-The first step to designing an API is figuring out what it actually needs to do.
-Working out the requirements of an API may not be as easy as you first think.
-Some people just make one resource per database table, forgetting that databases
-change over time a lot quick than we'd want our API to change.
 
-Trying to think ahead a bit and create an API which will not need breaking
-changes every few months involves some planning, and this is usually best done
-with a whiteboard, a few teammates, and maybe a few potential client developers.
+- **Endpoints**: Decide how users will interact with the API. For example, `/products` for fetching products or `/orders` for placing new ones.  
+- **Data Models**: What will requests and responses look like? Use standardized formats like JSON or XML for consistency. For example, a product might be `{ "id": 123, "name": "Laptop", "price": 899.99 }`.  
 
-Also trying to plan an entire API all at the same time can be tricky, but
-luckily there are two parts to an API which we can think about separately.
-
-== Service Model & Data Model
-
-The service model covers things like the URL, HTTP method, headers like content
-type, authentication strategy, etc. It is used to explain all the things outside
-of the message, the stuff peripheral to the actual data. 
-
-In a programming language this would be class names, method names, possible
-exceptions, but would not cover anything about the arguments: type hints,
-possible validations, etc.
-
-image::images/data-model-service-model.png[]
-
-The data model is used to describe the contents of the message, which is
-usually what you find in the HTTP request or response body.
-
-We can plan the service model for an API without needing to think too much about the 
-data model yet. Maybe when we get thinking about the data model we will come back and change the 
-service model, but one thing at a time ey?
-
-== Requirements as a Service Model
-
-Talk to your mobile app developer, your frontend people, talk to anyone who is
-likely to be using your API, or talk to yourself if you are a full-stack
-developer who is building both. 
-
-Finding stakeholders from the business can help too. Whilst they might not have
-too much technical insight, they can probably help get you thinking.
 
 When you have a decent list of things you need the API to do, make a simple list
 of resources, then think about what actions will need to be applied to those

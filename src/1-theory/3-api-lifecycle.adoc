@@ -1,0 +1,165 @@
+= API Lifecycle 
+
+Much like the chicken and the egg, there is no real start or end to an API
+lifecycle, there is a self perpetuating cycle of planning, designing, building,
+testing, deploying, managing, and iterating. The lifecycle of an API is a
+continuous process that evolves over time, adapting to changing requirements,
+technologies, and user needs. Any API being built is replacing another one, or
+evolving from a need that was not being met, such as popping a new feature into
+an existing product.
+
+Before anyone thinks about writing any code there should be a huge effort put
+into planning the API, which is often far more conversational than technical.
+
+== 1. Strategy: Defining the Purpose
+
+Planning an API does not start with technical details, it starts with a clear
+strategy. This is the foundation of everything. You figure out what the API will
+do, who it's for, and how it aligns with your business goals. This is the
+foundation of everything. You figure out what the API will do, who it's for, and
+how it aligns with your business goals.  
+
+The best way to make the most useful API possible is to open up the conversation
+to all stakeholders. This could be a mix of technical and non-technical people,
+and could include people from marketing, sales, customer support, and more. The
+worst APIs are built in a vacuum, where the developers were told to build
+something and then left to their own devices.
+
+- "Marketing said we need to tack an API on."
+- "The CEO said we need to open up our data to third-party developers."
+- "A major partner wants to integrate our services into their platform."
+
+If one one of these requests is being used as the entirety of the strategy input
+then the API will likely be very specific to that purpose. Maybe that's ok,
+maybe not, it'll either be "targeted" or "restrictive", but expanding the base
+of potential stakeholders can help flesh out what the needs really are.
+
+Start by asking: 
+
+- Who are your target users? Internal teams, third-party developers, or both? 
+- What are the business goals this API will help achieve?
+- What existing systems or data will the API interact with?
+- Which customers will be using this, and what are their needs?
+- If there is only one customer right now, can I find some other potential customers to talk to?
+- What sort of traffic can be expected? Will this be a few dozen users or millions worldwide?
+
+All of this can drastically shape the decisions made throughout the planning and
+development of the API, and could even suggest that you don't need a real-time
+REST API, but could perhaps need something else like an asynchronous API.
+
+The strategy phase is your chance to future-proof your API by anticipating
+growth and potential challenges, and making sure teams aren't hurriedly coding
+off in the wrong direction.
+
+== 2. Design: Mapping It Out
+
+Once the strategy is clear and requirements are nicely defined, the next stage is design. 
+
+Some people might just straight into using API description languages like
+OpenAPI, but it's worth taking a step back and thinking about the service model
+and the data model a little but more conceptually first, perhaps with a
+whiteboard or a piece of paper.
+
+The goal is to try and turn requirements into a visual representation of the
+API. This could be a diagram, a flowchart, or a simple list of resources and
+actions. The idea is to get a high-level view of what the API will do and how it
+will work, before we get stuck into implementation details like what endpoints
+and data formats to use.
+
+// TODO Replace this diagram
+image::images/data-model-service-model.png[]
+
+Once there is a decent list of things the API needs to do, make a simple list of
+resources, then think about what actions will need to be applied to those
+resources.
+
+One the rough plan of actions is mapped out, and stakeholders agree with the
+assessment of the situation, it's time to start turning those whiteboard
+diagrams into something more concrete. This is where API description languages
+like OpenAPI, RAML, or API Blueprint come in handy. These tools help you define
+the API's structure, endpoints, request/response formats, and more in a
+machine-readable format, and automatically produce interactive API documentation
+that developers can try out in real time.
+
+== 3. Mock: Creating a Prototype
+
+Before jumping straight into development, create a mock version of your API. This simulated API behaves as if it's live, allowing stakeholders and developers to interact with it and provide feedback.  
+
+Tools like **Postman**, **Mockoon**, or **SwaggerHub** help you generate a mock based on your API design. For example, a mock endpoint for `/products` might return a static list of products. This lets users test how their application integrates without waiting for the API to be fully built.  
+
+Mocks save time and money by identifying issues early. They're also invaluable for demonstrating the API's functionality to stakeholders or teams who need to prepare for its integration. Think of it as a rehearsal before the main performance.  
+
+== 4. Test: Ensuring Quality
+
+Once your API is mocked or partially built, it's time for rigorous testing. Testing ensures that the API works as expected and stands up to real-world demands.  
+
+There are several types of testing to consider:  
+- **Functional Testing**: Does the API perform its core tasks correctly? If `/products` is supposed to return a list of items, does it do so reliably?  
+- **Load Testing**: Simulate heavy traffic to see how the API handles it. For instance, what happens if 1,000 users simultaneously request `/orders`?  
+- **Security Testing**: Check for vulnerabilities like data leaks, insecure endpoints, or improper access controls. Can unauthorized users access sensitive data?  
+
+It's also helpful to create automated test scripts to cover routine checks, ensuring future updates don't accidentally break existing functionality. Testing isn't just about finding bugs—it's about building confidence that your API is robust and reliable.  
+
+== 5. Implement: Building the API
+
+With design and testing feedback in hand, you're ready to build the API. Developers now write the actual code that powers it, using frameworks, tools, and programming languages suited to the project.  
+
+At this stage, it's crucial to adhere to best practices. Write clean, modular code that's easy to maintain and extend. Incorporate logging and error handling to help diagnose issues quickly. For example, if `/orders` fails, the API should return a clear error message (`{ "error": "Invalid order ID" }`) rather than just a cryptic status code.  
+
+Implementation also involves integrating the API with your backend systems, databases, or third-party services. Developers must ensure these integrations are seamless and secure. Meanwhile, documentation should be updated continuously so that it accurately reflects the evolving API.  
+
+== 6. Deploy: Grand Opening
+
+Now it's time to deploy the API to production. This means making it publicly accessible or releasing it to internal teams for real-world use. Deployment involves hosting the API on a server or cloud platform like AWS, Azure, or Google Cloud.  
+
+You'll need a proper deployment pipeline to handle future updates smoothly. A CI/CD (Continuous Integration/Continuous Deployment) setup helps automate testing and rollouts. This minimizes downtime and ensures quality with every release.  
+
+It's also important to implement **version control** during deployment. For example, `/v1/orders` for the initial release and `/v2/orders` for a future iteration. This ensures backward compatibility so existing users don't face disruptions when updates are introduced.  
+
+== 7. Secure: Guarding the Gateway
+
+An API must be secure from day one. Security is an ongoing responsibility and not something to be bolted on later.  
+
+Start by implementing strong authentication methods like **OAuth 2.0**, API keys, or JWT (JSON Web Tokens). Ensure all communication happens over HTTPS to encrypt data in transit. For sensitive operations, consider adding multi-factor authentication (MFA).  
+
+Other security measures include rate limiting to prevent abuse, IP whitelisting for restricted access, and regular audits to identify vulnerabilities. For example, if a malicious actor tries to flood `/login` with requests, rate limiting ensures they can't overwhelm your system.  
+
+== 8. Manage: Keeping Things Running
+
+Once the API is live, the focus shifts to management. This includes monitoring its performance, ensuring uptime, and responding to user feedback.  
+
+Use API management tools like **Apigee**, **Postman API Platform**, or **Kong** to monitor traffic, enforce policies, and analyze usage patterns. For example, if `/products` sees unexpectedly high traffic, you can investigate whether it's a legitimate increase or a potential misuse.  
+
+Management also involves ongoing documentation updates and maintaining a developer portal where users can access resources, FAQs, and sample integrations.  
+
+== 9. Discover: Spreading the Word
+
+A well-built API is only as good as its visibility. Make it easy for developers to find, understand, and start using your API.  
+
+Publish it on popular API marketplaces like **RapidAPI** or create a dedicated developer portal. Tutorials, how-to guides, and live demos can help onboard new users quickly. You can also engage with communities via forums, webinars, or hackathons to generate interest and showcase use cases.  
+
+== 10. Develop: Expanding Capabilities
+
+Once the API gains traction, you can focus on expanding its features and ecosystem. Add new endpoints, improve existing functionality, or offer SDKs for different programming languages.  
+
+For example, if users request a `/categories` endpoint to organize `/products`, consider prioritizing it in your roadmap. The goal is to continuously improve and keep your users engaged.  
+
+== 11. Consume: Make It Developer-Friendly
+
+An API's success hinges on its usability. Ensure the onboarding process is smooth with clear documentation, sandbox environments for testing, and sample code.  
+
+Developers should be able to consume your API easily, with no need for guesswork. Providing tools like API libraries or plugins can make integration even faster.  
+
+== 12. Monitor: Keep an Eye Out
+
+Monitoring ensures your API performs reliably. Track metrics like response times, error rates, and user activity. Tools like **New Relic**, **Prometheus**, or **Datadog** are great for this.  
+
+Set up alerts for unusual behaviour. For example, if `/orders` suddenly spikes in usage, it could indicate either a popular campaign or potential abuse. Proactive monitoring keeps your API running smoothly.  
+
+== 13. Monetize: Unlock Revenue
+
+If monetization is part of your strategy, now's the time to implement pricing models. Options include pay-as-you-go, subscription tiers, or charging for premium features.  
+
+For example, offer a free tier with basic functionality, but charge for higher usage limits or advanced analytics. Transparent pricing and fair limits encourage adoption while generating revenue.  
+
+With these steps, your API can evolve from an idea to a well-managed, developer-loved product that generates real value.
