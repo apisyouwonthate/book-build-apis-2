@@ -1,3 +1,0 @@
-http://wiremock.org/
-
-http://get.mocklab.io/
