@@ -303,7 +303,7 @@ GET /users/octocat/repos
   {
       "id": 1296269,
       "name": "Hello-World",
-      "url": "https://api.github.com/repos/speakeasy-api/Hello-World"
+      "url": "https://api.github.com/repos/apisyouwonthate/Hello-World"
   }
 ]
 ----
@@ -314,7 +314,7 @@ When retrieving a user's timeline, each tweet includes a URL that links to the s
 
 [,http]
 ----
-GET /statuses/user_timeline.json?screen_name=speakeasydev
+GET /statuses/user_timeline.json?screen_name=apisyouwonthate
 ----
 
 [,json]
