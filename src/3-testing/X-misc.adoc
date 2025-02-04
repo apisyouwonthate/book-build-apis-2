@@ -1,8 +1,0 @@
-
-Assertions in postman...
-https://www.toolsqa.com/postman/assertions-in-postman-with-chai-assertion-library/
-
-Integration tests can and should test authentication headers, at WW we disabled authentication which lead to UNAUTHENTICATED ENDPOINTS BEING ADDED ALL THE DAMN TIME
-
-// https://malloc.fi/modern-http-benchmarking-tools-h2load-hey-wrk
-// https://github.com/adjust/go-wrk
