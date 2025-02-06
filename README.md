@@ -32,13 +32,6 @@ So far, this feels like how the book is gonna play out:
   - [ ] HTTP/1, HTTP/2 and HTTP/3
   - [x] Asynchronous Methodologies
   - [ ] Authentication
-  - [ ] Horror Stories
-    - [ ] Third Parties Gone Wild (The Keycard Troubles of 2016)
-    - [ ] Stampeding Herds
-    - [ ] "Syncing" in Microservices
-    - [ ] Denial of Service Attacking Yourself
-    - [ ] Firing Data into Blackholes
-    - [ ] Never testing if authentication works or even exists on endpoints
 
 - [ ] Part Two: Planning & Design
   - [x] Editors
