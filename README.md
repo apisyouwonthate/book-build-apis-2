@@ -38,6 +38,7 @@ So far, this feels like how the book is gonna play out:
     - [ ] "Syncing" in Microservices
     - [ ] Denial of Service Attacking Yourself
     - [ ] Firing Data into Blackholes
+    - [ ] Never testing if authentication works or even exists on endpoints
 
 - [ ] Part Two: Planning & Design
   - [x] Editors
