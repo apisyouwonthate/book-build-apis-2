@@ -29,8 +29,6 @@ So far, this feels like how the book is gonna play out:
   - [x] API Descriptions
   - [ ] Hypermedia Controls (HATEOAS)
   - [ ] HTTP/1, HTTP/2 and HTTP/3
-    - [ ] HTTP/2 is a real world thing today use it
-    - [ ] Lets Stop Building Around a Network Hack
   - [x] Asynchronous Methodologies
   - [ ] Authentication
   - [ ] Horror Stories
