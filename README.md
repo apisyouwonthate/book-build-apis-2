@@ -24,6 +24,7 @@ So far, this feels like how the book is gonna play out:
     - [x] Pagination
     - [x] Filtering
     - [x] Errors
+    - [ ] Authentication
     - [x] Caching
     - [x] Security
     - [x] Versioning
@@ -31,7 +32,6 @@ So far, this feels like how the book is gonna play out:
   - [ ] Hypermedia Controls (HATEOAS)
   - [ ] HTTP/1, HTTP/2 and HTTP/3
   - [x] Asynchronous Methodologies
-  - [ ] Authentication
 
 - [ ] Part Two: Planning & Design
   - [x] Editors
