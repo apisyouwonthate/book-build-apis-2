@@ -26,7 +26,7 @@ So far, this feels like how the book is gonna play out:
     - [x] Errors
     - [x] Caching
     - [x] Security
-    - [ ] Versioning
+    - [x] Versioning
   - [x] API Descriptions
   - [ ] Hypermedia Controls (HATEOAS)
   - [ ] HTTP/1, HTTP/2 and HTTP/3
