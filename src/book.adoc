@@ -15,19 +15,31 @@ include::0-stuff/introduction.adoc[]
 
 :sectnums:
 
-:imagesdir: 1-theory
+:imagesdir: 1-introduction-to-apis
 
-include::1-theory/part.adoc[leveloffset=+1]
+include::1-introduction-to-apis/part.adoc[leveloffset=+1]
 
-:imagesdir: 2-planning
+:imagesdir: 2-api-design-basics
 
-include::2-planning/part.adoc[leveloffset=+1]
+include::2-api-design-basics/part.adoc[leveloffset=+1]
 
-// [part]
-// = Part Three: Testing & Monitoring
+:imagesdir: 3-api-design-first
 
-// [part]
-// = Part Four: Management
+include::3-api-design-first/part.adoc[leveloffset=+1]
 
-// [part]
-// = Part Five: Further Theory
+:imagesdir: 4-design-a-new-api
+
+include::4-design-a-new-api/part.adoc[leveloffset=+1]
+
+:imagesdir: 5-maintaining-an-api
+
+include::5-maintaining-an-api/part.adoc[leveloffset=+1]
+
+:imagesdir: 6-taking-apis-further
+
+include::6-taking-apis-further/part.adoc[leveloffset=+1]
+
+:imagesdir: 7-testing-apis
+
+include::7-testing-apis/part.adoc[leveloffset=+1]
+
