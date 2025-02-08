@@ -19,7 +19,7 @@ Think of server-side caching as a way to skip application work like database cal
 
 HTTP caching is driven by cache headers. In its most simple form, when an API sends a response, it includes instructions that tell the client and other network components like CDNs if they are allowed to cache the response, and if so for how long.
 
-The guide on link:/api-design/responses[API responses] briefly introduced the `Cache-Control` header:
+The guide on xref:theory-responses[API responses] briefly introduced the `Cache-Control` header:
 
 [,http]
 ----

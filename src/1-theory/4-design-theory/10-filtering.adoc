@@ -232,7 +232,7 @@ Validation is also critical. If a user tries to apply a filter with invalid data
 just failing silently or returning incorrect results. Be sure to handle edge
 cases as well, such as empty values or invalid characters in the query string.
 
-_Learn more about link:/api-design/responses/errors[error handling in REST APIs]._
+Learn more about xref:theory-errors[error handling in REST APIs] later in the book.
 
 === Performance Considerations
 

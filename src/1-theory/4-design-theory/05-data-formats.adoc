@@ -15,8 +15,8 @@ JSON has become the de facto standard for API requests because it:
 
 Example of complex JSON request:
 
-{lang=json}
-~~~~~~~~
+[source,json]
+----
 {
   "place": {
     "name": "Central Park",
@@ -29,7 +29,7 @@ Example of complex JSON request:
     "capacity": null
   }
 }
-~~~~~~~~
+----
 
 == XML: Ye Oldé Standard
 
@@ -48,8 +48,8 @@ also more compact, which is important when you are sending data over the wire.
 
 An example of a bunch of different data types in JSON.
 
-{lang=json}
-~~~~~~~~
+[source,json]
+----
 {
   "place": {
     "id": 1,
@@ -59,10 +59,10 @@ An example of a bunch of different data types in JSON.
     "empty_string": ""
   }
 }
-~~~~~~~~
+----
 
-{lang=xml}
-~~~~~~~~
+[source,xml]
+----
 <places>
     <place>
         <id>1</id>,
@@ -72,7 +72,7 @@ An example of a bunch of different data types in JSON.
         <empty_string />
     </place>
 </places>
-~~~~~~~~
+----
 
 Basically, in XML, _everything_ is considered a string, meaning integers,
 booleans, and nulls can be confused. Both `maybe` and `empty_string` have the
@@ -92,14 +92,14 @@ Everything is a string. To handle a boolean a client has to send `1` or `0`,
 which will be read as `"1"` or `"0"`. You could send `property=true` but that is
 a literal `"true"` string on the server.
 
-{lang=http}
-~~~~~~~~
+[source,http]
+----
 POST /checkins HTTP/1.1
 Host: api.example.org
 Content-Type: application/x-www-form-urlencoded
 
 place_id=1&message=This%20is%20a%20bunch%20of%20text.&with_friends[]=1&with_friends[]=2&with_friends[]=3
-~~~~~~~~
+----
 
 This is a bit of a mess, as the message needs to be "URL encoded" and the
 `with_friends` is an array with awkward syntax. On top of that it's not clear
@@ -109,8 +109,8 @@ to the correct data types.
 
 For comparison, the same request in JSON is a lot easier to create and work with.
 
-{lang=http}
-~~~~~~~~
+[source,http]
+----
 POST /checkins HTTP/1.1
 Host: api.example.org
 Content-Type: application/json
@@ -120,7 +120,7 @@ Content-Type: application/json
   "message": "This is a bunch of text.",
   "with_friends": [1, 2, 3]
 }
-~~~~~~~~
+----
 
 This is a JSON object, and it is easy to see what is going on. The `place_id` is
 an integer, the `message` is a string, and `with_friends` is an array of
@@ -132,8 +132,8 @@ Multipart forms are a way to send data in multiple parts as a single HTTP reques
 
 This is particularly useful for endpoints that need to process metadata (e.g., JSON) alongside uploaded files. Each part of the form is separated by a boundary string and includes headers that describe the content type and disposition of the part.
 
-{lang=http}
-~~~~~~~~
+[source,http]
+----
 POST /checkins HTTP/1.1
 Host: api.example.org
 Content-Type: multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW
@@ -153,7 +153,7 @@ Content-Type: image/jpeg
 
 [Binary data of the image file]
 ------WebKitFormBoundary7MA4YWxkTrZu0gW--
-~~~~~~~~
+----
 
 This is either confusing or brilliant depending on how you're looking at it, but it's generally a massive pain to work with.
 

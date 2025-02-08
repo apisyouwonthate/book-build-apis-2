@@ -2,16 +2,16 @@
 :description: API Pagination is a common pattern for managing large data sets in APIs. This guide covers the basics of API pagination and best practices.
 
 Pagination is a crucial concept that needs to be understood and designed into a
-REST API before you start building it. It is often forgotten about until it's
-too late, so let's get stuck into it right now, from the basics of API
-pagination to the best practices.
+REST API before its built. It is often forgotten about until it's too late and
+API consumers are already integrating with the API, so it's important to get
+stuck into doing things the right way early on.
 
 == What is API Pagination?
 
-At first you think about collections as having a few hundred records, and that
-might be just fine for the server to fetch from the database, turn into JSON,
-and send back to the client. But as soon as you start getting into the thousands
-of records, things start to fall apart in wild and unexpected ways.
+At first it's easy to image that collections only have a few hundred records.
+That not be too taxing for the server to fetch from the database, turn into
+JSON, and send back to the client, but as soon as the collection is getting into
+thousands of records things start to fall apart in wild and unexpected ways.
 
 For example, a coworking company that expected to mostly host startups of 10-50
 people, but then Facebook and Amazon rock up with ~10,000 employees each, and
@@ -19,11 +19,11 @@ every time somebody loads that data the entire API server crashes, along with
 every application that uses it, and every application that uses that.
 
 Breaking down a large dataset into smaller chunks helps to solve this, and it
-works a lot like the pagination you've probably seen on any website. When you
-search on a functioning search engine like Duck Duck Go or Ecosia, the results
-are broken down into Page 1, page 2... page 34295. It doesn't just throw every
-single result into the browser and leave your computers fans whirring whilst it
-tries to turn render infinite HTML into your browser.
+works a lot like pagination does in the browser: when searching on a functioning
+search engine like Duck Duck Go or Ecosia, the results are broken down into page
+1, page 2... page 34295. It doesn't just throw every single result into the
+browser in the worlds longest slowest web response, forcing computer fans to
+whir until they snap out as it tries to render infinite HTML to the screen.
 
 This is pagination in action, and pagination in an API is exactly the same idea.
 Much like web pages it is done with query string parameters on a GET request.
@@ -34,13 +34,13 @@ GET /items?page=2
 
 The main difference is that the client is not seeing a list of buttons in HTML,
 instead they are getting metadata or links in the JSON/XML response. How exactly
-that looks depends on which pagination strategy you pick, and there are a few to
-chose from with their own pros and cons.
+that looks depends on which pagination strategy is picked, and there are a few to
+choose from with their own pros and cons.
 
 == Choosing a Pagination Strategy
 
-To help you pick a pagination strategy, let's look
-at some examples and talk through the pros and cons.
+To help pick a pagination strategy, let's look at some examples and talk through
+the pros and cons.
 
 . Page-Based Pagination
 . Offset-Based Pagination
@@ -70,7 +70,7 @@ There are two main ways to show pagination data in the response.
 }
 ----
 
-This is pretty common, but forces the client to know a whole lot about your
+This is pretty common, but forces the client to know a whole lot about the
 pagination implementation, which could mean some guesswork (which could be
 guessed wrong), or reading a whole lot of documentation about which bit goes
 where and what is multiplied by whom.
@@ -121,20 +121,20 @@ now.
 * Pro: Simple to implement and understand.
 * Pro: Easy for users to navigate through pages.
 * Pro: UI can show page numbers and know exactly how many pages there are.
-* Pro: Can optionally show a next/previous link as you know if there are more pages available.
+* Pro: Can optionally show a next/previous link to show consumers if there are more pages available.
 
 *Performance*
 
 * Con: Involves counting all records in the dataset which can be slow and hard to cache depending on how many variables are involved in the query.
-* Con: Becomes exponentially slower the more records you have. Hundreds are fine. Thousands are rough. Millions are horrendous.
+* Con: Becomes exponentially slower with more records. Hundreds are fine. Thousands are rough. Millions are horrendous.
 
 *Consistency*
 
-* Con: If you load the latest 10 records, then a new record is added to the
-database, then a user loads the second page, they'll see one of those
-records twice. This is because there is no such concept as a "page" in
-the database, just saying "grab me 10, now the next 10" does not
-differentiate which records they actually were.
+* Con: When a consumer loads the latest 10 records, then a new record is added
+to the database, then a user loads the second page, they'll see one of those
+records twice. This is because there is no such concept as a "page" in the
+database, just saying "grab me 10, now the next 10" does not differentiate which
+records they actually were.
 
 === Offset-Based Pagination
 
@@ -206,12 +206,12 @@ Or with hypermedia controls in the JSON:
 *Consistency*
 
 * Con: The same problems exist for offset pagination as page pagination, if
-more data has been added you could see the same record returned twice in two requests.
+more data has been added between the first request and second being made, the same record could show up in both pages.
 
 *See this in action*
 
-* https://developers.google.com/youtube/v3/guides/implementation/pagination?ref=apisyouwonthate.com[YouTube Data API]
-* https://www.reddit.com/dev/api/?ref=apisyouwonthate.com[Reddit API]
+* https://developers.google.com/youtube/v3/guides/implementation/pagination[YouTube Data API]
+* https://www.reddit.com/dev/api/[Reddit API]
 
 === Cursor-Based Pagination
 
@@ -226,14 +226,14 @@ GET /items?cursor=abc123&limit=10
 Here, `abc123` represents the last item's unique identifier from the previous
 page, this could be a UUID, but it can be more dynamic than that.
 
-APIs like Slack will base64 encode information with a field name and a value, so
-you can send it a order by field, and an ID, all wrapped up in an opaque string
-of `dXNlcjpXMDdRQ1JQQTQ=` to represent `user:W07QCRPA4`.
+APIs like Slack will base64 encode information with a field name and a value,
+even adding sorting logic, all wrapped up in an opaque string. For example,
+`dXNlcjpXMDdRQ1JQQTQ=` would represent `user:W07QCRPA4`.
 
 Obfuscating the information like this aims to stop API consumers hard-coding
-values so your pagination logic, which allows you to change the pagination logic
-over time without breaking things. The consumers can simply pass the cursor
-around to do the job, without worrying about what it actually involves.
+values for the pagination, which allows for the API to change pagination logic
+over time without breaking integrations. The consumers can simply pass the
+cursor around to do the job, without worrying about what it actually involves.
 
 It can look a bit like this:
 
@@ -246,9 +246,8 @@ It can look a bit like this:
 }
 ----
 
-If you want to save the client even having to think about cursors, or knowing
-the name of the query parameters for cursor or limit, you can again use
-links:
+To save the client even having to think about cursors (or knowing the name of
+the query parameters for cursor or limit), links can once again save the day:
 
 [,json]
 ----
@@ -268,13 +267,13 @@ links:
 
 *Ease of Use*
 
-* Pro: API consumers don't have to think about anything and you can change the cursor logic easily.
+* Pro: API consumers don't have to think about anything and the API can change the cursor logic.
 * Con: Slightly more complex to implement than offset-based pagination.
 * Con: API does not know if there are more records available after the last one in the dataset so has to show a next/previous link which may return no data. (You can grab limit+1 number of records to see if it's there, but that's a bit of a hack which could end up being slower. Benchmarks are your friend.)
 
 *Performance*
 
-* Pro: Generally more efficient than offset-based pagination depending on your data source.
+* Pro: Generally more efficient than offset-based pagination depending on the data source being used.
 * Pro: Avoids the need to count records to perform any sort of maths which means larger data sets can be paginated without suffering exponential slowdown.
 
 *Consistency*
@@ -283,13 +282,13 @@ links:
 
 *See it in action*
 
-* https://developer.twitter.com/en/docs/twitter-api?ref=apisyouwonthate.com[Twitter API]
-* https://developers.facebook.com/docs/instagram-api/?ref=apisyouwonthate.com[Instagram Graph API]
-* https://slack.engineering/evolving-api-pagination-at-slack/?ref=apisyouwonthate.com[Slack API]
+* https://developer.twitter.com/en/docs/twitter-api[Twitter API]
+* https://developers.facebook.com/docs/instagram-api/[Instagram Graph API]
+* https://slack.engineering/evolving-api-pagination-at-slack/[Slack API]
 
-=== Pick a Strategy That Works For You
+=== Choosing a strategy
 
-Choosing the right pagination strategy depends on your specific use case and
+Choosing the right pagination strategy depends on the specific use case and
 dataset size.
 
 Offset-based pagination is simple but may suffer from performance issues with
@@ -301,8 +300,8 @@ datasets but come with added complexity.
 Page-based pagination is user-friendly but shares similar performance concerns
 with offset-based pagination.
 
-If you use links instead of putting metadata in the response, you can change
-between these items with little-to-no impact on clients.
+Using links instead of putting metadata in the response allows for more
+flexibility over time with little-to-no impact on clients.
 
 == Where Should Pagination Go?
 
@@ -311,9 +310,10 @@ back for the client to construct their own pagination controls, or sending them
 links in JSON to avoid the faff.
 
 Using links is probably the best approach, but they don't have to go in the
-JSON response. Instead you can use the more modern approach: https://www.rfc-editor.org/rfc/rfc8288?ref=apisyouwonthate.com[RFC 8299: Web
+JSON response. Instead use the more modern approach: https://www.rfc-editor.org/rfc/rfc8288[RFC 8299: Web
 Linking].
 
+[,http]
 ----
 Link: <https://api.example.com/items?page=1&size=10>; rel="first",
       <https://api.example.com/items?page=3&size=10>; rel="next",
@@ -321,16 +321,17 @@ Link: <https://api.example.com/items?page=1&size=10>; rel="first",
 ----
 
 Popping them into HTTP headers seems like the cleaner choice instead of
-littering your resources with metadata. It's also a slight performance putting
-this into headers because HTTP/2 adds https://blog.clou4986dflare.com/hpack-the-silent-killer-feature-of-http-2?ref=apisyouwonthate.com[header compression via
+littering responses with metadata. It's also a slight performance putting
+this into headers because HTTP/2 adds https://blog.clou4986dflare.com/hpack-the-silent-killer-feature-of-http-2[header compression via
 HPAK].
 
 As this is a common standard instead of a convention, https://apisyouwonthate.com/blog/ketting-v5-hypermedia-controls/[generic HTTP clients like
 Ketting] can
 pick this information up to provide a more seamless client experience.
 
-Either way, pick the right pagination strategy for your dataset, document it
-well with a dedicated guide in your API documentation, and make sure it scales
-up with the dataset you're expecting to have instead of testing with a handful
-of records, because if you want to change pagination later it could be a whole
-mess of backwards compatibility breaks.
+Either way, pick the right pagination strategy for the data source, document it
+well with a dedicated guide in API documentation, and make sure it scales up
+with a realistic dataset instead of testing with a handful of records as assuming it scales
+
+Adding or drastically changing pagination later could be a whole mess of
+backwards compatibility breaks.

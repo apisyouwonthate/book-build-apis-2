@@ -19,26 +19,19 @@ So far, this feels like how the book is gonna play out:
     - [x] Resources & Collections
     - [x] Data Formats
     - [x] Request Bodies
-    - [ ] Status Codes
-    - [ ] Response Data
-    - [ ] Pagination
+    - [x] Status Codes
+    - [x] Response Data
+    - [x] Pagination
     - [x] Filtering
     - [x] Errors
+    - [ ] Authentication
     - [x] Caching
+    - [x] Security
+    - [x] Versioning
   - [x] API Descriptions
-  - [x] Hypermedia Controls (HATEOAS)
+  - [ ] Hypermedia Controls (HATEOAS)
   - [ ] HTTP/1, HTTP/2 and HTTP/3
-    - [ ] HTTP/2 is a real world thing today use it
-    - [ ] Lets Stop Building Around a Network Hack
   - [x] Asynchronous Methodologies
-  - [ ] Authentication
-  - [ ] Security
-  - [ ] Horror Stories
-    - [ ] Third Parties Gone Wild (The Keycard Troubles of 2016)
-    - [ ] Stampeding Herds
-    - [ ] "Syncing" in Microservices
-    - [ ] Denial of Service Attacking Yourself
-    - [ ] Firing Data into Blackholes
 
 - [ ] Part Two: Planning & Design
   - [x] Editors

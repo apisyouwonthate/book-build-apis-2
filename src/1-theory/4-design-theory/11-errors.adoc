@@ -1,73 +1,63 @@
 = Returning informative API Errors
-:description: Design useful API errors to save your clients time.
+:description: Design useful API errors to save clients time.
 
-When building an API it's natural to put most of the focus into building a beautiful golden path for your API's usage. Builders often don't like to consider the failure cases. And so errors are often under designed.
+When building an API it's natural to put most of the focus into building a
+beautiful "happy path" where nothing goes wrong. Developers often don't like to
+consider the failure cases, because of course everything is going to work out
+just fine, so errors are often not designed with the same care as the rest of
+the API.
 
-But errors in an API are not just an edge-case, they a crucial part of the functionality, and should be treated like a core feature to be proudly shared and documented with users. Failing clearly and concisely is arguably more important than any other aspect of API design.
+Errors in an API are not just an edge-case, they are a crucial part of the
+functionality, and should be treated like a core feature to be proudly shared
+and documented with users. Failing clearly and concisely is arguably more
+important than any other aspect of API design.
 
 Errors should:
 
 * Be as detailed as possible.
-* Provide context as to exactly what went wrong and why.
+* Provide context as to exactly what went wrong, and why.
 * Help humans find out more information about the problem.
-* Help applications decide what to do next.
+* Help computers decide what to do next.
 * Be consistent across the API.
 
 == HTTP Status Codes
 
-The journey to great errors starts with status codes. Status code conventions exist to specify what type of error occurred. Make sure that you match conventions, because tools will make decisions automatically based on the status code, like automatically refreshing access tokens on a `403`, or retrying the request on a `500`.
+The journey to great errors starts with link:/api-design/status-codes[status
+codes]. Status code conventions exist to specify what
+category of error has occurred, and they are a great way to help developers
+make decisions automatically based on the status code, like automatically
+refreshing access tokens on a `403`, or retrying the request on a `500`.
 
-There are a lot of status codes, but here are the most common ones you'll see in API responses:
-
-* 400 Bad Request - The request was invalid or cannot be served. The exact error should be explained in the error payload.
-* 401 Unauthorized - The request requires an authentication token.
-* 403 Forbidden - The server understood the request, but is refusing it or the access is not allowed.
-* 404 Not Found - There is no resource behind the URI.
-* 405 Method Not Allowed - The request method is known by the server but has been disabled and cannot be used.
-* 406 Not Acceptable - The requested media type is not supported.
-* 408 Request Timeout - The server timed out waiting for the request.
-* 409 Conflict - The request could not be completed because of a conflict.
-* 410 Gone - The resource is no longer available and will not be available again.
-* 412 Precondition Failed - The server does not meet one of the preconditions that the requester put on the request.
-* 413 Payload Too Large - The request body is larger than limits defined by server. The server might close the connection or return an `Retry-After` header field.
-* 414 URI Too Long - The URI requested by the client is longer than the server is willing to interpret.
-* 415 Unsupported Media Type - The request entity has a media type which the server or resource does not support.
-* 416 Range Not Satisfiable - The client has asked for a portion of the file, but the server cannot supply that portion.
-* 417 Expectation Failed - The server cannot meet the requirements of the `Expect` request-header field.
-* 418 I'm a Teapot - The Network Working Group were particularly bored one day and did an April fools joke.
-* 429 Too Many Requests - The user has sent too many requests in a given amount of time.
-* 500 Internal Server Error - The server has encountered a situation it doesn't know how to handle.
-* 501 Not Implemented - The request method is not supported by the server and cannot be handled.
-* 502 Bad Gateway - The server, while acting as a gateway or proxy, received an invalid response from the upstream server.
-* 503 Service Unavailable - The server is not ready to handle the request.
-* 504 Gateway Timeout - The server, while acting as a gateway or proxy, did not receive a timely response from the upstream server.
-
-HTTP status codes can convey a lot of assumptions, but they cannot possibly
-cover all situations, so it's important to add something for the human
-developers to see what's wrong.
+Learn more about link:/api-design/status-codes[HTTP Status Codes], and how to use
+them effectively.
 
 == Application Errors
 
-An error like `400 Bad Request` is generally used as a vague catch-all error
-that covers a whole range of potential issues. Responding with a status code and
-telling your user the request was "bad" is not particularly useful on its own.
-You need to include additional data in the API response to explain exactly what
-has occurred, including additional data which is useful for:
+HTTP status codes only set the scene for the category of issue that has
+occurred. An error like `400 Bad Request` is generally used as a vague catch-all
+error that covers a whole range of potential issues.
+
+More information will be required to help developers understand what went wrong,
+and how to fix it, without having to dig through logs or contact the support
+team.
+
+Error details are useful for:
 
 . humans - so that the developer building the integration can understand the issue.
-. programs - so that program behavior can be correctly triggered of the error.
+. software - so that client applications can automatically handle more situations correctly.
 
-Imagine that you're building a carpooling app, and you need to plan a trip
-between two locations. What happens if the user inputs coordinates that which
-ait's not possible to drive between, say England and Iceland? Below is a series
-of responses from the API with increasing precision:
+Imagine building a carpooling app, where the user plans a trip between two
+locations. What happens if the user inputs coordinates that which are not
+possible to drive between, say England and Iceland? Below is a series of
+responses from the API with increasing precision:
 
 [,http]
 ----
 HTTP/1.1 400 Bad Request
 ----
 
-A not very helpful error response, the user will have no idea what they did incorrectly.
+A not very helpful error response, the user will have no idea what they did
+incorrectly.
 
 [,http]
 ----
@@ -78,7 +68,9 @@ HTTP/1.1 400 Bad Request
 }
 ----
 
-This message could be passed back to the user which will allow them to figure out how to address the issue, but it would be very difficult for an application to programmatically determine what issue occurred and how to respond.
+This message could be passed back to the user which will allow them to figure
+out how to address the issue, but it would be very difficult for an application
+to programmatically determine what issue occurred and how to respond.
 
 [,http]
 ----
@@ -90,22 +82,38 @@ HTTP/1.1 400 Bad Request
 }
 ----
 
-Now this includes data that can help our users know what's going on, as well as an error code which let's them handle the error programmatically if they would like to.
+Now this includes data that can help our users know what's going on, as well as
+an error code which let's them handle the error programmatically if they would
+like to.
 
-So, we should always include both API error messages, as well as API error codes. Let's take a closer look at the best practices for each
+So, we should always include both API error messages, as well as API error
+codes. Let's take a closer look at the best practices for each of these.
 
-== API Error Messages
+== API error messages
 
-== API Error Codes
+API error messages should be clear, concise, and actionable. They should provide
+enough information for the developer to understand what went wrong, and how to
+fix it.
 
-The use of an Error Code is well established in the API ecosystem. However,
+Here are a few best practices for API error messages:
+
+* *Be Specific*: The error message should clearly explain what went wrong.
+* *Be Human-Readable*: The error message should be easy to understand.
+* *Be Actionable*: The error message should provide guidance on how to fix the issue.
+* *Be Consistent*: Error messages should follow a consistent format across the API.
+
+== API error codes
+
+The use of an error code is well established in the API ecosystem. However,
 unlike status codes, error codes are specific to an API or organization. That
-said, there are conventions you can follow to give your error code a predictable
+said, there are conventions to follow to give error codes a predictable
 format.
 
-image::images/design-theory/errors/stripe-error-codes.png[Screenshot of Stripe.com API documentation's "Error Codes" page, which explains how "error codes" are added to provide extra information on top of HTTP status codes.]
+image::./assets/stripe-error-codes.png[Screenshot of Stripe.com API documentation's "Error Codes" page, which explains how "error codes" are added to provide extra information on top of HTTP status codes.]
 
-Stripe's error codes have a nice easy to understand structure. We recommend that you stick to this structure, or adapt it to fit your own APIs structure. we could switch to an error object and pop a `code` property in:
+Stripe's error codes have a nice easy to understand structure. Each error has a
+code which is a string, and a message which is a string, and that string is
+documented online so it can be understood, or reported to support.
 
 [,http]
 ----
@@ -119,6 +127,8 @@ HTTP/1.1 400 Bad Request
 }
 ----
 
+This makes it easy for developers to react programatically to the error too:
+
 [,typescript]
 ----
 if (error.code === 'trip_too_short')
@@ -126,7 +136,9 @@ if (error.code === 'trip_too_short')
 
 == Complete Error Objects
 
-If you include a `code` and a `message` you are off to a great start, but there's more you can do to turn errors into a handy feature instead of just a red flag.
+Include a `code` and a `message` puts an error message off to a great start, but
+there's more to be done to turn errors into a handy feature instead of just a
+red flag.
 
 Here's the full list of what an API error should include:
 
@@ -136,10 +148,10 @@ Here's the full list of what an API error should include:
 * *Application-Specific Error Code*: A unique code that helps developers programmatically handle the error (e.g., `cart-empty`, `ERRCARTEMPTY`).
 * *Links to Documentation*: Providing a URL where users or developers can find more information or troubleshooting steps.
 
-You can build your own custom format for this, but let's leave that to the
-professionals and use existing standards: https://www.rfc-editor.org/rfc/rfc9457.html[RFC 9457 - Problem Details for HTTP
-APIs]. This is being used by more
-and more API teams.
+Some folks will build their own custom format for this, but let's leave that to
+the professionals and use existing standards: https://www.rfc-editor.org/rfc/rfc9457.html[RFC 9457 - Problem Details for
+HTTP APIs]. This is being used by
+more and more API teams.
 
 [,json]
 ----
@@ -154,12 +166,12 @@ and more API teams.
 This example of an error from the https://signatureapi.com/docs/errors[Signature
 API] includes a `type`, which is basically
 the same as an error code, but instead of an arbitrary string like
-`invalid-api-key` the standard suggests a URI which is unique to your API (or
+`invalid-api-key` the standard suggests a URI which is unique to the API (or
 ecosystem): `+https://signatureapi.com/docs/v1/errors/invalid-api-key+`. This does
 not have to resolve to anything (doesn't need to go anywhere if someone loads it
 up) but it _can_, and that covers the "link to documentation" requirement too.
 
-image::images/design-theory/errors/signature-api-errors.png[Signature API error response documentation]
+image::./assets/errors-documentation.png[API Documentation for the SignatureAPI, with an explanation of what the error is, what happened, and how to fix it]
 
 Why have both a `title` and a `description`? This allows the error to be used in
 a web interface, where certain errors are caught and handled internally, but
@@ -169,7 +181,8 @@ phone us". This can reduce incoming support requests, and allow applications to
 evolve better when handling unknown problems before the interface can be
 updated.
 
-Here's a more complete usage including some optional bits of the standard and some extensions.
+Here's a more complete usage including some optional bits of the standard and
+some extensions.
 
 [,json]
 ----
@@ -178,8 +191,8 @@ Content-Type: application/problem+json
 
 {
  "type": "https://example.com/probs/out-of-credit",
- "title": "You do not have enough credit.",
- "detail": "Your current balance is 30, but that costs 50.",
+ "title": "Not enough credit.",
+ "detail": "The current balance is 30, but that costs 50.",
  "instance": "/account/12345/msgs/abc",
  "balance": 30,
  "accounts": ["/account/12345", "/account/67890"]
@@ -188,11 +201,11 @@ Content-Type: application/problem+json
 
 This example shows the same `type`, `title`, and `detail`, but has extra bits.
 
-The `instance` field allows you to point to a specific resource (or endpoint)
+The `instance` field allows the server to point to a specific resource (or endpoint)
 which the error is relating to. Again URI could resolve (it's a relative path to
 the API), or it could just be something that does not necessarily exist on the
-API but makes sense to the API, allowing clients to report a specific instance
-of a problem back to you with more information that "it didn't work...?".
+API but makes sense to the API, allowing clients/users to report a specific instance
+of a problem with more information that "it didn't work...?".
 
 The `balance` and `account` fields are not described by the specification, they
 are "extensions", which can be extra data which helps the client application
@@ -208,7 +221,7 @@ status code. It's about providing clear, actionable information that both
 developers, applications, and end-users of those applications can understand and
 act upon.
 
-Here are a few more things to think about as you're designing errors in your API.
+Here are a few more things to think about when designing errors.
 
 === 200 OK and Error Code
 
@@ -217,35 +230,37 @@ all sorts of other network components that something bad happened.
 
 *The folks over at CommitStrip.com know what's up.*
 
-image::images/design-theory/errors/errors-200-ok.jpeg[This monster has got his API responding with HTTP Status 200 OK despite the request failing.]
+image::./assets/errors-200-ok.jpeg[This monster has got his API responding with HTTP Status 200 OK despite the request failing.]
 
-If you return an HTTP status code of 200 with an error code, you are confusing
-every single developer and every single standards based tool that you or your
-clients are ever likely to use, even if you have not thought of it yet.
+Returning an HTTP status code of 200 with an error code confuses every single
+developer and every single HTTP standards-based tool that may ever come into
+contact with this API. now or in the future.
 
-It's the difference between thinking of HTTP as a dumb pipe to move data up and
-down, and you are going to do all of the work of detecting success or failure in
-your code, or leveraging HTTP as a network protocol with a bunch plethora of
-built in and extensible functionality which standards based tooling can all
-build upon for the benefit of everyone.
+Some folks want to consider HTTP as a "dumb pipe" that purely exists to move data up and
+down, and part of that thinking suggests that so long as the HTTP API was able to respond then thats a 200 OK.
+
+This is fundamentally problematic, but the biggest issue is that it delegates
+all of the work of detecting success or failure to the client code. Caching tools will cache the error. Monitoring tools
+will not know there was a problem. Everything will look absolutely fine despite mystery weirdness happening throughout the system. Don't do this!
 
 === Single or Multiple Errors?
 
-Should you return a single error for a response, or multiple errors?
+Should an API return a single error for a response, or multiple errors?
 
 Some folks want to return multiple errors, because the idea of having to fix one
 thing, send a request, fail again, fix another thing, maybe fail again, etc.
 seems like a tedious process.
 
 This usually comes down to a definition of what an error is. Absolutely, it
-would be super annoying if you get one response with an error saying "that email
-is in a bad format" and then another with "the name you sent has unsupported
-characters" when that information could have been answered at once, but you
-don't need multiple errors to do that.
+would be super annoying for a client to get one response with an error saying
+"that email is in a bad format" and then when they resubmit they get another
+error with "the name you sent has unsupported characters". Both those validation
+messages could have been sent at once, but an API doesn't need multiple errors
+to do that.
 
-The error there is that "the payload is invalid", and that can be a single
-error. We don't want to lose that context, so lets pop in some `validation`
-messages, which is a common pattern.
+The error there is that "the resource is invalid", and that can be a single
+error. The validation messages are just extra information added to that single
+error.
 
 [,json]
 ----
@@ -266,9 +281,6 @@ messages, which is a common pattern.
 }
 ----
 
-This is a single error, but it contains multiple validation errors, which sets a
-decent expectation of being able to progress when this is all fixed.
-
 This method is preferred because it's impossible to preempt things that might go
 wrong in a part of the code which has not had a chance to execute yet. For
 instance, that email address might be valid, but the email server is down, or
@@ -277,23 +289,23 @@ already registered, all of which are different types of error with different
 status codes, messages, and links to documentation to help solve each of them
 where possible.
 
-=== Should You Use a Standard?
+=== Custom or standard error formats
 
 When it comes to standards for error formats, there are two main contenders:
 
 *RFC 9457 - Problem Details for HTTP APIs*
 
 The latest and greatest standard for HTTP error messages. There only reason not
-to use this standard is not hearing about it, and you've just fixed that. It's
-new, released in 2023, replacing the RFC 7807 which came out in 2016 but it
-pretty much the same thing.
+to use this standard is not knowing about it. It is technically new, released in
+2023, but is replacing the RFC 7807 from 2016 which is pretty much the same
+thing.
 
 It has a lot of good ideas, and it's being adopted by more and more
 tooling, either through web application frameworks directly, or as "middlewares"
 or other extensions.
 
-This helps you avoid reinventing the wheel, and it's strongly recommended that
-you use it if possible.
+This helps avoid reinventing the wheel, and it's strongly recommended to use it
+if possible.
 
 *JSON:API Errors*
 
@@ -318,35 +330,16 @@ enough experience to avoid a lot of the common problems around.
 
 Smaller teams that are not in this privileged position can benefit from
 deferring to standards written by people who have more context on the task at
-hand. If you are Facebook then certainly roll your own error format, but if you
-are not then RFC 9457 will point you in the right direction, and implementations
-make it easy.
-
-=== Ambiguity in error code?
-
-`404` is drastically overused in APIs. People use it for "never existed", "no
-longer exists", "you can't view it" and "deactivated", which is way too vague.
-That can be split up into `403`, `404` and `410` for different meanings.
-
-If you get a `403`, this could be because the requesting user is not in the
-correct group to see the requested content. Should the client suggest you
-upgrade your account somehow? Are you not friends with the user whose content
-you are trying to view? Should the client suggest you add them as a friend?
-
-A `410` on a resource could be due to the resource being deleted, or it could be
-due to the user deleting their entire account.
-
-Sometimes being more specific about these different use-cases can help, but
-sometimes it can leak sensitive information. For example, GitHub prefer to
-return a `404` for a private repository that you do not have access to, instead of
-a `403`, because a `403` would confirm the existence of the repository. You maybe
-don't want people knowing that github.com/acme/your-secret-repo exists, so it's
-better to not give out any hints.
+hand. Companies the size of Facebook can roll their own error format and brute
+force their decisions into everyones lives with no pushback, but everyone on
+smaller teams should stick to using simple standards like RFC 9457 to keep
+tooling interoperable and avoid reinventing the wheel.
 
 === Retry-After
 
-As an API designer you want to let API consumers know if they should retry a
-failure, and if so, when. The `Retry-After` header is a great way to do this.
+API designers want their API to be as usable as possbile, so whenever it makes
+sense, let consumers know when and if they should come back and try again., and if so, when. The
+`Retry-After` header is a great way to do this.
 
 [,http]
 ----

@@ -3,11 +3,11 @@
 We learned about URLs in _link:./what-is-a-url.adoc[What is a URL?]_ which is how an
 API defines its "resources". If an API request were a sentence, the URL would be the noun. In this section, we'll cover the verbs of API requests: HTTP methods.
 
-{lang=curl}
-~~~~~~~~
+[source,http]
+----
 GET /places?lat=40.759211&lon=-73.984638 HTTP/1.1
 Host: api.example.org
-~~~~~~~~
+----
 
 Sometimes people will suggest HTTP methods are optional, or they they're just noise, and everything would be better off done as purely a `GET` or `POST`. This is a bit of a misunderstanding of how HTTP works, and how the web works, and leads to all sorts of trouble down the line.
 
@@ -21,11 +21,11 @@ With that in mind, let's dive into the core HTTP methods and best practices for 
 
 `GET` is "idempotent", meaning that if you made the same get call over and over again, You can expect the same outcome every time. If you `GET` the resource, but the request fails or times out, and you `GET` it again, the end result is that you got it. Nothing was deleted, or removed, or changed in any lasting way, so if this thing is got a bunch of times it is the same as being got once.
 
-{lang=curl}
-~~~~~~~~
+[source,http]
+----
 GET /places?lat=40.759211&lon=-73.984638 HTTP/1.1
 Host: api.example.org
-~~~~~~~~
+----
 
 === Best Practices for GET requests
 
@@ -44,8 +44,8 @@ Host: api.example.org
 
 Creating a new location resources:
 
-{lang=curl}
-~~~~~~~~
+[source,http]
+----
 POST /places HTTP/1.1
 Host: api.example.org
 Content-Type: application/json
@@ -55,12 +55,12 @@ Content-Type: application/json
   "lat": 50.464569783,
   "lon": -4.486597585
 }
-~~~~~~~~
+----
 
 Triggering an email send:
 
-{lang=curl}
-~~~~~~~~
+[source,http]
+----
 POST /emails/send HTTP/1.1
 Host: api.example.org
 Content-Type: application/json
@@ -70,7 +70,7 @@ Content-Type: application/json
   "subject": "Hello",
   "body": "Hi Phil, how are you?"
 }
-~~~~~~~~
+----
 
 === Best Practices for POST requests
 
@@ -89,14 +89,14 @@ Some developers get hung up about is this a "create or update" action. Their con
 
 An example of this would be an image upload. An API might have the ability to upload an image for a user, which is probably a profile image. A request with `PUT /users/jane/image` and a body of the image contents (or a JSON payload with a URL) could then provide the image. It does not matter if the user already had an image or not, if the request is a success they will have one. If the upload fails that is fine, another request can be made, and it will be overridden.
 
-{lang=curl}
-~~~~~~~~
+[source,http]
+----
 PUT /users/jane/image HTTP/1.1
 Host: api.example.org
 Content-Type: image/jpeg
 
 [Binary image data]
-~~~~~~~~
+----
 
 === Best Practices for PUT requests
 
@@ -111,14 +111,14 @@ Content-Type: image/jpeg
 
 `PATCH` is not idempotent, so if you `PATCH` a resource, and the request fails, you cannot just retry the request as you could with a `PUT`. The server might have already made some changes, and retrying the request could result in a different outcome.
 
-{lang=curl}
-~~~~~~~~
+[source,http]
+----
 PATCH /users/phil
 
 {
   "image_url": "https://cdn.example.org/fancy-headshot.png"
 }
-~~~~~~~~
+----
 
 How exactly PATCH works can vary depending on which data format you're using. If it's `JSON` then there are two popular approaches: link:https://tools.ietf.org/html/rfc6902[JSON Patch] and link:https://tools.ietf.org/html/rfc7396[JSON Merge Patch].
 
@@ -126,8 +126,8 @@ JSON Merge Patch is what most people will want to use for general APIs, as it is
 
 === PATCH Example
 
-{lang=json}
-~~~~~~~~
+[source,json]
+----
 {
   "title": "Goodbye!",
   "author" : {
@@ -137,12 +137,12 @@ JSON Merge Patch is what most people will want to use for general APIs, as it is
   "tags":[ "example", "sample" ],
   "content": "This will be unchanged"
 }
-~~~~~~~~
+----
 
 A user agent wishing to change the value of the "title" member from "Goodbye!" to the value "Hello!", add a new "phoneNumber" member, remove the "familyName" member from the "author" object, and replace the "tags" array so that it doesn't include the word "sample" would send the following request:
 
-{lang=curl}
-~~~~~~~~
+[source,http]
+----
 PATCH /my/resource HTTP/1.1
 Host: example.org
 Content-Type: application/merge-patch+json
@@ -155,12 +155,12 @@ Content-Type: application/merge-patch+json
   },
   "tags": [ "example" ]
 }
-~~~~~~~~
+----
 
 The resulting JSON document would be:
 
-{lang=json}
-~~~~~~~~
+[source,json]
+----
 {
   "title": "Hello!",
   "author" : {
@@ -170,7 +170,7 @@ The resulting JSON document would be:
   "content": "This will be unchanged",
   "phoneNumber": "+01-123-456-7890"
 }
-~~~~~~~~
+----
 
 === Best Practices for PATCH requests
 
@@ -185,11 +185,11 @@ Aptly named, the `DELETE` method is used to remove resources from the system. It
 
 === DELETE Example
 
-{lang=curl}
-~~~~~~~~
+[source,http]
+----
 DELETE /places/123 HTTP/1.1
 Host: api.example.org
-~~~~~~~~
+----
 
 === Best Practices for DELETE requests
 
@@ -209,15 +209,15 @@ While most APIs primarily use GET, POST, PUT, PATCH, and DELETE, several other H
 
 Example:
 
-{lang=http}
-~~~~~~~~
+[source,http]
+----
 HEAD /articles/123 HTTP/1.1
 Host: api.example.org
 
 HTTP/1.1 200 OK
 Last-Modified: Wed, 15 Oct 2024 12:00:00 GMT
 Content-Length: 12345
-~~~~~~~~
+----
 
 === OPTIONS
 
@@ -227,15 +227,15 @@ Content-Length: 12345
 
 Example:
 
-{lang=http}
-~~~~~~~~
+[source,http]
+----
 OPTIONS /api/articles HTTP/1.1
 Host: api.example.org
 
 HTTP/1.1 200 OK
 Allow: GET, POST, HEAD, OPTIONS
 Access-Control-Allow-Methods: GET, POST
-~~~~~~~~
+----
 
 === TRACE
 
@@ -274,8 +274,8 @@ Don't force everything through POST or GET. Each method has its purpose:
 
 With `PUT` & `PATCH` requests, be aware of potential race conditions:
 
-{lang=http}
-~~~~~~~~
+[source,http]
+----
 # Client A reads resource
 GET /resources/123
 # Client B reads resource
@@ -284,7 +284,7 @@ GET /resources/123
 PUT /resources/123 {...}
 # Client A updates resource
 PUT /resources/123 {...}
-~~~~~~~~
+----
 
 Both clients were trying to update a single instance of a resource, but little do they know they are overwriting one another. This is on the server to handle, and there are a few ways to do it.
 
