@@ -1,3 +1,9 @@
 = A History of APIs
 
-Something something SOAP, something something REST, something something gRPC, something something GraphQL.
+*The early days:* WSDL and SOAP: In the late 90s and early 2000s, SOAP web services were popular, and people used the XML-based WSDL (Web Services Description Language) to describe them. WSDL files outlined all the operations and payloads in a verbose XML format. It was powerful, but many felt it was overly complex. Developers creating, maintaining, and using the APIs felt the frustration of working with them.
+
+*REST APIs take over:* REST, introduced in the early 2000s, focused on simplicity and scalability. Unlike SOAP, REST didn't have a standard way of describing APIs. Many developers relied on manual documentation, example cURL commands, or tools like Postman collections. It worked, but it was messy, inconsistent, and could easily diverge from the implementation of the API.
+
+*The OpenAPI era:* Around 2011, Swagger (later renamed OpenAPI) arrived to help describe REST APIs. It introduced a standard machine-readable format for defining operations, parameters, payloads, and validation rules, all using JSON or YAML. There were a few other similar projects (mainly RAML, API Blueprint) but they all fell out of use, and OpenAPI became the champion, especially with v3.0 and v3.1 improved on this base.
+
+*AsyncAPI:* In 2017, AsyncAPI released a v1.0 of a new specification to help event-driven architectures describe their APIs in a similar way to OpenAPI, in fact it was a fork. It includes support for common message brokers such as Apache Kafka and RabbitMQ amongst many others.
