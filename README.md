@@ -9,6 +9,21 @@ Support the development of this book, and [**pre-order on LeanPub!**](https://le
 - [ ] Part One: Introduction to APIs
     - [ ]: History of APIs
 - [ ] Part Two: API Design Basics
+    - [x] Structuring URLs
+    - [x] HTTP Methods
+    - [x] Parameters
+    - [x] Resources & Collections
+    - [x] Data Formats
+    - [x] Request Bodies
+    - [x] Status Codes
+    - [x] Response Data
+    - [x] Pagination
+    - [x] Filtering
+    - [x] Errors
+    - [ ] Authentication
+    - [x] Caching
+    - [x] Security
+    - [x] Versioning
 - [ ] Part Three: API Design First Workflow
 - [ ] Part Four: Design a new API
 - [ ] Part Five: Managing and Maintaining an API
