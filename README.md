@@ -28,6 +28,7 @@ Support the development of this book, and [**pre-order on LeanPub!**](https://le
     - [x] Versioning
 - [ ] Part 3: API Design First Workflow
   - [x] Intro to API Design First
+  - [x] API Descriptions
 - [ ] Part 4: Design a new API
 - [ ] Part 5: Managing and Maintaining an API
 - [ ] Part 6: Taking APIs Further

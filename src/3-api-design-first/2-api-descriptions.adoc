@@ -1,10 +1,9 @@
 [#theory-descriptions]
 = API Descriptions
 
-API descriptions are a way to describe how an API works, what it does, and what
-it expects. They are a contract between the API provider and the API consumer,
-describing exactly how the interface of the API should work in a way that gives
-everyone confidence that it will work as expected.
+The "I" in "API" means interface, and so writing a description for that interface
+is the act of writing down what that interface is going to look like, to avoid
+folks having to guess, or go and hunt for some documentation somewhere.
 
 Let's use the fantastic https://pokeapi.co/[PokeAPI] as an example.
 
