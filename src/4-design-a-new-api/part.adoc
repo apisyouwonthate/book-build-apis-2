@@ -1,3 +1,2 @@
 [part]
-= Part Four: Design a new API
-
+= Part 4: Design a new API

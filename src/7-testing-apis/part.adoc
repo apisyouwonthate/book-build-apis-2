@@ -1,3 +1,2 @@
 [part]
-= Part Seven: Testing APIs
-
+= Part 7: Testing APIs

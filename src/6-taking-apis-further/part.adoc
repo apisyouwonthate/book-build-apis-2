@@ -1,3 +1,2 @@
 [part]
-= Part Six: Taking APIs Further
-
+= Part 6: Taking APIs Further
