@@ -13,7 +13,7 @@ To understand why design-first is such a big deal, it helps to know where it cam
 
 == What Is API Design-First?
 
-API Design-First means you define the API's contract before writing any application code. This contract includes things like:
+API Design-First means defining the API's contract before writing any application code. This contract includes things like:
 
 * The endpoints (URLs) and their HTTP methods (GET, POST, etc.)
 * The structure and validation rules of resources and collections.
@@ -38,6 +38,7 @@ Describing an API is the most important part of the API design-first workflow af
 
 OpenAPI documents are written in JSON or YAML, making them machine-readable, and somewhat human-readable too. They contain all the information needed to describe the interface of an API: requests, responses, reusable components, etc.
 
+```yaml
  openapi: 3.0.0
  info:
    title: Example API
@@ -60,6 +61,7 @@ OpenAPI documents are written in JSON or YAML, making them machine-readable, and
                        type: integer
                      name:
                        type: string
+```
 
 This snippet describes an API endpoint `/users` that responds with a list of users when a client sends a GET request. It then describes the responses a client could expect to see, with the status codes (e.g.: 200), content types (e.g.: `application/json`), then gets stuck into the `schema` which will outline the shape of the JSON.
 
@@ -67,7 +69,7 @@ If you're just getting started with OpenAPI, we're here to help you on your jour
 
 AsyncAPI works in a very similar way, but instead of describing endpoints you describe "publishers" and "consumers".
 
-....
+```yaml
 asyncapi: 3.0.0
 
 channels:
@@ -84,7 +86,7 @@ operations:
       $ref: '#/channels/user~1signedup'
     messages:
       - $ref: '#/channels/user~1signedup/messages/publishUserSignedUp.message'
-....
+```
 
 == Comparing Design-first and Code-first
 
@@ -94,7 +96,8 @@ The rush to get coding often meant the first version clients get to see is not r
 
 For example, when OpenAPI is utilized in this approach, it is usually as annotations or code comments, popped into the application somewhere near the code it's describing, with the hope being that a developer will remember to update both at the same time. These annotations can then be exported to an `openapi.yaml` document which can be displayed as documentation or generate SDKs.
 
- class UserController {
+```
+class UserController {
    @OpenApi(
        path = "/users",
        method = HttpMethod.POST,
@@ -103,7 +106,8 @@ For example, when OpenAPI is utilized in this approach, it is usually as annotat
    public static void createUser(Context ctx) {
        // ...
    }
- }
+}
+```
 
 Sadly this approach relies entirely on conflating proximity with accuracy. The annotations and code just a few lines below would often tell two completely different stories.
 
@@ -143,6 +147,6 @@ Having the design phase handled with TypeScript allows rapid change to the whole
 
 Later when it comes time to deploy documentation, run mock servers, do security checks, lint with style guides, etc. then TypeSpec does not have anywhere near as much tooling as OpenAPI, so you can say "ok, that design looks good, export OpenAPI" and run it through all of those tools, getting the best of both worlds.
 
-== Wrapping Up
+== Summary
 
 API Design-First is all about getting the API's design nailed down before jumping into coding. It helps teams work faster, stay consistent, and avoid costly mistakes later on. OpenAPI has become the standard for REST APIs, making it easy to design, document, and manage APIs. AsyncAPI brings this same power to the event-driven API world. Tooling has evolved massively in the last few years to support these standards, so you aren't constantly having to convert things into multiple formats or try to duct-tape infinite tools together with no common source of truth.

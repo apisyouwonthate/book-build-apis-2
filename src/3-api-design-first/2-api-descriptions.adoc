@@ -1,9 +1,12 @@
 [#theory-descriptions]
 = API Descriptions
 
-The "I" in "API" means interface, and so writing a description for that interface
-is the act of writing down what that interface is going to look like, to avoid
-folks having to guess, or go and hunt for some documentation somewhere.
+API Descriptions are a way to write down what an API is meant to do, and how it
+is meant to do it. They are a contract between the API developers and the client
+that helps everyone understand what is going on without having to guess, or go
+and hunt for some documentation somewhere.
+
+== Why Do We Need API Descriptions?
 
 Let's use the fantastic https://pokeapi.co/[PokeAPI] as an example.
 
@@ -42,7 +45,7 @@ wanting to understand how an API is meant to work.
 - Which of those properties are required or optional?
 - What other validation rules can be applied to those properties?
 
-Before various API description formats got popular for HTTP APIs, there were a
+Before API description formats like OpenAPI got popular for HTTP APIs, there were a
 few common ways people would share information about how the API would work and
 what it should do.
 
@@ -262,25 +265,6 @@ describing the data model. The schema keywords that OpenAPI v3.0 uses are based
 on JSON Schema, and there is a bit of a tangent we should look into here about
 compatibility.
 
-[[WARNING]]
-====
-OpenAPI v3.0 schema objects are a subset/superset/sideset implementation of
-_JSON Schema draft 05_. Most JSON Schema keywords are available and work as
-expected, a few extra OpenAPI-only keywords were added, but some JSON Schema
-keywords are not supported. There is also the tricky situation where JSON Schema
-has continued to progress quickly since draft 5 (draft 8 is almost complete at
-time of writing).
-
-This can cause confusion for new developers, but interoperability
-amongst standards is always a tricky one. Thankfully, future versions of OpenAPI
-(probably v3.1) aim to solve this, so no need to get too stuck in the weeds here.
-For those who want to learn more,
-https://blog.apisyouwonthate.com/openapi-and-json-schema-divergence-part-1-1daf6678d86e[this
-first article] fully explains the situation, and
-https://blog.apisyouwonthate.com/openapi-and-json-schema-divergence-part-2-52e282e06a05[this
-second article] explains workarounds and longer term solutions.
-====
-
 OpenAPI documents are static files. They're usually stored in the same
 repository as the source code, changes as API code is changed, reviewed as one,
 then deployed off to OpenAPI documentation tools or S3 for other uses. Some
@@ -489,7 +473,7 @@ endpoints API versions, etc. with the design-first approach. Nobody will get mad
 at you for not having a time machine, just don't use that as an excuse to not
 bother designing things.
 
-== Also Know as Contacts or Specifications
+== Also Known as Contacts or Specifications
 
 Some people talk about "API Specifications", or "contracts", and the APIs You
 Won't Hate blog has been guilty of using these terms interchangeably. There a
