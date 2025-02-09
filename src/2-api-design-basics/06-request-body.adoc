@@ -1,0 +1,193 @@
+= Sending request data
+
+[.text-muted]
+Best practices and common patterns for API requests.
+
+Understanding how to properly structure and handle request data is crucial for building robust APIs. This guide covers best practices and common patterns for working with API request data.
+
+== URL Structure
+
+Every API request starts with a URL that identifies the resource and any query parameters:
+
+[source,http]
+----
+GET /api/v1/places?lat=40.759211&lon=-73.984638 HTTP/1.1
+Host: api.example.org
+----
+
+Key components:
+
+* Resource path: Identifies what you're interacting with.
+* Query parameters: Filter, sort, or modify the request.
+* API version: Often included in the path.
+
+== Request Bodies
+
+Requests can also have a 'request body', which is a payload of data being sent
+the API for processing. It is very frowned upon for `GET` but expected for
+`POST`, `PUT`, and `PATCH`. The request body can be in a variety of formats, but
+the most common are JSON, XML, and form data.
+
+[source,http]
+----
+POST /places HTTP/1.1
+Host: api.example.org
+Content-Type: application/json
+
+{
+  "name": "High Wood",
+  "lat": 50.464569783,
+  "lon": -4.486597585
+}
+----
+
+This `POST` request to the `/places` endpoint is trying to add a new place to
+the API, once again using a JSON body. The `Content-Type` header lets the server
+know to expect JSON data, so it can parse the body and create a new place with
+the name "High Wood" and the coordinates `50.464569783, -4.486597585`.
+
+So far the examples of HTTP requests and responses have been using text, but in
+reality they are just a series of bytes. The text is just a human-readable
+representation of the bytes, and the tools that interact with the API will
+convert the text to bytes before sending it, and convert the bytes back to text
+when receiving it.
+
+Most of you will interact with APIs using a programming language, and the code
+to send a request will look something like this:
+
+[tabs]
+====
+TypeScript::
++
+[source,typescript]
+----
+import axios from 'axios';
+
+const response = await axios.post('https://api.example.org/places', {
+  name: 'High Wood',
+  lat: 50.464569783,
+  lon: -4.486597585,
+});
+----
+
+Python::
++
+[source,python]
+----
+import json
+import requests
+
+headers = {
+    'Content-Type': 'application/json',
+}
+payload = {
+    'name': 'High Wood',
+    'lat': 50.464569783,
+    'lon': -4.486597585,
+}
+req = requests.post(
+  'https://api.example.org/places',
+  data=json.dumps(payload),
+  headers=headers
+)
+----
+
+PHP::
++
+[source,php]
+----
+$client = new Guzzle\Http\Client('https://api.example.org');
+
+$headers = [
+    'Content-Type' => 'application/json',
+];
+$payload = [
+    'name' => 'High Wood',
+    'lat' => 50.464569783,
+    'lon' => -4.486597585,
+];
+$req = $client->post('/places', [
+  'headers' => $headers,
+  'json' => $payload,
+]);
+----
+
+Ruby::
++
+[source,ruby]
+----
+conn = Faraday.new(
+  url: 'https://api.example.org',
+  headers: { 'Content-Type' => 'application/json' }
+)
+
+response = conn.post('/places') do |req|
+  req.body = {
+    name: 'High Wood',
+    lat: 50.464569783,
+    lon: -4.486597585,
+  }.to_json
+end
+----
+====
+
+HTTP tooling is essentially the same thing no matter the language. It's all
+about URLs, methods, body, and headers. This makes REST API design a lot easier,
+as you have a "uniform interface" to work with, whether everything is following
+all these set conventions already.
+
+Requests like `POST`, `PUT`, and `PATCH` typically include data in their body.
+
+[source,http]
+----
+POST /places HTTP/1.1
+Host: api.example.org
+Content-Type: application/json
+
+{
+  "name": "High Wood",
+  "lat": 50.464569783,
+  "lon": -4.486597585
+}
+----
+
+This area is yours to do with as you want. There's a lot of freedom in how you
+structure data, but there are some best practices to follow which you can learn
+more about in the xref:theory-collections[API Collections & Resources] guide.
+
+=== Request Body
+
+The request is body is where the majority of "domain specific" data (things
+specifically about your organization or API) will go. To understand more about
+request bodies, we need to learn about data formats.
+
+== Best Practices
+
+=== 1. Keep Request & Response Data Consistent
+
+Maintain the same structure for data going in and out of your API. You want to
+strive for predictability and consistency in your API design. When a user sends
+a `POST` request to create a new resource, they should get back a response that
+looks like the resource they just created. If a user updates a resource, the
+response should return the new state of the updated resource.
+
+[source,json]
+----
+// POST Request
+{
+  "name": "High Wood",
+  "lat": 50.464569783,
+  "lon": -4.486597585
+}
+
+// Response
+{
+  "id": 123,
+  "name": "High Wood",
+  "lat": 50.464569783,
+  "lon": -4.486597585,
+  "created_at": "2024-10-24T12:00:00Z"
+}
+----
+
+More on this in the xref:theory-responses[API Responses] guide.
