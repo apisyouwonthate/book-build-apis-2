@@ -38,7 +38,8 @@ Describing an API is the most important part of the API design-first workflow af
 
 OpenAPI documents are written in JSON or YAML, making them machine-readable, and somewhat human-readable too. They contain all the information needed to describe the interface of an API: requests, responses, reusable components, etc.
 
-```yaml
+[source,yaml]
+----
  openapi: 3.0.0
  info:
    title: Example API
@@ -61,7 +62,7 @@ OpenAPI documents are written in JSON or YAML, making them machine-readable, and
                        type: integer
                      name:
                        type: string
-```
+----
 
 This snippet describes an API endpoint `/users` that responds with a list of users when a client sends a GET request. It then describes the responses a client could expect to see, with the status codes (e.g.: 200), content types (e.g.: `application/json`), then gets stuck into the `schema` which will outline the shape of the JSON.
 
@@ -69,7 +70,8 @@ If you're just getting started with OpenAPI, we're here to help you on your jour
 
 AsyncAPI works in a very similar way, but instead of describing endpoints you describe "publishers" and "consumers".
 
-```yaml
+[source,yaml]
+----
 asyncapi: 3.0.0
 
 channels:
@@ -86,7 +88,7 @@ operations:
       $ref: '#/channels/user~1signedup'
     messages:
       - $ref: '#/channels/user~1signedup/messages/publishUserSignedUp.message'
-```
+----
 
 == Comparing Design-first and Code-first
 
@@ -96,7 +98,8 @@ The rush to get coding often meant the first version clients get to see is not r
 
 For example, when OpenAPI is utilized in this approach, it is usually as annotations or code comments, popped into the application somewhere near the code it's describing, with the hope being that a developer will remember to update both at the same time. These annotations can then be exported to an `openapi.yaml` document which can be displayed as documentation or generate SDKs.
 
-```
+[source,ruby]
+----
 class UserController {
    @OpenApi(
        path = "/users",
@@ -107,7 +110,7 @@ class UserController {
        // ...
    }
 }
-```
+----
 
 Sadly this approach relies entirely on conflating proximity with accuracy. The annotations and code just a few lines below would often tell two completely different stories.
 
