@@ -27,6 +27,7 @@ Support the development of this book, and [**pre-order on LeanPub!**](https://le
     - [x] Security
     - [x] Versioning
 - [ ] Part 3: API Design First Workflow
+  - [ ] What is API Design First?
 - [ ] Part 4: Design a new API
 - [ ] Part 5: Managing and Maintaining an API
 - [ ] Part 6: Taking APIs Further
@@ -41,21 +42,6 @@ How the book was looking as Phils random braindumps.
   - [x] Understanding Different Paradigms
   - [ ] API Lifecycle
   - [ ] Design Theory
-    - [x] Structuring URLs
-    - [x] HTTP Methods
-    - [x] Parameters
-    - [x] Resources & Collections
-    - [x] Data Formats
-    - [x] Request Bodies
-    - [x] Status Codes
-    - [x] Response Data
-    - [x] Pagination
-    - [x] Filtering
-    - [x] Errors
-    - [ ] Authentication
-    - [x] Caching
-    - [x] Security
-    - [x] Versioning
   - [x] API Descriptions
   - [ ] Hypermedia Controls (HATEOAS)
   - [ ] HTTP/1, HTTP/2 and HTTP/3
