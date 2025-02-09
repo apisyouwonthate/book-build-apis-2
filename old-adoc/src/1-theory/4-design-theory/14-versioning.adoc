@@ -1,0 +1,427 @@
+= Versioning & Evolution
+
+:description: Learn how to manage API versioning and evolution to ensure smooth transitions and backward compatibility for clients.
+
+Once an API has been designed, built, deployed, and integrated with by various
+consumers, changing the API can be very difficult.
+
+*Additive Changes:* Adding new endpoints, adding new properties to a response,
+or introducing optional parameters are non-breaking changes, and can typically
+be done without significant issues.
+
+*Breaking Changes:* Removing or renaming endpoints, removing required fields,
+or changing response structures are considered breaking changes. These have
+the potential to disrupt existing client applications, resulting in errors and
+loss of functionality. Clients, especially paying customers, may face the
+expense and time-consuming task of adapting their code to accommodate these
+changes.
+
+For effective management of changes, developers must navigate versioning and
+evolution of APIs carefully, ensuring that client integrations are not
+negatively impacted. Let's explore these challenges in more detail.
+
+== When are API changes an issue
+
+Some APIs are built purely to service a single application. This might be a
+backend for a web application, handled by a single full-stack developer or team
+that manages both the frontend and the API. In this case, changes aren't as
+problematic because both the frontend and backend can be updated simultaneously,
+ensuring that there's no risk of breaking integration.
+
+In most cases APIs are consumed by multiple clients, ranging from other teams
+within the same organization to external customers. This introduces
+complexities:
+
+* *Internal Clients*: Even when the consumers are within the same
+organization, changes may require coordination, especially if the API is used
+by different teams working on separate services. The timing of updates and
+changes can cause delays or disruptions.
+* *External Clients*: If the API is being used by third-party clients,
+particularly paying customers, changes can become even more difficult.
+External clients may resist updates due to the effort and risk involved in
+modifying their integrations. A major change could result in lost business,
+dissatisfaction, or churn.
+
+When API consumers are not in sync with the development team, managing
+versioning becomes essential to ensure smooth transitions.
+
+== Why APIs need to change
+
+Has anyone ever released any software then thought: "That's perfect, no change
+needed"?
+
+Probably not. APIs evolve over time like any other software, whether it's due to
+changing business requirements, feedback from users, or the need to adopt new
+technologies. APIs are rarely "`perfect`" and immutable.
+
+Just like software versioning, APIs also require a versioning system to
+accommodate changes. Developers use version numbers to signify changes in the
+API contract, allowing consumers to choose which version of the API they wish to
+use. This ensures backward compatibility for existing clients while introducing
+improvements and fixes in newer versions.
+
+With most software users can have any version running, with multiple versions of
+the software running on various users computers at once. Common conventions,
+including https://semver.org/[Semantic Versioning], use three numbers: major,
+minor, and patch, so some users might be running 1.0.0 whilst others run 1.0.2
+and eventually some may be on 2.1.3.
+
+Breaking changes might look like:
+
+* A change to the endpoint structure.
+* Adding a new required field.
+* Removing a field from a response.
+* Changing the behavior of an endpoint.
+* Changing validation rules.
+* Modifying the response format (e.g.: implementing a standard data format like JSON:API).
+
+If any of this is done, a new API version may be required to avoid breaking existing clients.
+
+== Versioning an API
+
+API versioning involves assigning a version number or identifier to the API,
+essentially creating multiple different APIs which are segmented in some clear
+way so that the consumer can specify which version of the API they wish to
+interact with.
+
+There are countless ways people have tried to solve this problem over time, but
+the two main approaches are:
+
+=== URL versioning
+
+URL versioning is one of the most common approaches. It involves including a
+version number in the URL, segmenting the API. Typically, only a major version
+is used, as seen in this example:
+
+[,http]
+----
+GET https://example.com/api/v1/users/123
+----
+
+[,json]
+----
+{
+	"id": 123,
+	"first_name": "Dwayne",
+	"last_name": "Johnson"
+}
+----
+
+In this example, `v1` refers to the version of the API, and its whatever the
+resource was designed at first.
+
+As the API grows a new version is introduced to accommodate changes separate
+from the first version.
+
+[,http]
+----
+GET https://example.com/api/v2/users/3a717485-b81b-411c-8322-426a7a5ef5e6
+----
+
+[,json]
+----
+{
+	"id": 123,
+	"full_name": "Dwayne Johnson",
+	"preferred_name": "The Rock"
+}
+----
+
+Here, the v2 endpoint introduces a few notable changes: they phased out
+auto-incrementing IDs as per the link:/api-design/security[security advice],
+ditched the https://www.kalzumeus.com/2010/06/17/falsehoods-programmers-believe-about-names/[fallacy of people having two
+names],
+and helped people put in a preferred name to show publicly instead of forcing
+everyone to publicize their legal name. Great, but this is a big change.
+
+If this change was deployed on the `/v1` version it would have broken most
+clients usage, they would see 404 errors using the old IDs, and the fields have
+changed so validation failures would occur.
+
+As this is being run simultaneously under `/v2`, both can be used at once. This
+allows clients to migrate at their own pace, and for the API to be updated
+without breaking existing clients.
+
+=== Media-type versioning
+
+Instead of embedding the version number in the URL, media type versioning places
+the versioning information in the HTTP `Accept` header. This allows for more
+flexible management of the API contract without altering the URL structure.
+
+[,http]
+----
+GET https://example.com/api/users/123
+Accept: application/vnd.acme.v2+json
+----
+
+[,json]
+----
+{
+	"id": 123,
+	"full_name": "Dwayne Johnson",
+	"preferred_name": "The Rock"
+}
+----
+
+In this case, the client specifies the version they want by including the
+`Accept` header with the version identifier (e.g.:
+`application/vnd.acme.v2+json`). The advantage is that the API URL remains
+clean, and the versioning is managed through the HTTP headers.
+
+This approach is less common than URL versioning, and has a few downsides. It's a
+bit more complex to implement, and it's not as easy to see which version of the
+API using.
+
+== API evolution as an alternative
+
+While versioning is a popular solution to API changes, *API evolution* is an
+alternative focuses on maintaining backward compatibility and minimizing
+breaking changes. Instead of introducing entirely new versions, API developers
+evolve the existing API to accommodate new requirements, but do so in a way that
+doesn't disrupt clients.
+
+API evolution is the concept of striving to maintain the "I" in API, the
+request/response body, query parameters, general functionality, etc., only
+breaking them when absolutely necessary. It's the idea that API
+developers bend over backwards to maintain a contract, no matter how annoying
+that might be. It's often more financially and logistically viable for the API
+developers to bear this load than dumping the workload onto a wide array of
+consumers.
+
+=== API evolution in practice
+
+To work on a realistic example, here's a simple change that could come up:
+
+____
+The property `name` exists, and that needs to be split into `first_name` and `last_name` to support Stripe's name requirements.
+____
+
+A minor example, but removing name and making all consumers need to change all code to use the two new fields would be a breaking change. There are ways to retain backwards compatibility.
+
+Most web application frameworks commonly used to build APIs have a feature like "serializers", where database models are turned into JSON objects to be returned, with all sensitive fields removed and any relevant tweaks or structure added.
+
+The database might have changed to use `first_name` and `last_name`, but the API does not need to remove the name property. It can be replaced with a "dynamic property" which joins the first and last names together and returns it in the JSON.
+
+[,ruby]
+----
+class UserSerializer
+  include FastJsonapi::ObjectSerializer
+
+  attributes :name, :first_name, :last_name
+    "#{object.first_name} #{object.last_name}"
+  end
+end
+----
+
+[,http]
+----
+GET https://api.example.com/users/123
+----
+
+[,json]
+----
+{
+  "id": 123,
+  "name": "Dwayne Johnson",
+  "first_name": "Dwayne",
+  "last_name": "Johnson"
+}
+----
+
+When a `POST` or `PATCH` is sent to the API, the API does not need to think about a version number to notice that `name` is being sent. IF name is sent it can be split, and if first_name and last_name are sent it can handle as expected.
+
+[,ruby]
+----
+class User < ApplicationRecord
+  def name=(name)
+    self.first_name, self.last_name = name.split(' ', 2)
+  end
+end
+----
+
+A lot of changes can be handled with new properties, and supporting old properties indefinitely, but at a certain point that becomes cumbersome enough to need a bigger change.
+
+When an endpoint is starting to feel a bit clunky and overloaded, or fundamental relationships change, an API rewrite can be avoided by evolving the API with new resources, collections, and relationships.
+
+=== Changing the domain model
+
+In the case of https://www.protect.earth/[Protect Earth's], a reforestation and rewilding charity, the Tree Tracker API needed some fundamental change. It used to focus on tracking trees that were planted, recording a photo and coordinates, and other metadata to allow for sponsoring and funding tree planting.
+
+There's a `/trees` resource, and `/orders` has a `plantedTrees` property, but the charity expanded beyond trees to sowing wildflower meadows, rewetting peat bogs, and clearing invasive species. Instead around adding `/peat`, and `/meadows` resources, the API became more generic with a `/units` collection.
+
+Removing `/trees` or `plantedTrees` would break customers, and that would stem the flow of funding. API evolution focuses on adding new functionality without breaking existing clients, so instead of removing the `/trees` endpoint, the API now supports both `/units` and `/trees`, with the `/trees` resource simply filtering the `/units` based on the `type` field:
+
+[,http]
+----
+GET https://api.protect.earth/trees
+----
+
+[,json]
+----
+{
+  "id": 123,
+  "species": "Oak",
+  "location": {
+    "latitude": 42.0399,
+    "longitude": -71.0589
+  }
+}
+----
+
+[,http]
+----
+GET https://api.protect.earth/units
+----
+
+[,json]
+----
+{
+  "id": 123,
+  "type": "tree",
+  "species": "Oak",
+  "location": {
+    "latitude": 42.0399,
+    "longitude": -71.0589
+  }
+}
+----
+
+This allows existing developers to continue using the `/trees` endpoint while new developers can use the `/units` endpoint. The API evolves to support new functionality without breaking existing clients.
+
+What about the `/orders` having `plantedTrees` on them? Removing this property would be a breaking change, so a backwards compatible solution is needed, and with API evolution there are countless options.
+
+It's possible to add both an old and a new property, allowing clients to migrate at their own pace. This can be done by adding a new `allocatedUnits` property to the `/orders` resource, while keeping the old `plantedTrees` property:
+
+[,http]
+----
+GET https://api.protect.earth/orders/abc123
+----
+
+[,json]
+----
+{
+  "id": "abc123",
+  "organization": "Protect Earth",
+  "orderDate": "2025-01-21",
+  "status": "fulfilled",
+  "plantedTrees": [
+    {
+      "id": 456,
+      "species": "Oak",
+      "location": {
+        "latitude": 42.0399,
+        "longitude": -71.0589
+      }
+    }
+  ],
+  "allocatedUnits": [
+    {
+      "id": 456,
+      "type": "tree",
+      "species": "Oak",
+      "location": {
+        "latitude": 42.0399,
+        "longitude": -71.0589
+      }
+    }
+  ]
+}
+----
+
+However, for orders with 20,000 trees this means there will be 40,000 items across those two sub-arrays with both of them being identical. This is a bit of a waste, but really this is helping to highlight an existing design flaw. Why are these sub arrays not link:/api-design/pagination[paginated], and why are units being embedded inside orders?
+
+They are different resources, and its far easier to treat them as such. API evolution gives us a chance to fix this.
+
+There is already an `/units` endpoint, let's use that.
+
+[,http]
+----
+GET https://api.protect.earth/orders/abc123
+----
+
+[,json]
+----
+{
+  "id": "abc123",
+  "organization": "Protect Earth",
+  "orderDate": "2025-01-21",
+  "status": "fulfilled",
+  "unitType": "peat",
+  "links": {
+    "units": "https://api.protect.earth/units?order=abc123"
+  }
+}
+----
+
+That way, the order resource is just about the order, and the units are about the units. This is a more RESTful design, and it's a better way to handle the relationship between orders and units.
+
+Where did "plantedTrees" go? It's moved behind a switch. It will only show up on orders for trees, and all other unit types can be found on the `units` link which benefits from full pagination.
+
+=== Deprecating endpoints
+
+All this flexibility comes with a tradeoff, it's more work to maintain two endpoints, because there may be performance tweaks and bug reports that need to be applied to both. It's also more work to document and test both endpoints, so it can be a good idea to keep an eye on which endpoints are being used and which aren't, and remove the old ones when they're no longer needed.
+
+Old endpoints can be deprecated using the `Sunset` header.
+
+[,http]
+----
+HTTP/2 200 OK
+Sunset: Tue, 1 Jul 2025 23:59:59 GMT
+----
+
+Adding a `Sunset` header to `/trees` will communicate to API consumers that the endpoint will be removed, and if it's done with sufficient warning and with a clear migration path, it can lead to a smooth transition for clients.
+
+Further details can be provided in the form of a URL in a `Link` header and the `rel="sunset"` attribute.
+
+----
+HTTP/2 200 OK
+Sunset: Tue, 1 Jul 2025 23:59:59 GMT
+Link: <https://example.org/blog/migrating-to-units>; rel="sunset"
+----
+
+This could be a link to a blog post or an upgrade guide in documentation.
+
+=== Deprecating properties
+
+Deprecating properties is a little more difficult, and generally best avoided whenever possible. It's not possible to use `Sunset` to communicate a property going away as it only applies to endpoints, but OpenAPI can help.
+
+OpenAPI v3.1 added the `deprecate` keyword, to allow API descriptions to communicate deprecations as an API evolves.
+
+[,yaml]
+----
+components:
+  schemas:
+    Order:
+      type: object
+      properties:
+        plantedTrees:
+          type: array
+          items:
+            $ref: '#/components/schemas/Tree'
+          deprecate: true
+          description: >
+            An array of trees that have been planted, only on tree orders.
+            *Deprecated:* use the units link relationship instead.
+----
+
+This will show up in the documentation, and can be used by SDKs to warn developers that they're using a deprecated property.
+
+Removing the `plantedTrees` property from the API entirely could be done, but it's a breaking change, and it's best to avoid breaking changes whenever possible.
+
+A better option is to stop putting the `plantedTrees` property into new orders starting on the deprecated date, and leave it on older orders.
+
+Another change being added to the API is the concept of orders expiring, because companies should have got their data out of the API within six months, otherwise the information is archived to reduce wasting emissions as database expands. If `plantedTrees` is not added to new orders, and eventually orders archive, then eventually it will be gone completely and can be removed from code.
+
+=== API design-first reduces change later
+
+Some APIs have kept their v1 API going for over a decade, which suggests they probably didn't need API versioning in the first place.
+
+Some APIs are on v14, because the API developers didn't reach out to any stakeholders to ask what they needed out of an API and just wrote loads of code, rushing to rewrite it every time a new consumer came along with slightly different needs instead of finding a solution that worked for everyone.
+
+Doing more planning, research, upfront API design, and prototyping can cut out the need for the first few versions, as many of those come from not getting enough user/market research done early on. This is common in startups that are moving fast and breaking things, but it can happen in any size business.
+
+== Summary
+
+When it comes to deciding between versioning and evolution, consider how many consumers will need to upgrade, and how long that work is likely to take. If it's two days of work, and there are 10 customers, then that's 160 person-hours. With 1,000 customers, that's 16,000 person-hours.
+
+At a certain point it becomes unconscionable to ask paying customers to all do that much work, and it's better to see if it could be handled with a new resource, new properties, or other backwards compatible changes which can slowly phase out their older forms over time, even if its a bit more work.

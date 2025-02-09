@@ -4,7 +4,18 @@ The API World has changed a lot since _["Build APIs You Won't Hate"](https://api
 
 Support the development of this book, and [**pre-order on LeanPub!**](https://leanpub.com/build-apis-you-wont-hate-2/), as we pick up rewriting in mid 2024. We're publishing new chapters as we go, but the price goes up. The earlier you buy the cheaper it will be, but you'll still get all the new chapters as they're released.
 
-## Outline
+## New Outline
+
+- [ ] Part One: Introduction to APIs
+    - [ ]: History of APIs
+- [ ] Part Two: API Design Basics
+- [ ] Part Three: API Design First Workflow
+- [ ] Part Four: Design a new API
+- [ ] Part Five: Managing and Maintaining an API
+- [ ] Part Six: Taking APIs Further
+- [ ] Part Seven: Testing APIs
+
+## Old Outline
 
 So far, this feels like how the book is gonna play out:
 
@@ -24,21 +35,14 @@ So far, this feels like how the book is gonna play out:
     - [x] Pagination
     - [x] Filtering
     - [x] Errors
+    - [ ] Authentication
     - [x] Caching
+    - [x] Security
+    - [x] Versioning
   - [x] API Descriptions
-  - [x] Hypermedia Controls (HATEOAS)
+  - [ ] Hypermedia Controls (HATEOAS)
   - [ ] HTTP/1, HTTP/2 and HTTP/3
-    - [ ] HTTP/2 is a real world thing today use it
-    - [ ] Lets Stop Building Around a Network Hack
   - [x] Asynchronous Methodologies
-  - [ ] Authentication
-  - [ ] Security
-  - [ ] Horror Stories
-    - [ ] Third Parties Gone Wild (The Keycard Troubles of 2016)
-    - [ ] Stampeding Herds
-    - [ ] "Syncing" in Microservices
-    - [ ] Denial of Service Attacking Yourself
-    - [ ] Firing Data into Blackholes
 
 - [ ] Part Two: Planning & Design
   - [x] Editors

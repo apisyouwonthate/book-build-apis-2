@@ -1,3 +1,4 @@
+[#theory-responses]
 = Designing API responses
 
 The API response is the most important part of the entire API. 
@@ -18,8 +19,8 @@ so let's look at each of those parts in turn.
 
 Just like requests allow API consumers to add HTTP headers to act as metadata for the request, APIs and other network components can add headers to a response.
 
-{lang=http}
-~~~~~~~~
+[source,http]
+----
 HTTP/2 200 OK
 Content-Type: application/json
 Cache-Control: public, max-age=18000
@@ -28,7 +29,7 @@ RateLimit: "default";r=50;t=30
 {
   "title": "something"
 }
-~~~~~~~~
+----
 
 This is a successful request, with some JSON data as highlighted by the `Content-Type` header. The API has also alerted the API consumer that this is cacheable so they don't need to ask for it again for 5 hours, and explained that the client is running a little low on their rate limiting policy with only 50 more requests allowed in the next 30 seconds.
 
@@ -38,8 +39,8 @@ API responses contain lots of useful metadata in the headers, but data is going 
 
 You should strive to keep response consistent and well-structured, with minimal nesting and correct use of data types.
 
-{lang=json}
-~~~~~~~~
+[source,json]
+----
 {
   "id": 123,
   "name": "High Wood",
@@ -52,7 +53,7 @@ You should strive to keep response consistent and well-structured, with minimal 
     "reviews": "/places/123/reviews"
   }
 }
-~~~~~~~~
+----
 
 It's pretty common to add an `id` of some sort, often data will have dates, and
 relationships and available actions can be linked allowing API consumers to easily
@@ -96,8 +97,8 @@ The common success status codes and when to use them:
 
 Example success response
 
-{lang=http}
-~~~~~~~~
+[source,http]
+----
 HTTP/1.1 200 OK
 Content-Type: application/json
 
@@ -107,7 +108,7 @@ Content-Type: application/json
     "name": "John Doe"
   }
 }
-~~~~~~~~
+----
 
 ==== 3XX is all about redirection
 
@@ -194,11 +195,6 @@ cumbersome, but there's plenty of generic libraries with various extensions and
 "middlewares" that will help auto-retry any auto-retriable responses,
 automatically cache cachable responses, and so on.
 
-[NOTE]
-====
-Avoid confusing your API consumers by xref:retries[enabling retry logic] in your Speakeasy SDK.
-====
-
 == Best Practices
 
 === 1. Keep Status Codes Appropriate & Consistent
@@ -217,8 +213,8 @@ and the response, and this should be avoided whenever possible.
 
 Whatever shape you pick for a request, you should match that shape on the response.
 
-{lang=json}
-~~~~~~~~
+[source,json]
+----
 // POST /places 
 
 {
@@ -236,7 +232,7 @@ Whatever shape you pick for a request, you should match that shape on the respon
   "lon": -4.486597585,
   "created_at": "2024-10-24T12:00:00Z"
 }
-~~~~~~~~
+----
 
 You can see that some differences, like `id` or `created_at` dates on the
 response but not the request. That's OK, because they can be handled as
@@ -252,8 +248,8 @@ responses wrapped into objects to make it look tidy, but the React team said it
 would be too hard to get their data manager to do that, so the request skipped
 it.
 
-{lang=json}
-~~~~~~~~
+[source,json]
+----
 // POST /places
 
 {
@@ -273,7 +269,7 @@ it.
   },
   "created_at": "2024-10-24T12:00:00Z"
 }
-~~~~~~~~
+----
 
 Aghh!
 
@@ -288,15 +284,15 @@ Push back against request/response model deviations. It's not worth it.
 Just returning a status code and a message is not enough, at the bare minimum
 add an error message in the JSON body that adds more context. 
 
-{lang=http}
-~~~~~~~~
+[source,http]
+----
 HTTP/2 409 Conflict
 Content-Type: application/json
 
 {
   "error": "A place with that name already exists."
 }
-~~~~~~~~
+----
 
 This is better than nothing but not ideal. Other information needs to be added
 to help with debugging, and to help the API client differentiate between errors.
@@ -304,8 +300,8 @@ to help with debugging, and to help the API client differentiate between errors.
 There is a better way: link:https://tools.ietf.org/html/rfc9457[RFC 9457] which
 defines a standard way to return errors in JSON (or XML).
 
-{lang=http}
-~~~~~~~~
+[source,http]
+----
 HTTP/2 409 Conflict
 Content-Type: application/problem+json
 
@@ -316,6 +312,6 @@ Content-Type: application/problem+json
   "instance": "/places/123/errors/<unique-id>",
   "status": 409
 }
-~~~~~~~~
+----
 
-More on this in the xref:api-errors[API Errors] guide.
+Learn more on errors later in the xref:theory-errors[API Errors] section.
