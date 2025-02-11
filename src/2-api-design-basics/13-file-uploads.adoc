@@ -1,5 +1,5 @@
 = File Uploads
-:description: Best practices and common patterns for API requests.
+:description: Uploading more than JSON or XML is absolutely possible, but how.
 
 File uploads can be confusing to work with at first because it takes a bit of a
 mental shift to think about.
