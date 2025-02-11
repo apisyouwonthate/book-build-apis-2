@@ -306,7 +306,7 @@ def update
 end
 ----
 
-=== Securing File Uploads
+=== Securing Considerations
 
 Allowing file uploads can introduce all sorts of new attack vectors, so it's worth being very careful about the whole thing.
 
