@@ -1,4 +1,6 @@
 [part]
-= Part One: Introduction to Web APIs
+= Part 1: Introduction to Web APIs
 
 include::1-history-of-apis.adoc[]
+include::2-apis-services-microservices.adoc[]
+include::3-different-paradigms.adoc[]

@@ -1,3 +1,54 @@
 = A History of APIs
 
-Something something SOAP, something something REST, something something gRPC, something something GraphQL.
+Back in the early days of web APIs, things were a lot more rigid. Around the
+late 90s and early 2000s, most web services relied on XML-based protocols like
+XML-RPC and SOAP. XML-RPC was pretty straightforward—it let you make remote
+procedure calls using XML over HTTP. But then came SOAP, which was way more
+structured, with strict schemas defined by WSDL (Web Services Description
+Language). It had built-in security, error handling, and a whole bunch of
+enterprise-level features, but man, it was heavy. Lots of boilerplate, lots of
+XML, and it just felt bloated, especially when you were dealing with simple
+requests. But big enterprises loved it because it had all these guarantees
+around messaging and security.  
+
+Then in 2000, Roy Fielding dropped his dissertation introducing REST
+(Representational State Transfer), and everything changed. REST wasn't a
+protocol like SOAP—it was more of an architectural style that embraced the web's
+existing HTTP model. Instead of complicated XML payloads, REST used simple HTTP
+methods like GET, POST, PUT, and DELETE, and it wasn't tied to XML. Once JSON
+became more popular (lighter than XML, easier for JavaScript to handle), REST
+APIs really took off. By the 2010s, platforms like Twitter, Facebook, and Google
+were all using REST, and it became the gold standard for APIs.  
+
+But then people started running into some issues. One big one was over-fetching
+and under-fetching—REST endpoints return fixed data structures, so sometimes
+you'd get way more data than you needed, or you'd have to make multiple requests
+to piece together the right data. This concern was especially relevant during
+the HTTP/1.1 era, where multiple requests could be slow due to the head-of-line
+blocking problem, so minimizing requests was key at that time.
+
+Facebook came up with GraphQL in 2015 to solve some of these issues. Instead of
+fixed endpoints, GraphQL lets clients ask for exactly the data they need and
+nothing more. It also lets you fetch related data in a single request, so no
+more chaining multiple REST calls. This was a game changer for front-end
+development, especially for mobile apps where you wanted to minimize network
+calls. But GraphQL isn't a replacement for REST—it just solves different
+problems. Some people love it, others find it overcomplicated, especially when
+dealing with caching and performance at scale.  
+
+Then there's gRPC, which came out of Google. Instead of using HTTP's standard
+text-based model, gRPC is all about efficiency—it uses Protocol Buffers
+(protobufs) instead of JSON, and it's built on HTTP/2, which supports things
+like multiplexing (sending multiple requests at once over a single connection).
+gRPC is great for internal microservices because it's super fast and has
+built-in support for streaming, but it's not as web-friendly as REST or GraphQL.  
+
+HTTP/2 brought similar performance improvements to REST, meaning some of the
+concerns that had people looking at alternatives like GraphQL and gRPC were less
+pressing.
+
+REST is still the dominant style for public APIs, GraphQL has carved
+out a strong niche where flexible queries are needed (like frontend-heavy
+applications), and gRPC is thriving in backend and microservices environments
+where performance is critical. There's no “winner” here—just different tools for
+different jobs.

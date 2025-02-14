@@ -1,3 +1,2 @@
 [part]
-= Part Five: Managing and Maintaining an API
-
+= Part 5: Managing and Maintaining an API

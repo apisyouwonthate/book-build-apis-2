@@ -6,9 +6,11 @@ Support the development of this book, and [**pre-order on LeanPub!**](https://le
 
 ## New Outline
 
-- [ ] Part One: Introduction to APIs
-    - [ ]: History of APIs
-- [ ] Part Two: API Design Basics
+- [ ] Part 1: Introduction to APIs
+    - [ ] History of APIs
+    - [x] APIs, Services, and Microservices
+    - [x] Understanding Different Paradigms
+- [ ] Part 2: API Design Basics
     - [x] Structuring URLs
     - [x] HTTP Methods
     - [x] Parameters
@@ -24,48 +26,35 @@ Support the development of this book, and [**pre-order on LeanPub!**](https://le
     - [x] Caching
     - [x] Security
     - [x] Versioning
-- [ ] Part Three: API Design First Workflow
-- [ ] Part Four: Design a new API
-- [ ] Part Five: Managing and Maintaining an API
-- [ ] Part Six: Taking APIs Further
-- [ ] Part Seven: Testing APIs
+- [ ] Part 3: API Design First Workflow
+  - [x] Intro to API Design First
+  - [x] API Descriptions
+- [ ] Part 4: Design a new API
+- [ ] Part 5: Managing and Maintaining an API
+- [ ] Part 6: Taking APIs Further
+- [ ] Part 7: Testing APIs
 
 ## Old Outline
 
-So far, this feels like how the book is gonna play out:
+How the book was looking as Phils random braindumps.
 
-- [ ] Part One: Theory
+- [ ] Part 1: Theory
   - [x] APIs, Services, and Microservices
   - [x] Understanding Different Paradigms
   - [ ] API Lifecycle
   - [ ] Design Theory
-    - [x] Structuring URLs
-    - [x] HTTP Methods
-    - [x] Parameters
-    - [x] Resources & Collections
-    - [x] Data Formats
-    - [x] Request Bodies
-    - [x] Status Codes
-    - [x] Response Data
-    - [x] Pagination
-    - [x] Filtering
-    - [x] Errors
-    - [ ] Authentication
-    - [x] Caching
-    - [x] Security
-    - [x] Versioning
   - [x] API Descriptions
   - [ ] Hypermedia Controls (HATEOAS)
   - [ ] HTTP/1, HTTP/2 and HTTP/3
   - [x] Asynchronous Methodologies
 
-- [ ] Part Two: Planning & Design
+- [ ] Part 2: Planning & Design
   - [x] Editors
   - [x] Mocking
   - [x] Documentation
   - [ ] Style Guides (#33)
 
-- [ ] Part Three: Building & Testing
+- [ ] Part 3: Building & Testing
   - [ ] Building Blocks
   - [ ] Serialization
   - [ ] Deserialization
@@ -79,7 +68,7 @@ So far, this feels like how the book is gonna play out:
   - [ ] Testing in Production
   - [ ] Notes on Deployment
 
-- [ ] Part Four: Management & Experience
+- [ ] Part 4: Management & Experience
   - [ ] Portals & Documentation
   - [ ] API Gateways
   - [ ] Gateway Validation
@@ -89,7 +78,7 @@ So far, this feels like how the book is gonna play out:
   - [ ] Deprecation (#34)
   - [ ] Versioning & Evolution (#35)
 
-- [ ] Part Five: Further Theory
+- [ ] Part 5: Further Theory
   - [ ] Picking Paradigms (#37)
   - [ ] Common Architectures
     - [ ] GraphQL as a Monolith

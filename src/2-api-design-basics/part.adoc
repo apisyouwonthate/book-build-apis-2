@@ -1,5 +1,5 @@
 [part]
-= Part Two: API Design Basics 
+= Part 2: API Design Basics 
 
 include::01-structuring-urls.adoc[]
 include::02-http-methods.adoc[]
