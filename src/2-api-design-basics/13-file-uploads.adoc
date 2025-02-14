@@ -1,0 +1,336 @@
+= File Uploads
+:description: Uploading more than JSON or XML is absolutely possible, but how.
+
+File uploads can be confusing to work with at first because it takes a bit of a
+mental shift to think about.
+
+Firstly, a file is usually not just a file, it also has metadata needs to go
+with it and that can be hard to keep track of.
+
+Secondly, it is not really a file upload, simply a resource or collection of
+resources with a `Content-Type` of something other than the usual JSON or XML.
+
+== URL design
+
+To visualize how file uploads could be designed into an API, let's see how
+images could be added for two different use-cases.
+
+A user could have an avatar sub-resource, which might look like this:
+
+----
+/users/<username>/avatar
+----
+
+This can then be uploaded and retrieved on the same URL, making it a consistent
+API experience with any other type of resource.
+
+Multiple images could be needed for product thumbnails, and that can be a
+sub-collection of the product.
+
+----
+/product/<uuid>/thumbnails
+----
+
+A collection of resources could be available, and a particular thumbnail could
+be retrieved or deleted using regular semantics like `GET` and `DELETE` on the
+particular resource URL.
+
+----
+/product/<uuid>/thumbnails/<image-uuid>
+----
+
+== POST or PUT
+
+There is no particular link:/api-design/http-methods[HTTP method] specific to file
+uploads, instead we use the appropriate hTTP method for the resource or
+collection being worked with.
+
+For the example of a single avatar for each user, the URL is already known, and
+it does not make any difference whether this is the first avatar they have
+uploaded, or they have remade the same request 10 times in a row after an
+intermitted internet connection messed up the first few. This should use a
+`PUT`, because that means "The end result should be this, regardless of what is
+there right now."
+
+----
+PUT /users/<username>/avatar
+----
+
+When working with a collection, the URL of the resource is not known until it
+has been created. For this reason a `POST` would be more appropriate.
+
+----
+POST /product/<uuid>/thumbnails
+----
+
+How these uploads work could vary depending on the use case, so let's look at
+the most popular methods.
+
+== Different methods of file upload
+
+There are a few popular approaches to file uploads in APIs:
+
+. Uploading a file by itself, like adding an avatar for an existing user.
+. Uploading a file with metadata in the same request, like a video file with a title, description, and geodata.
+. Importing a file from a URL, like a user's avatar from Facebook.
+
+It's not entirely unreasonable to consider an API using all of these approaches
+for different use cases throughout the API depending on the specifics. Lets
+learn how these things work, and talk about when to use one over the other.
+
+=== Method A: Direct file uploads
+
+When no metadata is needed to be uploaded with a request, a direct file upload
+is beautifully simple.
+
+* Uploading a CSV of emails being imported to send a tree sponsorship email to.
+* A new logo for a funding partner.
+* A replacement avatar for a user profile.
+
+In all of these situations, the file is the only thing that needs to be uploaded
+and they also have a handy content type that can go right into the HTTP request
+to let the API know what's coming.
+
+[,http]
+----
+PUT /users/philsturgeon/image HTTP/2
+Authentication: Bearer <token>
+Content-Type: image/jpeg
+Content-Length: 284
+
+<raw image content>
+----
+
+Any file can be uploaded this way, and the API can infer the content type from
+the `Content-Type` header. The API can also infer the user from the token, so
+the request does not need to include any user information.
+
+The API will then save the file, and return a response with a URL to the file
+that was uploaded. This URL can be used to access the file in the future, and
+can be used to link the file to the user that uploaded it.
+
+The response here will have a simple body:
+
+[,json]
+----
+{
+  "url": "https://cdn.example.org/users/philsturgeon.jpg",
+  "links": {
+    "self": "https://example.org/api/images/c19568b4-77b3-4442-8278-4f93c0dd078",
+    "user": "https://example.org/api/users/philsturgeon"
+  }
+}
+----
+
+That `user` was inferred from the token, and the `url` is the resulting URL to
+the avatar that has been uploaded. Normally this would be some sort of Content
+Delivery Network (CDN) URL, but it could be a direct-to-S3 URL, or a URL to a Go
+service that handles file uploads. It's up to you, but its good to split off
+file uploads to a separate service to keep your API servers free to do more
+impactful work than serving files.
+
+=== Method B: Upload from URL
+
+Depending on how the client application works, uploading from a file might not
+be the preferred approach. A common pattern is mobile clients uploading user
+images directly from the photo libraries on the mobile device, and the web teams
+were pulling avatars from Facebook or Twitter profiles after they have done a
+"social login" flow.
+
+This is common because its harder for the web application to access the raw
+content of a file using just browser-based JavaScript. At some point a server
+needs to be involved to read that, so whether they have uploaded via cloudinary
+or some other upload service, the API server is going to need to take a URL and
+download the file.
+
+The same endpoint that handled the direct upload can serve this same logic, with
+the `Content-Type` header changed to `application/json` and the body of the
+request containing a URL to the file.
+
+[,http]
+----
+PUT /users/philsturgeon/image HTTP/2
+Authentication: Bearer <token>
+Content-Type: application/json
+
+{
+  "url" : "https://facebook.com/images/dfidsyfsudf.png"
+}
+----
+
+The API will then download the file from the URL, save it, and return a response
+with a URL to the file that was uploaded. This URL can be used to access the file
+in the future, and can be used to link the file to the user that uploaded it.
+
+[,json]
+----
+{
+  "url": "https://cdn.example.org/users/philsturgeon.jpg",
+  "links": {
+    "self": "https://example.org/api/images/c19568b4-77b3-4442-8278-4f93c0dd078",
+    "user": "https://example.org/api/users/philsturgeon"
+  }
+}
+----
+
+Supporting both might not be necessary, but if they are, just support both the
+image types you need and the JSON alternative of that. HTTP makes that
+incredibly easy to do thanks to being able to switch `Content-Type`.
+
+=== Method 3: Separate metadata resource
+
+The above examples are great for simple file uploads, but what if you need to
+upload metadata with the file? This is where things get a bit more complex.
+
+One approach would be multipart forms, but they're pretty complex to work with
+and not ideal for large files. If sending a massive video file, you don't want
+to have to send the title, description, and tags in the same request as the
+video file. If the video file upload fails, you'll have to re-upload the video
+file and all of the metadata again.
+
+The way YouTube handles uploads via API are an interesting examples of splitting
+out metadata and a video file. They use a two-step process which focuses on
+metadata first, which allows for the metadata to be saved and the video can then
+be retried and uploaded without losing the metadata.
+
+The YouTube Data API (v3) approach to https://developers.google.com/youtube/v3/guides/using_resumable_upload_protocol[Resumable
+Uploads]
+works like this.
+
+First, they make a POST request to the video upload endpoint with the metadata
+in the body of the request:
+
+[,http]
+----
+POST /upload/youtube/v3/videos?uploadType=resumable&part=snippet,status HTTP/1.1
+Host: www.googleapis.com
+Authorization: Bearer <token>
+Content-Length: 278
+Content-Type: application/json; charset=UTF-8
+
+{
+  "snippet": {
+    "title": "My video title",
+    "description": "This is a description of my video",
+    "tags": ["cool", "video", "more keywords"],
+    "categoryId": 22
+  },
+  "status": {
+    "privacyStatus": "public",
+    "embeddable": true,
+    "license": "youtube"
+  }
+}
+----
+
+The response then contains a `Location` header with a URL to the video upload endpoint:
+
+[,http]
+----
+HTTP/1.1 200 OK
+Location: https://www.googleapis.com/upload/youtube/v3/videos?uploadType=resumable&upload_id=xa298sd_f&part=snippet,status,contentDetails
+Content-Length: 0
+----
+
+Then to upload the video it's back to direct file uploads. The video file can be
+uploaded to the URL provided in the `Location` header, with the content type set
+to `video/*`:
+
+[,http]
+----
+PUT https://www.googleapis.com/upload/youtube/v3/videos?uploadType=resumable&upload_id=xa298sd_f&part=snippet,status,contentDetails HTTP/1.1
+Authorization: Bearer AUTH_TOKEN
+Content-Length: <file length>
+Content-Type: video/mp4
+
+<BINARY_FILE_DATA>
+----
+
+What's cool about this approach, is that URL _could_ be part of your main API,
+or it _could_ be a totally different service. It could be a direct-to-S3 URL,
+Cloudinary, or some other service that handles file uploads.
+
+Larger companies will be more prone to building a service to handle such files
+coming in, whilst smaller teams might want to keep things simple and let their
+API do the heavy lifting. The larger the file, the more likely you'll want to
+split that off, as having your API handle these huge files - even if the uploads
+are chunked - will keep the HTTP workers busy. Maintaining those connections
+might slow down a Rails-based API for a long time, for example, so having
+another service would help there.
+
+== Best practices
+
+=== Check Content-Type and Content-Length
+
+It is worth noting that the `Content-Type` header is not always reliable, and
+you should not trust it. If you're expecting an image, you should check the
+first few bytes of the file to see if it is a valid image format. If you're
+expecting a CSV, you should check the first few lines to see if it is a valid
+CSV. *Never trust input.*
+
+The only thing worth mentioning on that request is the addition of
+`Content-Length`, which is basically the size of the image being uploaded. A
+quick check of `headers['Content-Length'].to_i > 3.megabytes` will let us
+quickly reply saying "This image is too large", which is better than waiting
+forever to say that. Sure, malicious folks could lie here, so your backend code
+will need to check the image size too. *Never trust input.*
+
+Protecting against large files is important, as it can be a denial of service
+attack. If you allow users to upload files, they could upload a 10GB file and
+fill up your disk space. This is why it's important to check the size of the
+file before writing it to disk.
+
+To make sure it seems to be the right type, and to make sure it's not too large,
+you can read the file in chunks. This can be done with a simple `File.open` and
+`File.read` in Ruby, or similar in other languages. The file is read in chunks,
+and then written to a file on disk. This is a good way to handle large files, as
+you're not trying to load the whole file into memory at once.
+
+[,ruby]
+----
+def update
+  if headers['Content-Type'] != 'image/jpeg'
+    render json: { error: 'Invalid content type' }, status: 400
+    return
+  end
+
+  if headers['Content-Length'].to_i > 3.megabytes
+    render json: { error: 'File is too large' }, status: 400
+    return
+  end
+
+  file = File.open("tmp/#{SecureRandom.uuid}.jpg", 'wb') do |f|
+    f.write(request.body.read)
+  end
+
+  # Do something with the file
+end
+----
+
+=== Securing Considerations
+
+Allowing file uploads can introduce all sorts of new attack vectors, so it's worth being very careful about the whole thing.
+
+One of the main issues with file uploads is directory traversal attacks. If you allow users to upload files, they could upload a file with a name like `../../etc/passwd`, which could allow them to read sensitive files on your server.
+
+Uploading from a URL could allow for https://owasp.org/API-Security/editions/2023/en/0xa7-server-side-request-forgery/[Server-Side Request Forgery (SSRF)] attacks, where an attacker could upload a file from a URL that points to a sensitive internal resource, like an AWS metadata URL, or something like `localhost:8080` which allows them to scan for ports on the server.
+
+The https://cheatsheetseries.owasp.org/cheatsheets/File_Upload_Cheat_Sheet.html[OWASP File Upload Cheat Sheet] has a lot of good advice on how to secure file uploads, including:
+
+* Limiting the types of files that can be uploaded.
+* Limiting the size of files that can be uploaded.
+* Storing files in a location that is not accessible via the web server.
+* Renaming files to prevent directory traversal attacks.
+* Checking the file type by reading the first few bytes of the file.
+* Checking the file size before writing it to disk.
+* Checking the file for viruses using a virus scanner.
+
+== Summary
+
+Think about what sort of file uploads are needed, how big the files are, where
+they're going, and what sort of clients will be using the API.
+
+The YouTube approach is a bit complex, but a combination of 1 and 2 usually take care of the
+job, and help avoid complicated multipart uploads.
+
+As always, build defensively, and never trust any user input at any point.
