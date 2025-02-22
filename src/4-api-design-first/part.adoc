@@ -1,5 +1,5 @@
 [part]
-= Part 3: The API Design-first Workflow
+= Part 4: The API Design-first Workflow
 
 include::01-introduction.adoc[]
 include::02-api-descriptions.adoc[]

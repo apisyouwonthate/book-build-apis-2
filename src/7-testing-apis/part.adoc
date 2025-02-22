@@ -1,2 +1,0 @@
-[part]
-= Part 7: Testing APIs

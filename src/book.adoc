@@ -23,23 +23,27 @@ include::1-introduction-to-apis/part.adoc[leveloffset=+1]
 
 include::2-api-design-basics/part.adoc[leveloffset=+1]
 
-:imagesdir: 3-api-design-first
+:imagesdir: 3-open-api
 
-include::3-api-design-first/part.adoc[leveloffset=+1]
+include::3-open-api/part.adoc[leveloffset=+1]
 
-:imagesdir: 4-design-a-new-api
+:imagesdir: 4-api-design-first
 
-include::4-design-a-new-api/part.adoc[leveloffset=+1]
+include::4-api-design-first/part.adoc[leveloffset=+1]
 
-:imagesdir: 5-maintaining-an-api
+:imagesdir: 5-design-a-new-api
 
-include::5-maintaining-an-api/part.adoc[leveloffset=+1]
+include::5-design-a-new-api/part.adoc[leveloffset=+1]
 
-:imagesdir: 6-taking-apis-further
+:imagesdir: 6-maintaining-an-api
 
-include::6-taking-apis-further/part.adoc[leveloffset=+1]
+include::6-maintaining-an-api/part.adoc[leveloffset=+1]
 
-:imagesdir: 7-testing-apis
+:imagesdir: 7-taking-apis-further
 
-include::7-testing-apis/part.adoc[leveloffset=+1]
+include::7-taking-apis-further/part.adoc[leveloffset=+1]
+
+:imagesdir: 8-testing-apis
+
+include::8-testing-apis/part.adoc[leveloffset=+1]
 
