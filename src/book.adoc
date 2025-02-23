@@ -13,6 +13,8 @@ include::0-stuff/author.adoc[]
 
 include::0-stuff/introduction.adoc[]
 
+include::0-stuff/howto.adoc[]
+
 :sectnums:
 
 :imagesdir: 1-introduction-to-apis
