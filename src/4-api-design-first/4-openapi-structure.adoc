@@ -1,0 +1,10 @@
+== Understanding OpenAPI Structure
+
+=== Basic Structure
+=== Defining API Servers
+=== Paths and Operations
+=== Parameters (Path, Query, Header, and Cookie)
+=== Parameter Serialization
+=== HTTP Requests
+=== HTTP Responses
+=== Components Section

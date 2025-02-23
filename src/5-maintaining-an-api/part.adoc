@@ -1,2 +1,0 @@
-[part]
-= Part 5: Managing and Maintaining an API

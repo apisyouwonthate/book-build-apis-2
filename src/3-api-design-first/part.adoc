@@ -1,2 +1,0 @@
-[part]
-= Part 3: The API Design-first Workflow

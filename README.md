@@ -26,13 +26,14 @@ Support the development of this book, and [**pre-order on LeanPub!**](https://le
     - [x] Caching
     - [x] Security
     - [x] Versioning
-- [ ] Part 3: API Design First Workflow
+- [ ] Part 3: OpenAPI
+- [ ] Part 4: API Design First Workflow
   - [x] Intro to API Design First
   - [x] API Descriptions
-- [ ] Part 4: Design a new API
-- [ ] Part 5: Managing and Maintaining an API
-- [ ] Part 6: Taking APIs Further
-- [ ] Part 7: Testing APIs
+- [ ] Part 5: Design a new API
+- [ ] Part 6: Managing and Maintaining an API
+- [ ] Part 7: Taking APIs Further
+- [ ] Part 8: Testing APIs
 
 ## Old Outline
 
