@@ -1,0 +1,10 @@
+[howto]
+= How to read this book
+
+The book has been designed to be read in a linear fashion, slowly building up your understanding of APIs. Each chapter builds on the previous one; however, we start each chapter with a short introduction to give you an idea of what you will learn. 
+
+If you are already familiar with APIs, you can read the introduction and decide if you want to skip the chapter. A lot has changed in the world of APIs in the last few years, so even if you are familiar with APIs, re-covering the basics might be helpful. Repetition is vital to learning. Think of it like athletes who practice the same moves repeatedly to get better. Re-doing the basics is never a bad thing.
+
+We have tried to avoid too many code examples, especially early in the book, as we want to focus on the concepts and ideas behind APIs.
+
+Enjoy reading
