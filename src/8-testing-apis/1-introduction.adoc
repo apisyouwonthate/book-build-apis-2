@@ -1,0 +1,629 @@
+= What is the Meaning of API Testing?
+
+API testing is a software process that validates that an API is working as expected. Once declared, API tests can run automatically, such as part of a test suite on a continuous integration server, a development environment, or even in production.
+
+Ok, sure, but what does "`working as expected`" mean? How does one test an API?
+
+* Does it accept the same data your API design/documentation says it does?
+* Does it output the same data your API design/documentation says it does?
+* Does it create good error objects or blow up with a 500?
+* Does it perform quickly?
+* Does it perform quickly under pressure?
+* Does it have gaping security holes?
+* What does API testing mean?
+
+This topic is further confused by providers and consumers wanting to test different things in different contexts.
+
+Settle in, grab a beverage, and let's unravel this mess that is an introduction to API testing.
+
+== Providers & Consumers
+
+When different developers working on different parts of an ecosystem talk about "`API testing`", an API consumer might be speaking about testing the API calls they are making to another API, and an API provider might be talking about making sure their API works.
+
+A consumer needs to know if it is sending information that the API will not understand, and maybe they want to be sure that the API continues to give them the information they expect.
+
+A provider needs to know if their API is working according to the API design they initially created, the documentation that has been shared since, and that changes to the code do not accidentally change the API interface or wreck expectations that the consumers now have.
+
+An application could absolutely be both a provider and a consumer because it might be calling an upstream dependency to find information which it then sends back to another system. This could be a https://samnewman.io/patterns/architectural/bff/[Backend for Frontend], https://stripe.com/docs/api[submitting a payment to Stripe], https://www.twilio.com/docs/usage/api[sending an SMS with Twilio], or checking the https://api.electricitymap.org/[carbon intensity of the local electric grid] before firing off an energy-intensive process.
+
+Mistakes by either providers or consumers can set off expensive alarm bells which cause headaches for your support staff, and on-call engineers, and ram up your corporate Twitter feed with complaints.
+
+== Different Types of Testing for an API
+
+There is no one thing that is "`API testing`", but there are lots of different bits of code and functionality to test at various points in the API lifecycle. Let's learn about unit testing, integration API testing, acceptance testing, end-to-end testing, and contract testing, and let's keep in mind that the terms are different for providers and consumers.
+
+=== Unit Testing
+
+Testing that some sort of unit of code is working as expected. This could be a function, class, module, etc. Maybe you have an `add()` function, so check that when you call `add(1, 2)` it returns `3`. If you throw in `1` and `"HELLO THERE"` you get a `NaN` or an exception is thrown.
+
+If the function contains a call to some other function, class, or library, you may well "`isolate`" that unit of code you are trying to test by replacing the other code with a fake: known as a "`mock`" or "`stub`".
+
+=== Unit Testing for API Providers
+
+Some people consider a test that makes an HTTP call to a specific API endpoint to be a unit test because a "`unit`" of functionality could be anything, not just a function or a class. Maybe, if you're stubbing out other APIs with mock servers like https://stoplight.io/open-source/prism[Prism]... The orchestration of this is tough, so it's common to make a more classic unit test against the "`controller`" code.
+
+An API controller is just like any other web application controller in MVC-based frameworks, only it probably returns JSON or CSV instead of HTML. Unit tests can stub out calls to the database, and see what happens when the controller is called with certain properties. Then assertions are written station what data is expected back, and the test will pass or fail depending on what the code is actually doing.
+
+....
+RSpec.describe WidgetsController, type: :controller do
+
+  describe "GET #show" do
+    before do
+      get :show, id: widget.id
+    end
+
+    let(:widget) { Widget.create(title: 'Star Fangled Nut') }
+
+    it "returns http success" do
+      expect(response).to have_http_status(:success)
+    end
+
+    # ... other assertions ...
+  end
+end
+....
+
+The trouble with this sort of unit test on an API controller is that it's a poor simulation for real-life HTTP going over the wire through the web application server. Middleware is ignored, various hooks and events are not triggered, there are no headers being sent, and data types can be slightly wonky.
+
+Sure in this GET the input input is the `widget.id` which could be a string or an integer and not matter all that much, but in a request body or query string there would be subtle differences in how a `foo=false` value is actually sent. Generally, everything in the HTTP request is a string, so foo would have a value of `string("false")` instead of `bool(false)`, which is just one way these unit tests on API controllers produce false positives in API.
+
+For API producers, unit tests will mostly be applied to the internal logic, the libraries, classes, and functions, that power the business logic, and the controllers are usually best served by hitting them with Integration Tests. More on this below.
+
+_When these tests are used, they're almost always in the repository with the functionality they are testing._
+
+=== Unit Testing for API Consumers
+
+API consumers of all sorts will want to write unit tests to confirm that various parts of their application are working too, including super important parts like a payment form.
+
+Say we have a website entirely built in Ruby, like the cyclist social network https://strava.com/[Strava]. The user submits their credit card information, which is sent off the payment gateway, and a card token is given back so that charges can be made later without keeping cards in plain text locally.
+
+The unit testing here is trying to confirm that the payment method controller is able to send form information to the gateway correctly, not test that the payment gateway API works. We also don't want to hit the real API every time the tests run, so how do we do that? General conventions are to wrap the payment gateway interaction logic in some sort of library, making it easy to stub/mock the library, instead of trying to mock the HTTP interactions directly.
+
+_Even if that payment gateway has an SDK, create your own wrapper with an interface that you control instead of mocking that SDK. Why? You really want to https://hynek.me/articles/what-to-mock-in-5-mins/[avoid mocking things you don't own.]_
+
+Let's call the payment gateway Acme, so our wrapper could be `AcmeGatewayWrapper`.
+
+....
+RSpec.describe PaymentMethodController do
+  describe '.update' do
+    it 'send credit card tokens to payment gatway' do
+      params = {
+        type: 'card',
+        card_number: '1234-3456-5678-9999',
+        verification: '111',
+      }
+
+      # Mock the wrapper, knowing the create method will be called
+      # and define the response
+      expect(AcmePaymentWrapper).to receive(:create).with({
+        last4: '9999',
+        type: 'visa'
+      })
+
+      # call the payment method controller update method
+      subject.update(params)
+
+      # ruby people let the db interactions happen in unit tests
+      expect(PaymentMethod.last.last4).to eql('9999)
+    end
+  end
+end
+....
+
+Here we define a bunch of params that represent what the user will submit in the form, then the payment method controller passes some of that information off to the `AcmePaymentWrapper`.
+
+_If you're a Ruby user you're probably ok with database interactions happening in the unit test, which is pretty controversial in other languages. We could have mocked the `PaymentMethod` model too, but here we just assert that it's got the last4 saved properly._
+
+The frontend controller is doing the right stuff when it comes to passing information to the payment gateway wrapper and doing the right thing with the response, but this whole test is built on some assumptions. If the Acme Payment Gateway API changes at all, then this unit test is not proving your application actually works. You'll need to write other tests to confirm the Payment Gateway Wrapper is doing what is expected, including more unit tests on the wrapper directly, and integration testing.
+
+_When these tests are used, they're almost always in the repository with the functionality they are testing._
+
+=== Integration Testing
+
+____
+Integration tests check small sections of your product and it's interaction with external tools or systems e.g. databases or external APIs.
+
+*-- http://kayleigholiver.com/difference-acceptance-integration-tests/[Kayleigh Oliver]*
+____
+
+Instead of focusing purely on one piece of code and stubbing out any of its dependencies, you let them talk to each other and you see if things blow up or work as expected.
+
+Involving more layers of code and dependencies results in slower tests, but this does not make them worse or less valuable. It's common to write more unit tests to cover subtle variations, trying to trigger every error condition or possible output, then write a smaller number of integration tests just to check that errors are handled and a few positive and negative outcomes work as expected.
+
+=== Integration Testing for API Producers
+
+The Unit Testing for Producers logic was testing the WidgetController "`show`" method was working, which is the underlying code that handles `+GET /widgets/{id}+`. Instead of unit testing the controller, we're going to try integration testing the controller instead and make a more tricky example: creating a widget.
+
+Generally, it will look fairly similar, but look out for some key differences.
+
+....
+class CreateWidgetsTest < ActionDispatch::IntegrationTest
+  describe "POST /widgets" do
+    let(:token) { AuthenticationToken.create(token: 'this-is-a-good-token')}
+
+    it "will not let unauthorized users create widgets" do
+      params = { name: 'Star Fangled Nut' }
+      post '/widgets', params: params, as: :json
+      expect(response).to have_http_status(:unathorized)
+
+      post '/widgets', params: params, as: :json, header: { Authorization: 'invalid-token'}
+      expect(response).to have_http_status(:unathorized)
+
+      post '/widgets', params: params, as: :json, header: { Authorization: 'this-is-a-good-token'}
+      expect(response).to have_http_status(:created)
+    end
+  end
+end
+....
+
+Seeing as this integration test hits more of the full application stack, hitting an actual URI instead of referencing a controller method, including security middlewares and JSON deserialization, it's possible to make sure the whole thing works together.
+
+The database can be involved, and whatever code is powering things internally is involved, but one thing to watch out for will be API requests happening in the background.
+
+_When these tests are used, they're almost always in the repository with the functionality they are testing._
+
+If you suddenly become an API consumer, these integration tests become a little more complex. image:https://s.w.org/images/core/emoji/15.0.3/svg/1f447.svg[👇]
+
+=== Integration Testing for Consumer
+
+Whenever you're testing some code that's going over the wire to any sort of API, you're faced with some choices. Yes, you've probably wrapped it up already, but then you've got to test the wrapper. You could let it hit the real API, but if you're offline your test suite won't run, and you might accidentally run up a bill doing something you shouldn't. Ever accidentally sent a bunch of test emails to real customers? Not great.
+
+There are a few ways to create a fake real API to talk to. If it's a HTTP API you could make a mock HTTP server via a CLI command using something like https://stoplight.io/open-source/prism[Prism], but that is pretty awkward to handle programmatically and requires OpenAPI -- which you might not have for that API.
+
+Another option is something like https://www.npmjs.com/package/nock[nock] for JavaScript, https://github.com/bblimke/webmock[webmock] for Ruby, http://wiremock.org/[wiremock] for Java, or any other similar HTTP mocking tool which operates in a programming language.
+
+A quick look at the Ruby:
+
+....
+stub_request(:any, "www.example.com")
+
+Net::HTTP.get("www.example.com", "/")
+....
+
+This has created a stub on `www.example.com` that will accept any HTTP method, so when the Ruby Net library makes the call, it's going to hit that stub, not go over the wire.
+
+You can create complex stubs, define the body, and even put a little business logic in there:
+
+....
+stub_request(:post, "www.example.com").
+  with(body: { data: { a: '1', b: 'five' } })
+
+RestClient.post('www.example.com', '{"data":{"a":"1","b":"five"}}',
+  content_type: 'application/json')    # ===> Success
+
+RestClient.post('www.example.com', '<data a="1" b="five" />',
+  content_type: 'application/xml')    # ===> Success
+....
+
+Here you're into "`mocking something you don't own`" which can be tricky, so for that there are record and replay tools. These tools can be run in "`record`" mode where they will actually hit the real API one time, then they are run in replay mode after that to use the real saved responses from there.
+
+There are pros and cons to manually setting up these HTTP mocks in your test suite, or letting record and replay do that work, and neither is super easy to work with. Learn more about this in _https://apisyouwonthate.com/blog/testing-api-client-applications[Testing API Client Applications]_, because we've got more types of API testing to get to!
+
+_When these tests are used, they're almost always in the repository with the functionality they are testing._
+
+=== Acceptance Tests
+
+Acceptance and Integration are often thrown around interchangeably, but a common difference is the way they're written and who is writing them.
+
+____
+Acceptance tests give feedback to the state of a system in from a user's perspective.
+
+Acceptance tests can be written for the integration or system/end-to-end testing level of your product.
+
+Acceptance tests are very business focused meaning that the name of the test and it's result should be very easy to understand, even by someone that's not part of the development team.
+
+*-- http://kayleigholiver.com/difference-acceptance-integration-tests/[Kayleigh Oliver]*
+____
+
+Whilst an integration test might be making sure that various bits of code are working the things it's expected to as far as a developer is concerned, the acceptance test is checking that things work as a user expects.
+
+Sometimes developers will write tests that are very similar to integration tests but they'll test important workflows, chaining various requests and responses together, using the data from the response to try the next bit, following HATEOAS links to see if the REST API is working like the state machine it's designed to be.
+
+Acceptance tests also often describe automated business rules, maybe written by a developer, but could be written by folks in the business. To make this easier, instead of writing tests in a programming language like Go or Ruby, acceptance tests are often written with a more text-based syntax like https://cucumber.io/docs/guides/overview/[Cucumber]:
+
+ Feature: Link Click
+   Scenario: User clicks the link
+     Given I am on the homepage
+     When I click the provided link
+     Then I should see the link click confirmation
+
+This might be used for some easy interface testing but could be used for really complex stuff like testing all sorts of pricing logic for tax codes, VAT, partial refunds, coupons, and discounts, which a business person would know better than the average developer.
+
+_Acceptance tests may or may not live in the repository with the functionality they are testing._
+
+== Contract Testing
+
+In API, the I stands for the interface, and it's surprising how often that part is overlooked. Some companies just bash out new functionality, and throw some tests in for certain functionality, but the interface is generally considered to be whatever they're spitting out at the time, and code changes over time, so... consumers break.
+
+Let me mention a scenario, and see if it sounds familiar to you. Working on a new API integration between the frontend consumer and a new API in development. The frontend developer writes their side of the code, and the backend developer writes theirs. As they go, the fields and types are explained verbally, DMed over Slack, dumped into a Google Doc somewhere, shoved in a Wiki, or written up in HTML.
+
+____
+*Fred:* Hey Sarah, there's a new "`fudge`" field and it can be "`blah`" or "`whatever`"
+
+*Sarah:* Great! Thanks I'll chuck that in now.
+____
+
+Telling somebody about it on Slack is not particularly scalable, and writing it into a Google Doc is not exactly "`machine-readable`", so these approaches to writing down the contract are just a snapshot of the contract at a certain point in time, and they're usually not kept up to date.
+
+Contract testing solves this, by writing down what the contract should be: the URLs, HTTP statuses expected, the JSON properties expected, which are required, optional, nullable, which could be strings or binary data, some validation rules, etc...
+
+As always, the term can be used differently by different people.
+
+=== API Producer Contract Testing
+
+Most of the time when talking to API people, when they say "`contract testing`" they're talking about Producer Contract Testing. The API development teams will create a test that records all the parts of the interface, and run these tests on pull requests to the API repository, to make sure that the code didn't accidentally change.
+
+Sometimes people will try and use whole other test suites for contract testing, creating huge tests with rules like this:
+
+....
+Feature: User API
+
+Scenario: Show action
+    When I visit "/users/1"
+    Then the JSON response at "first_name" should be "John"
+    And the JSON response at "last_name" should be "Smith"
+    And the JSON response should have "username"
+    And the JSON response at "email" should be a string
+    And the JSON response at "email" should be an email
+    And the JSON response should have "created_at"
+    And the JSON response at "created_at" should be a string
+....
+
+This can be rather frustrating to write out, and there is not much reason for doing it. If the API providers are following the https://stoplight.io/api-design-guide/basics/[API Design-first Workflow] and using an API Description Format like OpenAPI, that document _is_ a written-out contract.
+
+OpenAPI and its various JSON Schema models are perfect for contract testing. Instead of writing all the properties, data formats, validations, etc. again into a test suite, you can just take the schemas and assert that the response matches it.
+
+....
+# specs/test_helper.rb
+require "json_matchers/rspec"
+
+JsonMatchers.schema_root = "api/schemas"
+
+# specs/users_spec.rb
+it 'should return HTTP OK (200)' do
+  get "/users/#{subject.id}"
+  expect(response).to have_http_status(:ok)
+end
+
+it 'should conform to user schema' do
+  get "/users/#{subject.id}"
+  expect(response).to match_json_schema('user')
+end
+....
+
+That'll go looking for `api/schemas/user.json` which might look this.
+
+ {
+   "type": "object",
+   "properties": {
+     "id": {
+       "readOnly": true,
+       "type": "string",
+       "example": "123"
+     },
+     "first_name": {
+       "type": "string",
+       "example": "John"
+     },
+     "last_name": {
+       "type": "string",
+       "example": "Smith"
+     },
+     "email": {
+       "type": "string",
+       "format": "email",
+       "example": "john@example.com"
+     },
+     "created_at": {
+       "readOnly": true,
+       "type": ["string", "null"],
+       "format": "date-time",
+       "example": "2018-04-09T15:45:44.358Z"
+     }
+   },
+   "required": ["first_name", "last_name", "email", "name"]
+ }
+
+If any required properties are missing, data types mismatch or formats are not correct, the JSON Schema validator this assertion library wraps will trigger an error and the test case will fail.
+
+One of many handy side-effects to using OpenAPI and JSON Schema files for contract testing your API responses, is that as well as double checking your code does what the descriptions say, it confirms the API descriptions are correct against what the code is doing, and this extra check helps you make sure your documentation is up to date -- cutting out the need for tools like https://dredd.org/[Dredd].
+
+These tests live in the same repository as the API so that docs, code, and tests can all be updated in the same pull request by the same person, block PRs that are incorrect, and immediately update documentation when PRs are merged.
+
+Read more about provider contract testing on APIs You Won't Hate's _https://apisyouwonthate.com/blog/writing-documentation-via-contract-testing[Writing Documentation via Contract Testing]_.
+
+=== API Consumer Contract Testing
+
+Any consumer that is talking to another API is just hoping they don't make breaking changes to parts of the API that they use. API developers _should_ be using a https://www.apisyouwonthate.com/blog/api-versioning-has-no-right-way[sensible API Versioning strategy] that does not allow for breaking changes, or https://apisyouwonthate.com/blog/api-evolution-for-rest-http-apis[using API Evolution] where breaking change is extremely limited, and only when its unavoidable do people deprecate entire endpoints with the https://tools.ietf.org/html/rfc8594[`Sunset` header].
+
+If the API providers are adding `Sunset` headers but the consumers didn't notice, then applications will break.
+
+If the API providers are not doing their own contract testing and accidentally push out a breaking change, then applications will break.
+
+Either way, consumer contract testing can help keep an eye on if various dependency APIs are doing what the consumer wants to be doing.
+
+Tooling for this is very similar to the sort of tests you see in an API providers acceptance test, with one key difference: the API provider is (hopefully) testing all actions that should be possible, and asserting the responses have the correct contract, but the API consumer test suite is only testing what they need. The provider could have removed some fields and deleted an endpoint, but if the client doesn't care about that then it's not going to trigger a failure on the test suite.
+
+Here's an example of a test using https://pact.io/[Pact], which works in a bunch of languages but here's the JavaScript library.
+
+....
+describe('Pact with Order API', () => {
+  describe('given there are orders', () => {
+    describe('when a call to the API is made', () => {
+      before(() => {
+        return provider.addInteraction({
+          state: 'there are orders',
+          uponReceiving: 'a request for orders',
+          withRequest: {
+            path: '/orders',
+            method: 'GET',
+          },
+          willRespondWith: {
+            body: eachLike({
+              id: 1,
+              items: eachLike({
+                name: 'burger',
+                quantity: 2,
+                value: 100,
+              }),
+            }),
+            status: 200,
+            headers: {
+              'Content-Type': 'application/json; charset=utf-8',
+            },
+          },
+        });
+      });
+
+      it('will receive the list of current orders', () => {
+        return expect(fetchOrders()).to.eventually.have.deep.members([new Order(orderProperties.id, [itemProperties])]);
+      });
+    });
+  });
+});
+....
+
+The test suite here is basically describing requests that will be made and then outlines the "`contract`" for what should come back. The `eachLike` help define examples of data that should come back, so if the data types mismatch it'll trigger errors. Then if the contract type is wrong you'll see more errors, and so on.
+
+Creating a test suite of expectations for your codebase is one way of doing it, but I worry that the tests here and the actual code have subtly different expectations. A developer unfamiliar with Pact could change the request in the code, but not updated the defined interactions in the test suite, meaning the test suite is giving a false sense of security.
+
+If you are very lucky, the provider will provide SDKs, version them with SemVer, and you can enable something like https://dependabot.com/[Dependabot] to get updates for those SDKs, at which point your test suite will let you know if a used method or property has vanished from the SDK. If this is the case, you might not need consumer-driver contract testing.
+
+If that is not the case, but you're still lucky enough that the provider has provided OpenAPI descriptions (thanks https://github.com/stripe/openapi[Stripe] 🙌) then you can point Prism at those and use the validation proxy.
+
+ prism proxy --errors https://raw.githubusercontent.com/stripe/openapi/master/openapi/spec3.yaml https://api.stripe.com
+
+Running this will create a https://meta.stoplight.io/docs/prism/docs/guides/03-validation-proxy.md[Prism Validation Proxy] which is going to see what HTTP traffic comes through it, validate the request, and if it spots any mismatches it'll blow up thanks to `--errors`.
+
+If the request is good it'll remake that request to `+https://api.stripe.com+`, then validate the response. If the response is bad, you'll see output like this in the logs:
+
+ ›   error  Request terminated with error: https://stoplight.io/prism/errors#UNPROCESSABLE_ENTITY: Invalid request body payload
+
+This curl command came from their documentation and I removed the currency parameter. I expected that to cause the error, but looking at the JSON that Prism returned, the error is actually that the Stripe OpenAPI is wrong. image:https://s.w.org/images/core/emoji/15.0.3/svg/1f923.svg[🤣]
+
+....
+curl -i http://localhost:4010/v1/charges \
+  -u sk_test_f5ssPbJNt4fzBElsVbbR3OLk0024dqCRk1: \
+  -d amount=2000 \
+  -d source=tok_visa \
+  -d description="My First Test Charge (created for API docs)"
+
+HTTP/1.1 422 Unprocessable Entity
+content-type: application/problem+json
+Content-Length: 647
+Date: Wed, 17 Jun 2020 18:02:57 GMT
+Connection: keep-alive
+
+{
+    "type": "https:\/\/stoplight.io\/prism\/errors#UNPROCESSABLE_ENTITY",
+    "title": "Invalid request body payload",
+    "status": 422,
+    "detail": "Your request is not valid and no HTTP validation response was found in the spec, so Prism is generating this error for you.",
+    "validation": [
+        {
+            "location": [
+                "body",
+                "shipping",
+                "address"
+            ],
+            "severity": "Error",
+            "code": "required",
+            "message": "should have required property 'line1'"
+        },
+        {
+            "location": [
+                "body",
+                "shipping"
+            ],
+            "severity": "Error",
+            "code": "required",
+            "message": "should have required property 'name'"
+        },
+        {
+            "location": [
+                "body",
+                "transfer_data"
+            ],
+            "severity": "Error",
+            "code": "required",
+            "message": "should have required property 'destination'"
+        }
+    ]
+}
+....
+
+Here Prism is blowing up because the `shipping` property should be entirely
+optional, but _if_ `shipping` is passed then the `address.line1`, `name`, and
+`destination` are all required. There's a valid way to do that in OpenAPI, but
+it's not this, so... success for Prism. I'll let them know.
+
+== End-to-End Testing
+
+End-to-end testing (or "`E2E`") is the biggest, scariest, slowest, and most
+valuable type of testing around. They don't interact at a code level, they
+interact like they're a real user doing real things. They're usually not going
+to cover every little thing, they're more about ensuring critical paths through
+the ecosystem are supported, touching multiple applications and APIs to achieve
+that task.
+
+The interactions are real, maybe a few config variables are using "`Test`" keys
+for sending emails and making payments, and maybe those are sandbox
+environments, but everything else is actually happening.
+
+These sorts of tests are slow and hard to set up, they need to have real records
+created in the database and real users need to exist to do that. If the tests
+are run in a QA environment maybe they can do a big reset script to make all the
+APIs start from scratch, or it's creating a new user every time -- which can
+make the database _huge_ if these tests run hourly.
+
+E2E usually involves running the entire application, and also running all of its
+dependencies, and testing that real actions can be done through real interfaces.
+Because it's testing the whole ecosystem or certain chunks of it, the only
+difference between end-to-end testing is the entry point and the tools used to
+initiate these tests.
+
+* *Web Apps:* tests are run in a
+https://www.keycdn.com/blog/headless-browsers[headless browser] pretending to be
+a human clicking around. * *Mobile Apps:* tests are run with a
+https://www.browserstack.com/app-automate[simulator] that will tap and swipe
+around like a real user. * *APIs:* test runners like
+https://apifortress.com/[API Fortress] or
+https://github.com/eykrehbein/strest[Strest] make a bunch of requests to loads
+of endpoints following key workflows, taking values from one response and using
+them for another.
+
+Real APIs will be running in this test, if there are 10 APIs at the company and
+the E2E tests are being run on the mobile app, then you'll have a similar or 10
+API "`dependencies`" running using some tool like Docker or Kubernetes to
+maintain a testing environment. This can be complex to orchestrate if you're not
+familiar with Docker, Kubernetes, or other DevOps practices, but it's crucial
+for making sure your application actually works in the real world.
+
+Alternatively, some E2E test suites run on staging, or maybe even production!
+image:https://s.w.org/images/core/emoji/15.0.3/svg/1f60e.svg[😎]
+
+Because the goal of E2E testing is to make sure multiple applications and APIs
+work when talking together, they really do not belong in a repository that is
+owned by one of those APIs. Instead, end-to-end testing is usually in another
+repository entirely, maybe owned by a QA team, or similar.
+
+_One caveat to that might be if your organization uses the
+https://www.atlassian.com/git/tutorials/monorepos[monorepo] pattern, in which
+case they'd be considered as a separate application or test suite from the other
+applications in that repo._
+
+There are lots of E2E systems that are hosted Software-as-a-Service products and
+are totally separate from the source code.
+
+Previous versions of Stoplight had a test runner that would allow for creating
+comprehensive E2E test suites, known as Stoplight Scenarios. We found that most
+people were using it to do two things:
+
+. Make sure a response has an HTTP 200/201/202 status code. . Contract Testing
+
+Less than 1% of people were doing anything more than that, so we're putting our
+efforts into making these use cases easier. Earlier we talked about Contract
+Testing with https://stoplight.io/open-source/prism[Prism] and its
+https://meta.stoplight.io/docs/prism/docs/guides/03-validation-proxy.md[Validation
+Proxy], and that fits in with end-to-end testing nicely. Just create a bash
+script that makes some HTTP cURL calls through Prism, and you'll have contract
+testing.
+
+There are SaaS solutions like https://apifortress.com/[API Fortress] too, which
+will let you create tests for multiple APIs through a user interface, which
+expands who can contribute end-to-end tests at your organization.
+
+Or you can get a little more advanced and use
+https://github.com/eykrehbein/strest[Strest] to create scenarios in YAML. This
+might not be as easy as creating tests in a UI but is still more accessible for
+slightly less technical users than many of the other testing systems which force
+users to write JavaScript or other programming languages. Not only can Strest
+handle end-to-end testing with contract testing, but it'll handle "`stress
+testing`" too.
+
+So when do end-to-end tests run? You could run them on every single Pull
+Request, but they're usually pretty slow and that might get expensive. Some
+people place them in the deployment pipeline, meaning a mobile app must pass its
+end-to-end suite before being published to the App Store. Similarly, an API
+might be end-to-end tested in a special testing or staging environment before
+it's deployed to production. If continuous integration is being used it doesn't
+really matter if these tests are slow, and the deployment will just bounce back
+if not accepted.
+
+Many developers find having these external tests jarring at first because they
+are mostly used to having their tests under their control in their repo. Having
+them in another system can feel like "`an extra thing to do`" because a big
+change to their application means they might need to go and update the
+end-to-end tests too, but that is actually a benefit, not a bug. You _want_ a
+system that's outside of an API team's control.
+
+When tests are owned by the API, the tests can be changed to show that the API
+is "`all good`", but that might involve a change that would break the
+expectations of other consumers. Having these tests under the control of a
+Software Testing or Quality Assurance team means these accidental or
+unintentional breakages cannot slip through. If a breaking change is made to an
+API and the E2E testing is being run before deployments can go to production,
+then this breaking change will be caught safely.
+
+Ok, two quick ones to go. Let's knock 'em out.
+
+== Load Testing
+
+____
+While there are many styles of both, both in effect cover similar goals, and sometimes the goals are evident in the title. Load testing implies a simulation of a load profile. Performance testing suggests measuring performance. Stress testing indicates testing something until it is stressed or breaks. We often use the terms interchangeably but tend to prefer the term load testing, as it ties more strongly to the intent of simulating load and measuring for performance. -- https://www.flood.io/[Flood.io]
+____
+
+Does your API work fine when the only person hitting it is you on your machine,
+and maybe the test suite? Great.
+
+What about when your user base grows and grows for months and errors start
+coming through your monitoring system?
+
+What about when your product launch gets on Product Hunt or Hacker News and you
+get 1,000 users all at the same time?
+
+Firing a whole bunch of requests at your API to make sure it can handle the
+"load" and continues to work in high "stress" situations is the name of the game
+here.
+
+Tools like https://artillery.io/[Artillery], https://loader.io/[Loader.io], https://www.flood.io/[Flood], https://jmeter.apache.org/[JMeter], https://www.blazemeter.com/[BlazeMeter], https://gatling.io/[Gatling], and the aforementioned https://github.com/eykrehbein/strest[Strest] and https://apifortress.com/[API Fortress] can handle this nicely.
+
+Learn more from Hugo Guerrero and Vanessa Ramos in _https://developers.redhat.com/blog/2015/04/30/how-to-load-test-and-tune-performance-on-your-api/[How to load test and tune performance on your API]_.
+
+== Security Testing
+
+Security testing is a bit more of a general term that can be approached in a lot of different ways, but one interesting approach is the one taken by https://42crunch.com/[42crunch].
+
+____
+42Crunch makes any developer a security expert. With our integrated set of
+tools, you can audit your OpenAPI contract against 200+ security
+vulnerabilities, we'll rank them by severity level, and tell you exactly how to
+fix them -- making security a seamless part of your development lifecycle
+without sacrificing speed or innovation.
+____
+
+Smart! If you're already designing APIs with OpenAPI before you waste time
+writing code, and getting that design shaped by automated style guides, why not
+also have security audits done on that OpenAPI to see what problems could be
+avoided?
+
+This won't catch every single possible issue with your software, but it will be
+able to point out some bad ideas early on.
+
+// TODO Talk more about OWASP spectral ruleset
+
+== Summary
+
+If you're making an API set up integration tests in your repo, add contract
+testing to it so you'll know if a pull request breaks the contract early on,
+then work with QA to set up end-to-end testing to make sure the whole system
+works nicely with your API in it, and continues to work long into the future.
+Before big launches or every few months have a load testing run and see how
+things fare, and maybe put some time into performance improvements before your
+consumers notice real problems, and run things through the security testing now
+and then to see how new functionality looks.
+
+If you're building something that talks to APIs, wrap up that dependency in
+code, use HTTP mocking or record and replay to stop the test suite going over
+the wire, and maybe set up consumer-driven contract testing if you are
+untrusting of the dependency, especially if it's an external dependency.
