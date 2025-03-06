@@ -1,4 +1,4 @@
-[#theory-responses]
+[#design-responses]
 = Designing API responses
 
 The API response is the most important part of the entire API. 

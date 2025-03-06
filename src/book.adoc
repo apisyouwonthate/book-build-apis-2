@@ -25,9 +25,9 @@ include::1-introduction-to-apis/part.adoc[leveloffset=+1]
 
 include::2-api-design-basics/part.adoc[leveloffset=+1]
 
-:imagesdir: 3-open-api
+:imagesdir: 3-openapi
 
-include::3-open-api/part.adoc[leveloffset=+1]
+include::3-openapi/part.adoc[leveloffset=+1]
 
 :imagesdir: 4-api-design-first
 
@@ -48,4 +48,3 @@ include::7-taking-apis-further/part.adoc[leveloffset=+1]
 :imagesdir: 8-testing-apis
 
 include::8-testing-apis/part.adoc[leveloffset=+1]
-

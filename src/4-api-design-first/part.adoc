@@ -2,7 +2,4 @@
 = Part 4: The API Design-first Workflow
 
 include::1-introduction.adoc[]
-include::2-api-descriptions.adoc[]
-include::3-openapi-introduction.adoc[]
-include::4-openapi-structure.adoc[]
-include::5-openapi-data-models.adoc[]
+include::2-the-perfect-workflow.adoc[]

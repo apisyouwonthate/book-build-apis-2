@@ -227,7 +227,7 @@ https://code.visualstudio.com/[VS Code] users have a variety of popular extensio
 
 The OpenAPI Editor from 42 Crunch is a powerful choice, offering not just a preview panel but auto-complete and a "explorer" view to help you move around the OpenAPI document. It also has a choice of preview tools, with Swagger UI being the exact same tool used on SwaggerHub.
 
-image::/images/guides/migrating-from-swaggerhub/42crunch-openapi-editor.png[]
+image::images/migrating-from-swaggerhub/42crunch-openapi-editor.png[]
 
 The other tools offer just a preview experience, but offer two alternative open-source OpenAPI rendering tools to give you a few options in how you look at the OpenAPI as you go.
 
@@ -235,7 +235,7 @@ The other tools offer just a preview experience, but offer two alternative open-
 
 The JetBrains team clearly recognize the importance of OpenAPI to their IntelliJ, PhpStorm, RubyMine, etc. community because they've created an official extension: https://plugins.jetbrains.com/plugin/14394-openapi-specifications[Jetbrains OpenAPI Specifications].
 
-image::/images/guides/migrating-from-swaggerhub/jetbrains-openapi-specifications.png[]
+image::images/migrating-from-swaggerhub/jetbrains-openapi-specifications.png[]
 
 The 42Crunch team have also built an extension: https://plugins.jetbrains.com/plugin/14837-openapi-swagger-editor[OpenAPI​ Editor] will provide IntelliSense, "Go to Definition" for `$ref`, and the usual preview showing SwaggerUI or ReDoc.
 

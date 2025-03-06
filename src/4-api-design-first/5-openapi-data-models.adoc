@@ -1,7 +1,0 @@
-== Defining Data Models
-
-=== Schema and Data Types
-=== JSON Schema in OpenAPI
-=== Examples and Default Values
-=== Schema Composition
-=== Representing XML

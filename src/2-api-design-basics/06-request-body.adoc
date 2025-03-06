@@ -190,4 +190,4 @@ response should return the new state of the updated resource.
 }
 ----
 
-More on this in the xref:theory-responses[API Responses] guide.
+More on this in the xref:design-responses[API Responses] guide.

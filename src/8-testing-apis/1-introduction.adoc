@@ -162,7 +162,7 @@ The database can be involved, and whatever code is powering things internally is
 
 _When these tests are used, they're almost always in the repository with the functionality they are testing._
 
-If you suddenly become an API consumer, these integration tests become a little more complex. image:https://s.w.org/images/core/emoji/15.0.3/svg/1f447.svg[👇]
+If you suddenly become an API consumer, these integration tests become a little more complex. 👇
 
 === Integration Testing for Consumer
 
@@ -399,7 +399,7 @@ If the request is good it'll remake that request to `+https://api.stripe.com+`, 
 
  ›   error  Request terminated with error: https://stoplight.io/prism/errors#UNPROCESSABLE_ENTITY: Invalid request body payload
 
-This curl command came from their documentation and I removed the currency parameter. I expected that to cause the error, but looking at the JSON that Prism returned, the error is actually that the Stripe OpenAPI is wrong. image:https://s.w.org/images/core/emoji/15.0.3/svg/1f923.svg[🤣]
+This curl command came from their documentation and I removed the currency parameter. I expected that to cause the error, but looking at the JSON that Prism returned, the error is actually that the Stripe OpenAPI is wrong. 🤣
 
 ....
 curl -i http://localhost:4010/v1/charges \
@@ -500,7 +500,6 @@ familiar with Docker, Kubernetes, or other DevOps practices, but it's crucial
 for making sure your application actually works in the real world.
 
 Alternatively, some E2E test suites run on staging, or maybe even production!
-image:https://s.w.org/images/core/emoji/15.0.3/svg/1f60e.svg[😎]
 
 Because the goal of E2E testing is to make sure multiple applications and APIs
 work when talking together, they really do not belong in a repository that is
