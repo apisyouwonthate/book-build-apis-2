@@ -1,0 +1,1105 @@
+= Data Models
+
+== Schemas and Data Types
+
+One of the most important parts of OpenAPI is the `schema` object. Schema objects are used to describe HTTP request and response bodies, parameters, headers, and all sorts of other data, whether its JSON, XML, or primitive types like integers and strings.
+
+____
+If you're familiar with JSON Schema, you'll be right at home here, because OpenAPI v3.1 uses JSON Schema (draft 2020-12). For those who have not used JSON Schema before, that's ok, follow along.
+____
+
+The first thing to learn about a schema is the `type` keyword, which can be one or more of the following types:
+
+* null
+* boolean
+* object
+* array
+* number
+* string
+
+____
+You can also use "integer" for the sake of convenience, but "integer" and "number" are basically identical because JSON itself does not make that distinction. Since there is no distinct JSON integer type, JSON Schema defines integers mathematically. This means that both 1 and 1.0 are equivalent, and are both considered to be integers.
+____
+
+A schema object looks like this:
+
+[,yaml]
+----
+type: string
+----
+
+It can also define multiple types, for instance making a property nullable:
+
+[,yaml]
+----
+type: [string, null]
+----
+
+It also allows you to support properties that could be either a number or a numeric string.
+
+[,yaml]
+----
+type: [number, string]
+----
+
+Describing an object will often involve the use of `properties` to define what each of the objects properties should look like, and each of those properties will have a "subschema" that describes it.
+
+[,yaml]
+----
+type: object
+required:
+- name
+properties:
+  name:
+    type: string
+  age:
+    type: integer
+----
+
+Arrays work in a similar way, with an `items` keyword allowing each item in the array to be described.
+
+[,yaml]
+----
+type: array
+items:
+  type: string
+----
+
+Arrays of objects can be described by combining the two concepts:
+
+[,yaml]
+----
+type: array
+items:
+  type: object
+  required:
+  - name
+  properties:
+    name:
+      type: string
+    age:
+      type: integer
+----
+
+=== Data Formats
+
+The `type` keyword sets out the basic data type, but knowing something is a string or an integer is just the first step to understanding what that data is all about.
+
+First of all there's the `format` keyword, which covers a predefined set of common formats:
+
+[,yaml]
+----
+type: array
+items:
+  type: object
+  required:
+  - name
+  properties:
+    name:
+      type: string
+    email:
+      type: string
+      format: email
+    age:
+      type: integer
+      format: int32
+----
+
+The full list of formats defined in the JSON Schema Validation that OpenAPI v3.1 relies upon:
+
+* date-time:  A string instance is valid against this attribute if it is a valid representation according to the "date-time" production as defined in https://datatracker.ietf.org/doc/html/rfc3339[RFC3339].
+* date:  A string instance is valid against this attribute if it is a valid representation according to the "full-date" production as defined in https://datatracker.ietf.org/doc/html/rfc3339[RFC3339].
+* time:  A string instance is valid against this attribute if it is a valid representation according to the "full-time" production as defined in https://datatracker.ietf.org/doc/html/rfc3339[RFC3339].
+* duration:  A string instance is valid against this attribute if it is a valid representation according to the "duration" production as defined in https://datatracker.ietf.org/doc/html/rfc3339[RFC3339].
+* email:  As defined by the "Mailbox" ABNF rule in RFC 5321, section 4.1.2 https://datatracker.ietf.org/doc/html/rfc5321[RFC5321].
+* idn-email:  As defined by the extended "Mailbox" ABNF rule in RFC 6531, section 3.3 https://datatracker.ietf.org/doc/html/rfc6531[RFC6531].
+* hostname:  As defined by RFC 1123, section 2.1 https://datatracker.ietf.org/doc/html/rfc1123[RFC1123], including host names produced using the Punycode algorithm specified in RFC 5891, section 4.4 https://datatracker.ietf.org/doc/html/rfc5891[RFC5891].
+* idn-hostname:  As defined by either https://datatracker.ietf.org/doc/html/rfc1123[RFC 1123] as for hostname, or an internationalized hostname as defined by RFC 5890, section 2.3.2.3 https://datatracker.ietf.org/doc/html/rfc5890[RFC5890].
+* ipv4:  An IPv4 address according to the "dotted-quad" ABNF syntax as defined in RFC 2673, section 3.2 https://datatracker.ietf.org/doc/html/rfc2673[RFC2673].
+* ipv6:  An IPv6 address as defined in RFC 4291, section 2.2 https://datatracker.ietf.org/doc/html/rfc4291[RFC4291].
+* uri:  A string instance is valid against this attribute if it is a valid URI, according to https://datatracker.ietf.org/doc/html/rfc3986[RFC3986].
+* uri-reference:  A string instance is valid against this attribute if it is a valid URI Reference (either a URI or a relative- reference), according to https://datatracker.ietf.org/doc/html/rfc3986[RFC3986].
+* iri:  A string instance is valid against this attribute if it is a valid IRI, according to https://datatracker.ietf.org/doc/html/rfc3987[RFC3987].
+* iri-reference:  A string instance is valid against this attribute if it is a valid IRI Reference (either an IRI or a relative- reference), according to https://datatracker.ietf.org/doc/html/rfc3987[RFC3987].
+* uuid:  A string instance is valid against this attribute if it is a valid string representation of a UUID, according to https://datatracker.ietf.org/doc/html/rfc4122[RFC4122].
+* uri-template: A string instance is valid against this attribute if it is a valid URI Template (of any level), according to https://datatracker.ietf.org/doc/html/rfc6570[RFC6570].
+* json-pointer:  A string instance is valid against this attribute if it is a valid JSON string representation of a JSON Pointer, according to RFC 6901, section 5 https://datatracker.ietf.org/doc/html/rfc6901[RFC6901].
+* relative-json-pointer: A string instance is valid against this attribute if it is a valid Relative JSON Pointer https://datatracker.ietf.org/doc/html/draft-bhutton-json-schema-validation-00#ref-relative-json-pointer[relative-json-pointer].
+* regex - A regular expression, which SHOULD be valid according to the ECMA-262 ecma262 regular expression dialect
+
+You can also define your own custom formats, which tooling will not understand, but that doesn't matter as the specification tells tooling to ignore unknown formats.
+
+=== Validation
+
+In addition to defining data types and formats, JSON Schema provides several validation keywords to enforce specific constraints on the data. Here are a few popular validation keywords:
+
+==== const & enum
+
+Restricting a value down to one or more potential values can be done with the `const` or `enum` keywords.
+
+First, a look at `enum`, as that keyword has been around longer and is more used:
+
+[,yaml]
+----
+type: string
+enum:
+  - pending
+  - fulfilled
+  - archived
+----
+
+This says the string can't just be any old string, it has to be one of the approved values listed in `enum`.
+
+____
+Learn more about const on https://json-schema.org/understanding-json-schema/reference/enum[JSON-Schema.org: Enumerated Values].
+____
+
+OpenAPI v3.1 gained the `const` keyword added in modern JSON Schema, which helps with describing something that can only ever be one value.
+
+The JSON Schema tutorial uses the example of having a country field where you only support shipping to the United States for export reasons:
+
+[,yaml]
+----
+properties:
+  country:
+    const: United States of America
+----
+
+That's one way to use it, but another is to act as a switch in a `oneOf`.
+
+[,yaml]
+----
+oneOf:
+  - title: Card
+    properties:
+      object:
+        type: string
+        const: card
+      number:
+        type: string
+      cvc:
+        type: integer
+      exp_month:
+        type: integer
+      exp_year:
+        type: integer
+
+  - title: Bank Account
+    type: object
+    properties:
+      object:
+        const: bank_account
+        type: string
+      number:
+        type: string
+      sort_code:
+        type: string
+----
+
+In this example the `object` could be `card` or `bank_account`, but instead of defining that as an enum and the other properties all have to figure out whether they relate to cards or bank accounts, we use the `const` to help match the subschema.
+
+==== default
+
+Setting a `default` lets people and code know what to do when a value has not been provided.
+
+----
+type: string
+enum:
+  - pending
+  - fulfilled
+  - archived
+----
+
+==== minimum & maximum
+
+The `minimum` and `maximum` keywords allow you to specify the minimum and maximum values for numeric properties. For example:
+
+[,yaml]
+----
+type: number
+minimum: 0
+maximum: 100
+----
+
+This schema ensures that the value of the property falls within the range of 0 to 100.
+
+==== enum
+
+The `enum` keyword allows you to define a list of acceptable values for a property. For example:
+
+[,yaml]
+----
+type: string
+enum:
+  - apple
+  - banana
+  - orange
+----
+
+This schema restricts the property value to be one of the specified options: "apple", "banana", or "orange".
+
+==== pattern
+
+The `pattern` keyword allows you to enforce a specific regular expression pattern for string properties. For example:
+
+[,yaml]
+----
+type: string
+pattern: ^[A-Za-z]+$
+----
+
+This schema ensures that the property value consists of only alphabetic characters.
+
+==== required
+
+The `required` keyword is used to specify the required properties within an object. For example:
+
+[,yaml]
+----
+type: object
+required:
+  - name
+  - age
+----
+
+This schema mandates that the properties "name" and "age" must be present in the object.
+
+For more information on JSON Schema validation keywords, you can refer to the https://json-schema.org/learn/validation.html[JSON Schema Validation documentation].
+
+=== readOnly & writeOnly
+
+JSON Schema provides `readOnly` and `writeOnly` boolean keywords, which are really helpful in the context of an API, because resources are usually available in two flavours: the representation of a resource in a request body, and the representation of the resource in a response body.
+
+* `readOnly: true` indicates that a value should not or cannot be be modified, but can be seen (e.g., `id`, `created_at`).
+* `writeOnly: true` indicates that a value may be set, but will remain hidden (e.g., `password`, or PII like the `cvc` security code on a credit card).
+
+[,yaml]
+----
+type: object
+properties:
+  id:
+    type: string
+    readOnly: true
+  username:
+    type: string
+  date_of_birth:
+    type: string
+    format: date-time
+  password:
+    type: string
+    writeOnly: true
+  created_at:
+    type: string
+    format: date-time
+    readOnly: true
+----
+
+By using these, a single schema can serve both requests and responses. For example, a `User` schema can send `password` during creation (`POST`), but exclude it in the `GET` response, while fields like `id` and `created_at` are only returned. This approach reduces duplication, making schemas easier to maintain.
+
+These two keywords are considered "`annotations`" in JSON Schema, which means they are only there for various bits of tooling to do something with if they like. There is no requirement for tools to do anything in particular, but a common convention for most documentation tools will be to skip listing a `readOnly` property for a HTTP POST/PATCH request body, and similarly skip documenting `writeOnly` properties in a response body.
+
+This same approach extends to example request/responses of JSON data generated by documentation tools, and also mock servers, and even change the parameters available for generated SDK code.
+
+____
+There are some complexities here with HTTP PUT because you're meant to be sending the entire resource each time whether something is writeable or not, but if a property was removed from a sample request for an HTTP PUT request, that means: a) "send it or not, we don't care", or b) not sending it will result in it being removed. Seeing as tooling varies on this, and API implementations vary in how they interpret missing values in PUT, you just need to check the tools you use do what your API expects.
+____
+
+=== Learn more about JSON Schema
+
+There is a lot more to JSON Schema and OpenAPI Schema Objects, and we're about to get stuck in.
+
+== JSON Schema in OpenAPI
+
+For a long time JSON Schema and OpenAPI Schema Objects were similar but different. OpenAPI was inspired by JSON Schema, then they both evolved separately, but finally in OpenAPI v3.1 with lots of work from both teams, the specifications realigned on JSON Schema Draft 2020-12. This means you can learn more about OpenAPI Schema Objects by learning more about JSON Schema.
+
+=== JSON Schema Documentation
+
+The best places to start learning about JSON Schema is via the documentation, which comes in a few forms.
+
+* https://json-schema.org/learn/getting-started-step-by-step[JSON Schema Tutorials] - Getting started guides, and tutorials focusing in on particular bits like the differences between required and optional properties, nesting schemas, using composition with anyOf, allOf, and oneOf, etc.
+* https://json-schema.org/learn/glossary[JSON Schema Glossary] - There's a lot of terminology to wrap your head around depending on how deep you want to go, such as dialect, vocabulary, instance, subschema, composition, etc. This page explains it all and links off to more information on each.
+* https://www.learnjsonschema.com/2020-12/[Lean JSON Schema] - A mixture between specification and tutorial, with lots of examples explaining how various keywords work.
+
+These resources are intended to help the general user not need to go and dive into the specifications straight away, as these are more technical documents aimed more at tooling developers. If you cannot find what you need to know in the documentation then you might end up reading the specifications, so where can those be found?
+
+=== JSON Schema Specifications
+
+In OpenAPI v3.1 the https://spec.openapis.org/oas/v3.1.0#schema-object[Schema Object] is defined as a superset of the JSON Schema Specification Draft 2020-12, which is split across two relevant specifications.
+
+* https://json-schema.org/draft/2020-12/json-schema-core[JSON Schema Core] - defines the basic foundation of JSON Schema.
+* https://json-schema.org/draft/2020-12/json-schema-validation[JSON Schema Validation] - defines the validation keywords of JSON Schema.
+
+____
+Unless stated otherwise, the property definitions follow those of JSON Schema and do not add any additional semantics. Where JSON Schema indicates that behavior is defined by the application (e.g. for annotations), OAS also defers the definition of semantics to the application consuming the OpenAPI document.
+- *Source: https://spec.openapis.org/oas/v3.1.0#schema-object[OAS 3.1 Specification]*
+____
+
+If you end up having to read through the specification to find out something which would fit better in a tutorial, please take the time to contribute that tutorial back to the https://github.com/json-schema-org/website[JSON Schema website] to avoid others needing to do the same.
+
+=== Extra OpenAPI-specific Properties
+
+As mentioned above the OpenAPI Schema Object is a superset of JSON Schema Draft 2020-12, which means it supports everything and adds a few bits on top. This works because JSON Schema has the concept of https://tools.ietf.org/html/draft-bhutton-json-schema-00#section-4.3.3[dialects], and the OpenAPI Schema Object is a new dialect, which takes the JSON Schema vocabularies that give you all the keywords defined in the core and validation specifications, then adds four more:
+
+* `discriminator` - The discriminator is an object name that is used to differentiate between other schemas which may satisfy the payload description, acting as a shortcut for `oneOf` / `anyOf` that is no longer needed, but kept in OpenAPI v3.1 for compatibility with v3.0.
+* `example` - A free-form property to include an example of an instance for this schema. To represent examples that cannot be naturally represented in JSON or YAML, a string value can be used to contain the example with escaping where necessary. *Deprecated:* The `example` property has been deprecated in favor of the JSON Schema `examples` keyword.
+* `externalDocs` - Additional documentation found elsewhere outside of the OpenAPI or generated documentation, like tutorials or blog posts.
+* `xml` - Optional keyword for describing XML payloads, which does nothing on root schemas but helps describe properties where there may be wrapping tags or XML attributes.
+
+Most of this stuff can be ignored to build the majority of APIs especially if you're JSON-only, but if you do use these keywords do not worry about losing compatibility with JSON Schema tooling. If JSON Schema spots keywords it does not understand, the default behavior is to ignore them completely.
+
+== Examples & Defaults
+
+Examples and defaults are a change to demonstrate some potential input and output values. Examples are particularly useful at showing off parameters, headers, requests, responses, and various other bits of OpenAPI, which is handy for creating API documentation. These They can also be read by tools and libraries for other purposes, like API mocking can use sample values to generate mock requests.
+
+=== Examples
+
+There are three main types of examples:
+
+* Schema Examples
+* Media Type Examples
+* Parameter Examples
+
+==== Schema Examples
+
+The schema object is used all over in OpenAPI, for requests and responses, parameters, and headers. A schema in OpenAPI v3.1 can add an example for an entire schema, part of a schema, or a single specific property, which is either confusing or flexible, depending on how you see the world.
+
+Here's an example of the `examples` keyword being used for specific properties inside an object.
+
+[,yaml]
+----
+responses:
+  '200':
+    description: 'OK'
+    content:
+      application/json:
+        schema:
+          properties:
+          id:
+            type: integer
+          name:
+            type: string
+            examples:
+            - Dave
+          completed:
+            type: boolean
+            examples:
+            - false
+          completed_at:
+            type: ['string', 'null']
+            format: date-time
+            examples:
+            - '2024-04-23T13:22:52.685Z'
+          required:
+          - id
+          - name
+          - completed
+----
+
+This uses the JSON Schema keyword `examples` to provide an examples. Seeing as these examples are an array of values, the YAML `-` syntax is used as an array of one, but you can provide multiple examples if you like.
+
+In OpenAPI v3.0 you may have used the `example` keyword with a single value, but this was deprecated in OpenAPI v3.1 and whilst it is generally still supported it is recommended you use the `examples` keyword.
+
+Here's an example of the same schema `examples` keyword being used to provide an example for an entire object.
+
+[,yaml]
+----
+responses:
+  "200":
+    description: OK
+    content:
+      application/json:
+        schema:
+          properties:
+            id:
+              type: integer
+            name:
+              type: string
+            completed:
+              type: boolean
+            completed_at:
+              type: ['string', 'null']
+              format: date-time
+          required:
+            - id
+            - name
+            - completed
+          examples:
+            - id: 2
+              name: Dave
+              completed: true
+              completed_at: 2024-04-23T13:22:52.685Z
+----
+
+Same exact concept, but instead of being put on the property it's being put on the entire object at the root of the schema.
+
+You can mix and match property and object examples as much as you like, and most tooling will know how to pick the most appropriate example for any given scenario.
+
+For more on these schema examples, head over to the https://www.learnjsonschema.com/2020-12/meta-data/examples/[Learn JSON Schema: Examples].
+
+==== Media Type Examples
+
+The https://spec.openapis.org/oas/v3.1.0#media-type-object[Media Type Object] is the same object that defines the request body and each response underneath the `application/json` or whichever other content type is being defined.
+
+This type of example allows you to create an entire request or response example, and you have a choice between two two keywords: `example` or `examples`. There is more than just an `s` difference between these keywords, they're different shapes too. `example` is singular example which just contains the actual example value.
+
+[,yaml]
+----
+responses:
+  "200":
+    description: OK
+    content:
+      application/json:
+        example:
+          id: 1
+          name: get food
+          completed: false
+        schema:
+          properties:
+            id:
+              type: integer
+            name:
+              type: string
+            completed:
+              type: boolean
+            completed_at:
+              type: string
+              format: date-time
+              nullable: true
+          required:
+            - id
+            - name
+            - completed
+----
+
+However, `examples` is an array of objects, which have an arbitrary string which acts as a variable name for that example, and that property is another object which contains several optional properties including a `value` property, which then contains the actual example.
+
+[,yaml]
+----
+responses:
+  "200":
+    content:
+      application/json:
+        examples:
+          incompleteTask:
+            summary: Incomplete Task
+            value:
+              id: 1
+              name: get food
+              completed: false
+          completeTask:
+            summary: Complete Task
+            value:
+              id: 2
+              name: get cider
+              completed: true
+              completed_at: 2020-08-23T13:22:52.685Z
+        schema:
+          properties:
+            id:
+              type: integer
+            name:
+              type: string
+            completed:
+              type: boolean
+            completed_at:
+              type: string
+              format: date-time
+              nullable: true
+          required:
+            - id
+            - name
+            - completed
+----
+
+Using named examples like this allows for more clarity when certain combinations of parameters might be grouped together. For example if you support polymorphism for different types of objects for a payment accepting both a Bank Account and Credit Card, you could show how requests and responses look for those and let the user pick between them in documentation.
+
+The example names are entirely arbitrary, and casing does not matter, but it's best to use something more like a variable name with no special characters as these names are used in the URL for docs, and used in various programmatic ways for docs.
+
+The summary name is optional, but is a great place to put human readable names in that can then show up in API documentation tools.
+
+Notice that these examples are all defined _next_ to the `schema` keyword, not _inside_ it. Examples outside the schema object are an object with names, examples inside the schema object are just a list (array) which have no names. For clarity you can check the OpenAPI v3.1 Specification, looking at the https://spec.openapis.org/oas/v3.1.0#media-type-object[Media Type Object] and the https://spec.openapis.org/oas/v3.1.0#schema-object[Schema Object].
+
+Here's a quick example of all the examples so you know where to start.
+
+[,yaml]
+----
+requestBody:
+  content:
+    application/json:
+      schema:      # schema object
+        examples:  # schema examples
+          # ...
+
+      example:     # media type example
+        # ...
+
+      examples:    # media type examples
+        someName:
+          summary: ...
+          value:
+            # ...
+----
+
+==== Parameter Examples
+
+The OpenAPI v3.1 Parameter Object describes path parameters, query parameters, headers, etc. Since OpenAPI v3.0 They can have `examples` or an `example`, which work the same as the media type examples. They can also have a `schema`, which means they can have schema `examples` just like we talked about above.
+
+[,yaml]
+----
+/params:
+  get:
+    parameters:
+      - name: single-example-good
+        description: Valid to its schema
+        in: query
+        schema:
+          type: string
+          enum: [foo, bar]
+        example: foo
+
+      - name: single-schema-example-good
+        description: Valid to its schema
+        in: query
+        schema:
+          type: string
+          enum: [foo, bar]
+          example: foo
+
+      - name: multiple-examples
+        description: Some valid to its schema some not
+        in: query
+        schema:
+          type: string
+          enum: [foo, bar]
+        examples:
+          the-good:
+            summary: The Good
+            value: foo
+          the-bad:
+            summary: The Bad
+            value: 123
+          the-ugly:
+            summary: The Ugly
+            value: [an, array]
+----
+
+This is a lot of different types of example to think about, so how can we break it down?
+
+==== When to use which
+
+When you get the hang of when to use what sort of examples they can be really powerful. Here are a few tips:
+
+. Schema examples on properties can be really helpful to make sure that wherever a schema is referenced it is going to make some sense.
+. Media Type examples can then optionally be added to help with mocking, and documenting more complex APIs if the computed schema examples are not good enough.
+. Parameter examples don't particularly matter how you do it, especially if its all being defined inline (not using $ref) so do whichever.
+
+Some mocking tools [like Microcks][microcks] might prefer you use named examples, and match up your parameters, requests, and responses to help match up expected inputs with matching outputs, but that is not something you need to think about unless you are planning to use those tools.
+
+==== Example of All Examples
+
+Let's go on an adventure through all the types of examples available in OpenAPI v3.1, with a bunch of Adventure Time characters with random coordinates of their last known locations.
+
+[,yaml]
+----
+openapi: 3.1.0
+info:
+  title: Example of All Examples
+  version: 1.0.0
+paths:
+  /all-the-examples:
+      get:
+        operationId: infinite-examples
+        responses:
+          "200":
+            description: OK
+            content:
+              application/json:
+                schema:
+                  properties:
+                    name:
+                      type: string
+                      # Schema Object Example (Deprecated)
+                      example: Finn
+                    coordinates:
+                      description: We couldn't pick a format for coordinates so we support
+                      pretty much all of them.
+                      # Schema Object Examples
+                      examples:
+                      - "52.378091, 4.899207"
+                      - [52.378091, 4.899207]
+                      - { lat: 52.378091,, lon: 4.899207 }
+                  required:
+                    - name
+                    - coordinates
+
+                  # Schema Object Example (for an object)
+                  example:
+                    name: Jake
+                    coordinates: "52.378082, 4.899218"
+
+                # Media Type Example
+                example:
+                  name: Princess Bubblegum
+                  coordinates: "51.20180, 3.22488"
+
+                # Media Type Examples
+                # cannot have this and the OpenAPI Media Type Example together
+                examples:
+                  ice-king:
+                    value:
+                      name: Ice King
+                      coordinates: "78.21757, 15.63699"
+----
+
+Hopefully this will help you create useful examples that can be used by all sorts of tooling.
+
+=== Defaults
+
+There's one more thing to consider: sometimes an example is not needed, because a default is more appropriate as a validation rule which then can also be used as an example.
+
+In the schema object examples we had this property:
+
+[,yaml]
+----
+  schema:
+    properties:
+      completed:
+        type: boolean
+        examples:
+        - false
+----
+
+A boolean has two options, `true` and `false`, so an example of that seems redundant.
+
+What are we trying to achieve in doing this? We want the docs and mocks to have a useful value to work with, but most tools know what to do here just from the boolean alone, so we could remove the example, or we could do something more useful.
+
+[,yaml]
+----
+  schema:
+    properties:
+      completed:
+        type: boolean
+        default: false
+----
+
+This lets tools know that false is the default state for this property, which will make documentation more clear, help mock servers act more consistently, and can even make any code generated from OpenAPI work as expected.
+
+The `default` keyword is therefore quite similar to `examples` within a schema object, as it can introduce concrete values into the schema which can be used for all sorts of tooling, but it's more functional.
+
+== Schema Composition
+
+In OpenAPI v3.1 and JSON Schema, you can use `oneOf`, `allOf`, and `anyOf` keywords to handle composition, which is the concept of combining multiple schemas and subschemas in various ways to handle polymorphism, or "extending" other schemas to add more criteria.
+
+=== What are oneOf, anyOf, and allOf?
+
+* *allOf:* (AND) Must be valid against all of the subschemas.
+* *anyOf:* (OR) Must be valid against any of the subschemas.
+* *oneOf:* (XOR) Must be valid against exactly one of the subschemas.
+
+All of these keywords must be an array, where each item is a schema. Be careful with recursive schemas as they can exponentially increase processing times.
+
+==== oneOf
+
+The `oneOf` keyword is used when you want to specify that a value should match one of the given schemas exactly. It's useful when you have different possible data structures or types for a particular field, like accepting bank account or card payments, or having train tickets and tram tickets, which are similar but a little different.
+
+The validation will pass if the value matches exactly one of the schemas defined in `oneOf`.
+
+This can be done for a single value:
+
+[,yaml]
+----
+properties:
+	timestamp:
+    oneOf:
+    - type: string
+      format: date-time
+      examples:
+      - '2024-07-21T17:32:28Z'
+    - type: integer
+      examples:
+      - 1721820298
+----
+
+In this example the `timestamp` property could be either a RFC 3339 date time (e.g. `2017-07-21T17:32:28Z`) or a unix timestamp (e.g. `1721820298`).
+
+That shows how it works for a single property, but `oneOf` can also be used with whole objects:
+
+[,yaml]
+----
+ properties:
+    source:
+      oneOf:
+        - title: Card
+          properties:
+            number:
+              type: string
+            cvc:
+              type: integer
+            exp_month:
+              type: integer
+              format: int64
+            exp_year:
+              type: integer
+              format: int64
+          required:
+            - number
+            - cvc
+            - exp_month
+            - exp_year
+
+        - title: Bank Account
+          type: object
+          properties:
+            number:
+              type: string
+            sort_code:
+              type: string
+            account_type:
+              type: string
+              enum:
+                - individual
+                - company
+          required:
+            - number
+            - account_type
+----
+
+In the above example, the `source` property will be an object either way, but the properties contained within can be in one of two combinations. Either `number`, `cvc`, `exp_month`, and `exp_year` are valid and in good form (a card payment), or  `number`, `sort_code`, and `account_type` will be sent (a bank account). These are the only two outcomes which will return a valid result in a validator, because if neither subschema match it will be invalid, and if multiple subschemas match that will also be invalid.
+
+==== anyOf
+
+The `anyOf` keyword is very similar to `oneOf` but a little less restrictive. `oneOf` is more like a XOR in programming, where one or the other can match, but never both. anyOf is more like a regular OR, which allows one or another or both.
+
+Just like `oneOf`, you can use `anyOf` when you have multiple valid options for a particular field. The validation will pass if the value matches one or more of the listed subschemas.
+
+[,yaml]
+----
+oneOf:
+  - type: number
+    multipleOf: 5
+  - type: number
+    multipleOf: 3
+----
+
+The values _1, 2, 4, 7, 8, 11, 13, 14_ would all be rejected for not being multiples of either 3 or 5.
+
+The values _3, 5, 6, 9, 10, 12_ would be valid for being multiples of 3 and 5.
+
+The value _15_ would be rejected because it is multiples of both 3 and 5, and `oneOf` doesn't like that.
+
+==== allOf
+
+The `allOf` keyword is used when you want to specify that a value should match all of the given schemas. It is useful when you want to combine multiple schemas together. The validation will pass if the value matches all of the schemas defined in `allOf`.
+
+[,yaml]
+----
+allOf:
+  - type: object
+    properties:
+      name:
+        type: string
+  - type: object
+    properties:
+      age:
+        type: integer
+        minimum: 0
+----
+
+In the above example, the value should be an object that has both a `name` property of type string and an `age` property of type integer with a minimum value of 0.
+
+=== References in Composition
+
+All of these keywords can contain a list of subschemas that are defined directly inside them, or a `$ref` can point to a schema defined elsewhere.
+
+[,yaml]
+----
+schema:
+  oneOf:
+    - $ref: '#/components/schemas/Card'
+    - $ref: '#/components/schemas/BankAccount'
+----
+
+This says that the schema can be either one of these schemas stored as shared components.
+
+Due to the way `allOf` works, you can essentially reference multiple schemas and say "I want all of the validation rules and criteria from all of these schemas to apply here", providing a sort of merge-like functionality.
+
+[,yaml]
+----
+schema:
+  allOf:
+    - $ref: '#/components/schemas/PaymentMethod'
+    - $ref: '#/components/schemas/BankAccount'
+----
+
+This basically declares a schema which has a lot of generic payment fields, then adds specific fields from the bank account type, to avoid declaring generic fields like "name" and "number" in both.
+
+Feel free to mix and match a `$ref` and an inline subschema, which is a handy way to pop some extra content into a generic shared schema like HATEOAS links:
+
+[,yaml]
+----
+content:
+  application/json:
+    schema:
+      allOf:
+        - $ref: '#/components/schemas/Booking'
+        - properties:
+            links:
+              $ref: '#/components/schemas/Links-Self'
+----
+
+These schema composition keywords provide flexibility and allow you to define complex data structures and validation rules in OpenAPI v3.1 and JSON Schema, which becomes more useful as you start to improve reuse across one or more API using references.
+
+== Representing XML
+
+OpenAPI is set up with the assumption that you're most likely describing JSON, because that's what over 80% of APIs are using, but XML is still in the game and you could be using both in the same API. OpenAPI supports this with the `xml` keyword, which helps when XML output is using XML-specific syntax like attributes and wrapped arrays.
+
+By combining schema composition and references, it's possible to create reusable components that be used for both JSON and XML output, like this simplistic example below.
+
+[,yaml]
+----
+openapi: 3.1.0
+info:
+  title: Representing XML
+  description: An API that supports advanced XML
+  version: 1.0.0
+paths:
+  /stations:
+    get:
+      description: Get a list of train stations
+      operationId: get-stations
+      responses:
+        '200':
+          description: OK
+          content:
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/Stations'
+components:
+  schemas:
+    Stations:
+      type: array
+      items:
+        $ref: "#/components/schemas/Station"
+
+    Station:
+      type: object
+      xml:
+        name: stations
+      properties:
+        id:
+          type: string
+          format: uuid
+          examples:
+          - b2e783e1-c824-4d63-b37a-d8d698862f1d
+        name:
+          type: string
+          description: The name of the station
+          examples:
+          - Paris Gare du Nord
+        address:
+          type: string
+          examples:
+          - 18 Rue de Dunkerque 75010 Paris, France
+        country_code:
+          type: string
+          format: iso-country-code
+          examples:
+          - FR
+----
+
+This OpenAPI would be used to describe XML data that looked like this:
+
+[,xml]
+----
+<?xml version="1.0" encoding="UTF-8"?>
+<Station xmlns="http://example.com/xml/namespace">
+  <id>b2e783e1-c824-4d63-b37a-d8d698862f1d</id>
+  <name>Paris Gare du Nord</name>
+  <address>18 Rue de Dunkerque 75010 Paris, France</address>
+  <country_code>FR</country_code>
+</Station>
+----
+
+When using `$ref` and components like this, most tools will grab the tag name from the $ref, which is how we got `Stations`.
+
+If you want to control that name, you can set the `xml.name` keyword on the schema, and change it.
+
+[,yaml]
+----
+components:
+  schemas:
+   Stations:
+      type: array
+      items:
+        $ref: "#/components/schemas/Station"
+
+    Station:
+      type: object
+      xml:
+        name: station
+      properties:
+        # ...
+----
+
+----
+<?xml version="1.0" encoding="UTF-8"?>
+<station>
+	<id>b2e783e1-c824-4d63-b37a-d8d698862f1d</id>
+	<name>Paris Gare du Nord</name>
+	<address>18 Rue de Dunkerque 75010 Paris, France</address>
+	<country_code>FR</country_code>
+</station>
+----
+
+Better! Lowercase looks better, now lets get it wrapped in a tag so we can have multiple using the `xml.wrapped` property.
+
+[,yaml]
+----
+components:
+  schemas:
+    Stations:
+      type: array
+      xml:
+        name: data
+        wrapped: true
+      items:
+        $ref: "#/components/schemas/Station"
+
+    Station:
+      type: object
+      xml:
+        name: station
+----
+
+That looks like this:
+
+[,xml]
+----
+<?xml version="1.0" encoding="UTF-8"?>
+<data>
+	<station>
+		<id>b2e783e1-c824-4d63-b37a-d8d698862f1d</id>
+		<name>Paris Gare du Nord</name>
+		<address>18 Rue de Dunkerque 75010 Paris, France</address>
+		<country_code>FR</country_code>
+	</station>
+</data>
+----
+
+Now the XML looks a bit more ready for action, but if that's not enough to get your API and OpenAPI on the same page about your XML structure there are plenty of keywords to play with:
+
+=== The XML Object
+
+Inside the `xml` object you can use any of these keywords:
+
+* *name:* (string) Replaces the name of the element/attribute used for the described schema property. When defined within items, it will affect the name of the individual XML elements within the list. When defined alongside type being array (outside the items), it will affect the wrapping element and only if wrapped is `true`. If wrapped is `false`, it will be ignored.
+* *namespace:* (string) The URI of the namespace definition. This MUST be in the form of an absolute URI.
+* *prefix:* (string) The prefix to be used for the name.
+* *attribute:* (boolean) Declares whether the property definition translates to an attribute instead of an element. Default value is `false`.
+* *wrapped:* (boolean) MAY be used only for an array definition. Signifies whether the array is wrapped (for example, `<books><book/><book/></books>`) or unwrapped (`<book/><book/>`). Default value is `false`. The definition takes effect only when defined alongside type being array (outside the items).
+
+=== Examples of the XML Object
+
+Here are a few examples of how the `xml` object can be used in OpenAPI.
+
+==== Changing the Element Name
+
+You can use the `name` keyword to change the name of a single property too. for example changing the name of the id property in XML only.
+
+[,yaml]
+----
+components:
+  schemas:
+    Station:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          xml:
+            name: stationId
+        ...
+----
+
+This will result in the following XML:
+
+[,xml]
+----
+<?xml version="1.0" encoding="UTF-8"?>
+<station>
+  <stationId>b2e783e1-c824-4d63-b37a-d8d698862f1d</stationId>
+  ...
+</station>
+----
+
+==== Using Namespaces
+
+If you need to define a namespace for your XML elements, you can use the `namespace` keyword. Here's an example:
+
+[,yaml]
+----
+components:
+  schemas:
+    Stations:
+      type: array
+      xml:
+        name: data
+        namespace: http://example.com/xml/namespace
+        wrapped: true
+        # ...
+----
+
+The resulting XML will include the namespace declaration:
+
+[,xml]
+----
+<?xml version="1.0" encoding="UTF-8"?>
+<data xmlns="http://example.com/xml/namespace">
+	<station>
+    ...
+----
+
+==== Using Attributes
+
+To define an XML attribute instead of an element, you can use the `attribute` keyword. Here's an example:
+
+[,yaml]
+----
+components:
+  schemas:
+    Stations:
+      type: array
+      xml:
+        name: data
+        wrapped: true
+      items:
+        $ref: "#/components/schemas/Station"
+
+    Station:
+      type: object
+      xml:
+        name: station
+      properties:
+        id:
+          type: string
+          format: uuid
+          xml:
+            attribute: true
+        # ...
+----
+
+This will result in the following XML, where the `id` is now an attribute:
+
+[,xml]
+----
+<?xml version="1.0" encoding="UTF-8"?>
+<data>
+	<station id="b2e783e1-c824-4d63-b37a-d8d698862f1d">
+		<name>Paris Gare du Nord</name>
+		<address>18 Rue de Dunkerque 75010 Paris, France</address>
+		<country_code>FR</country_code>
+	</station>
+</data>
+----
+
+These are just a few examples of how you can use the `xml` object in OpenAPI to customize the representation of XML data. Explore all the options and see how it looks in various API documentation tools until you get the hang of it.

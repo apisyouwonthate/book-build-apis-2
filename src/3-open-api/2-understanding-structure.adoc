@@ -1,3 +1,4 @@
+[#openapi-understanding-structure]
 == Basic Structure
 
 The OpenAPI Specification (OAS) is an "API Description Format", providing a standard format for describing REST APIs, making it easier to design, document, and consume them.

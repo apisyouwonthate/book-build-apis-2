@@ -1,0 +1,1591 @@
+= Advanced OpenAPI
+
+== Multiple Content Types
+
+Let's dive into the nitty-gritty of describing multiple content types in OpenAPI. If you've ever needed to handle JSON, XML, CSV, and maybe even images in your API, you're in the right place. This tutorial will guide you through setting up your OpenAPI document to gracefully handle multiple different formats.
+
+=== Why Support Multiple Content Types?
+
+Supporting multiple content types in your API enhances client flexibility, interoperability, and user convenience. Different clients may prefer different data formats: JSON is great for web apps, XML might be preferred by legacy systems, and CSV is handy for data import/export tasks. By offering multiple formats, your API can interact with a broader range of systems and tools, making it more user-friendly and accessible.
+
+== Setting Up OpenAPI for Multiple Content Types
+
+We'll start with a simple OpenAPI document for an endpoint that supports JSON, XML, and CSV.
+
+=== Operation Definition
+
+In xref:openapi-understanding-structure[Understanding Structure] > Paths & Operations we learned how to create a simple API with both `application/json` and `text/csv`, so lets take that example and expand it a little.
+
+[,yaml]
+----
+    get:
+      summary: Get a list of bookings
+      responses:
+        '200':
+          description: A list of bookings
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Bookings'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/Bookings'
+            text/csv:
+              schema:
+                type: string
+              examples:
+                bookingsCsv:
+                  $ref: '#/components/examples/BookingsCSV'
+----
+
+For JSON and XML we can `$ref` to a schema, which could look a bit like this:
+
+[,yaml]
+----
+components:
+  schemas:
+    Bookings:
+      type: array
+      items:
+        type: object
+        properties:
+          id:
+            type: integer
+            format: int64
+          name:
+            type: string
+          price:
+            type: number
+            format: float
+----
+
+This is a generic enough data object that it would be fine to use for JSON and XML without any modifications. Here's the output:
+
+[,json]
+----
+[
+  {
+    "id": 0,
+    "name": "string",
+    "price": 0
+  }
+]
+----
+
+The XML it would look like this:
+
+[,xml]
+----
+<?xml version="1.0" encoding="UTF-8"?>
+<Bookings>
+	<id>0</id>
+	<name>string</name>
+	<price>0</price>
+</Bookings>
+----
+
+The API documentation tool has named the XML tag `<Bookings>` from the component name, but you can change that if xref:_guides/openapi/specification/v3.1/data-models/representing-xml.adoc[learn about the `xml` keyword], which can also handle more advanced XML syntax.
+
+=== Schemas & Examples
+
+OpenAPI doesn't have native support for CSV schemas like it does for JSON and XML, but you can provide examples to illustrate the format.
+
+[,yaml]
+----
+components:
+  examples:
+    BookingsCSV:
+      summary: Example CSV output
+      value: |
+        id,name,price
+        1,Item 1,10.00
+        2,Item 2,15.00
+        3,Item 3,20.00
+----
+
+Here's the complete OpenAPI document:
+
+[,yaml]
+----
+openapi: 3.1.0
+info:
+  title: Multi-Content API
+  description: An API that supports JSON, XML, and CSV
+  version: 1.0.0
+paths:
+  /bookings:
+    get:
+      summary: Get a list of bookings
+      responses:
+        '200':
+          description: A list of bookings
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Bookings'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/Bookings'
+            text/csv:
+              schema:
+                type: string
+              examples:
+                bookingsCsv:
+                  $ref: '#/components/examples/BookingsCSV'
+
+components:
+  schemas:
+    Bookings:
+      type: array
+      items:
+        type: object
+        properties:
+          id:
+            type: integer
+            format: int64
+          name:
+            type: string
+          price:
+            type: number
+            format: float
+  examples:
+    BookingsCSV:
+      summary: Example CSV output
+      value: |
+        id,name,price
+        1,Item 1,10.00
+        2,Item 2,15.00
+        3,Item 3,20.00
+----
+
+You now have an OpenAPI document that supports multiple content types, including JSON, XML, and CSV. By setting up your API this way, you can cater to a wider range of API clients and use cases, making your API more useful and user-friendly.
+
+== Multipart Form Data
+
+Multipart form data is a content type used for HTTP requests to send a combination of text and file data in a single request, allowing for one or more uploaded files to be sent with other form fields.
+
+In the context of an API, using multipart form data enables clients to send files to the server as part of a single API request, avoiding the need for metadata to be uploaded as one request then linking it back to the file somehow. This is handy when building resources that might have an avatar or a cover image, or sending a PDF that needs a name, description, and list of recipients.
+
+[,http]
+----
+POST /upload HTTP/2
+Host: api.example.com
+Content-Type: multipart/form-data; boundary=--------------------------1234567890
+
+----------------------------1234567890
+Content-Disposition: form-data; name="metadata"
+Content-Type: application/json
+
+{
+  "name": "My PDF Document",
+  "recipients": [
+    "andy@example.com",
+    "sarah@example.com"
+  ]
+}
+----------------------------1234567890
+Content-Disposition: form-data; name="description"
+
+This is a long form text field which can also be sent if JSON is not your thing.
+----------------------------1234567890
+Content-Disposition: form-data; name="file"; filename="document.pdf"
+Content-Type: application/octet-stream
+
+[base64 encoded PDF file data]
+----------------------------1234567890--
+----
+
+OpenAPI supports APIs using multipart form data in `requestBody`, by specifying the `multipart/form-data` content type.
+
+[,yaml]
+----
+paths:
+  /upload:
+    post:
+      summary: Upload a file
+      description: Endpoint to upload a file
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              # ...
+----
+
+Within the `schema` property of the `requestBody`, you must define the structure of the multipart form data. When boundaries are used to separate segments of the content being transferred, you will need to describe the Content-Types, or you can leave it with the sensible default values:
+
+* If the property is a primitive, or an array of primitive values, the default `Content-Type` is `text/plain`.
+* If the property is complex, or an array of complex values, the default `Content-Type` is `application/json`.
+* If the property is a `type: string` with a `contentEncoding`, the default `Content-Type` is `application/octet-stream`.
+
+[,yaml]
+----
+  requestBody:
+    required: true
+    content:
+      multipart/form-data:
+        schema:
+          type: object
+          properties:
+            # default Content-Type for objects is `application/json`
+            metadata:
+              type: object
+              properties:
+                name:
+                  type: string
+                recipients:
+                  type: array
+                  items:
+                    type: string
+            # Content-Type for application is `text/plain`
+            description:
+              type: string
+            # Content-Type for a string with a contentEncoding set is `application/octet-stream`
+            file:
+              type: string
+              contentEncoding: base64
+----
+
+This OpenAPI declares the schema to match the previous HTTP request example, documenting a JSON object with name and recipient array, a plain text description. No content media types had to be defined for either of those segments because OpenAPI will guess them, and usually guess right. The object is assumed to be JSON. The string with no other information is assumed to be plain text.
+
+Other sorts of segments can be a bit tricker, and need a bit of configuration.
+
+=== Content Encoding
+
+By default if a string has a `contentEncoding` set, the default will be `application/octet-stream`, which will accept any sort of file. This API would like a PDF but could also accept images and other files, so that's often just fine, and the server can reject invalid files later on.
+
+The `contentEncoding` is there to help define what form the data is in. Some file uploads are base64 encoded, so that can be described with `contentEncoding: base64`. The `contentEncoding` keyword supports all encodings defined in https://www.rfc-editor.org/rfc/rfc4648[RFC4648], including `"base64"` and `"base64url"`, as well as `"quoted-printable"` from https://www.rfc-editor.org/rfc/rfc2045[RFC2045] https://www.rfc-editor.org/rfc/rfc2045#section-6.7[Section 6.7].
+
+=== Content Media Type
+
+When you need to override the default `contentMediaType` assumptions for any of the multipart segments, you can update the schema for that segment to be as specific as you want.
+
+[,yaml]
+----
+  content:
+    multipart/form-data:
+      schema:
+        type: object
+        properties:
+          # One specific file type, but still text
+          csvSpecifically:
+            type: string
+            contentMediaType: text/csv
+          # Either PNG or JPEG, both encoded as base64
+          pngOrJpegImage:
+            type: string
+            contentMediaType: image/png, image/jpeg
+            contentEncoding: base64
+          # Any image is fine, but it'll be base64
+          anyImage:
+            type: string
+            contentMediaType: image/*
+            contentEncoding: base64
+----
+
+You can use a single mime type, a comma separated list, or use a wildcard (`*`) to support multiple.
+
+=== Encoding Object
+
+The `contentEncoding` and `contentMediaType` keywords should handle most scenarios, but if you need to get even more involved with describing each of the multipart segments, including even the headers on that segment, take a look at the encoding object.
+
+[,yaml]
+----
+requestBody:
+  content:
+    multipart/form-data:
+      schema:
+        type: object
+        properties:
+          id:
+            # default is text/plain
+            type: string
+            format: uuid
+          address:
+            # default is application/json
+            type: object
+            properties: {}
+          historyMetadata:
+            # need to declare XML format!
+            description: metadata in XML format
+            type: object
+            properties: {}
+          profileImage: {}
+      encoding:
+        historyMetadata:
+          # require XML Content-Type in utf-8 encoding
+          contentType: application/xml; charset=utf-8
+        profileImage:
+          # only accept png/jpeg
+          contentType: image/png, image/jpeg
+          headers:
+            X-Rate-Limit-Limit:
+              description: The number of allowed requests in the current period
+              schema:
+                type: integer
+----
+
+Take a look at the OpenAPI v3.1 Specification to learn more about the https://spec.openapis.org/oas/v3.1.0#encoding-object[Encoding Object], and see how to handle custom headers and even "styles" and "explode" to handle complex data expressed in a string form.
+
+____
+Multipart form data is only one way to handle file uploads, so read the xref:_guides/openapi/specification/v3.1/advanced/file-uploads.adoc[File Uploads] guide to see other ways to do it.
+____
+
+== Uploading a File
+
+APIs can handle file uploads in a variety of ways, and OpenAPI can help you describe any of them. The two most common methods are directly accepting the file based on the content-type of the request, e.g.: a HTTP request with `image/png`, `image/jpeg`, `text/csv`, etc., or a HTTP request with a `multipart/form-data` content type which allows you to combine text and file data in a single request.
+
+Here's an example of accepting a CSV file being directly passed in the request body, showing how the HTTP request would look, then how that would be described in OpenAPI v3.1.
+
+[,http]
+----
+GET /upload HTTP/1.1
+Host: api.example.org
+Content-Type: text/csv
+
+Planted On,Longitude,Latitude,Unit Type,Species
+4/1/23,-3.88628,56.17454,tree,Aspen
+4/1/23,-3.8863,56.17455,tree,Silver Birch
+----
+
+[,yaml]
+----
+paths:
+  /upload:
+    post:
+      summary: Upload a CSV file
+      requestBody:
+        required: true
+        content:
+          text/csv: {}
+----
+
+The `text/csv` does not need to declare a schema if its transferred in a binary (octet-stream), as that is the default. The same goes for images.
+
+[,yaml]
+----
+content:
+    image/png:
+        schema:
+            type: string
+            contentMediaType: image/png
+            contentEncoding: base64
+----
+
+[,yaml]
+----
+paths:
+  /upload:
+    post:
+      summary: Upload a file
+      description: Endpoint to upload a file
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+                  contentMediaType: text/csv
+----
+
+In this example, the `requestBody` object specifies that the request body is required and should be in the `multipart/form-data` format. The schema defines an object with a single property `file`, which represents the uploaded file. The `type` is set to `string` and the `format` is set to `binary` to indicate that it is a binary file.
+
+To upload images and a CSV file using the `contentEncoding` keyword, you can modify the schema as follows:
+
+[,yaml]
+----
+paths:
+  /upload:
+    post:
+      summary: Upload files
+      description: Endpoint to upload images and a CSV file
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                image1:
+                  type: string
+                  format: binary
+                  contentEncoding: base64
+                image2:
+                  type: string
+                  format: binary
+                  contentEncoding: base64
+                csv:
+                  type: string
+                  contentMediaType: text/csv
+----
+
+In this updated example, the schema includes three properties: `image1`, `image2`, and `csv`. Each property has the `type` set to `string`, the `format` set to `binary`, and the `contentEncoding` set to `base64`. This allows you to upload images and a CSV file encoded in base64.
+
+Remember to adjust the endpoint path and other details according to your specific API requirements.
+
+== Handling Error Formats
+
+When your API is happy you return the data or whatever response the action would like to provide, but what happens when you stray off that happy path and into the world of errors?
+
+In HTTP an error is any response returning a 400-599 status code, but that alone is generally not enough to tell an API client what to do, why it happened, what can be done to avoid it, when to try again, or anything else.
+
+HTTP API errors usually involve some sort of JSON payload which explains a few key things:
+
+* A human readable short summary: "Cannot checkout with an empty shopping cart"
+* A human readable message: "It looks like you have tried to check out but there is nothing in your..."
+* An application-specific error code relating to the problem: `ERRCARTEMPTY`
+* Links to a documentation page or knowledge base where a client or user of the client can figure out what to do next.
+
+=== API Errors with JSON Responses
+
+The most basic API error might look a bit like this, with something for the humans to read, a specific error code for a machine to read that should describe a more specific situation to them (perhaps its documented somewhere), and/or a unique link to a specific error which can help a machine recognize the exact application-level problem from a predefined list.
+
+[,http]
+----
+HTTP/1.1 400 Bad Request
+Content-Type: application/json
+
+{
+  "error": {
+    "message": "Message describing the error",
+    "code": "ERR-01234",
+    "href": "http://example.org/docs/errors/#ERR-01234"
+  }
+}
+----
+
+This JSON structure is not perfect but it's realistic, so lets show how to describe it.
+
+[,yaml]
+----
+paths:
+  /bookings:
+    get:
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Booking'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+----
+
+This operation shows a success status of 201, and a whole variety of interesting potential errors that can be returned. Any HTTP interaction could have a 500 so maybe you don't need to mention that, and there could be infinite other errors happening between your server and the client that would be impossible to guess, but if you aim to define as many errors for any given operation as seem relevant, you aren't going to be far off.
+
+To avoid repetition and ensure consistency, this example defines reusable HTTP error responses in the components section. These reusable components can then be referenced in multiple operations.
+
+[,yaml]
+----
+components:
+  schema:
+    Problem:
+      properties:
+        message:
+          type: string
+          description: An explanation of the problem.
+          example: Not enough credits in your account balance.
+        code:
+          type: string
+          description: An error code relating to an application-specific error scenario
+          example: ERR-01234
+        href:
+          type: string
+          format: url
+          description: A URL to find some more documentation on this problem if needed.
+          example: http://example.org/docs/errors/#ERR-01234
+
+  responses:
+    BadRequest:
+      description: Bad Request
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Problem'
+          example:
+            message: The request is invalid or missing required parameters.
+            code: ERR-NAUGHTY001
+            href: https://example.com/docs/errors/ERR-NAUGHTY001
+
+    Conflict:
+      description: Conflict
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Problem'
+          example:
+            message: There is a conflict with an existing resource.
+            code: ERR-EYYWOAH001
+            href: https://example.com/docs/errors/ERR-EYYWOAH001
+
+    Forbidden:
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Problem'
+          example:
+            message: Access is forbidden with the provided credentials.
+            code: ERR-NAH001
+            href: https://example.com/docs/errors/ERR-NAH001
+
+    InternalServerError:
+      description: Internal Server Error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Problem'
+          example:
+            message: An unexpected error occurred.
+            code: ERR-OOF001
+            href: https://example.com/docs/errors/ERR-OOF001
+----
+
+This approach is one of many you could take, but essentially what we're doing here is using one generic schema, then providing a tailored example for each type of error, with the types of error corresponding so far to the HTTP status codes likely to be returned.
+
+You could get more specific and get into application-level errors here, but they might be better off left as examples and the specific errors all defined elsewhere, the same place that is being linked to with these `href` values.
+
+=== Other Error Formats
+
+API errors can be designed in a bunch of ways, and described in a bunch of ways, but as with most things in APIs: there's a standard for that! Actually... there's a few.
+
+==== RFC 9457: Problem Details
+
+https://datatracker.ietf.org/doc/html/rfc9457[RFC 9457: Problem Details for HTTP APIs] (replacing very similar RFC 7807) defines loads of useful ideas and structure for API error messages. If we want to describe this, we can expand the main problem object from the last example.
+
+[,yaml]
+----
+components:
+  schema:
+    Problem:
+      properties:
+        type:
+          type: string
+          description: A URI reference that identifies the problem type
+          example: https://example.com/probs/out-of-credit
+        title:
+          type: string
+          description: A short, human-readable summary of the problem type
+          example: You do not have enough credit.
+        detail:
+          type: string
+          description: A human-readable explanation specific to this occurrence of the problem
+          example: Your current balance is 30, but that costs 50.
+        instance:
+          type: string
+          description: A URI reference that identifies the specific occurrence of the problem
+          example: /account/12345/msgs/abc
+        status:
+          type: integer
+          description: The HTTP status code
+          example: 400
+----
+
+Then as before you can expand on that schema with better examples.
+
+[,yaml]
+----
+  responses:
+    BadRequest:
+      description: Bad Request
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/Problem'
+          example:
+            type: https://example.com/errors/bad-request
+            title: Bad Request
+            status: 400
+            detail: The request is invalid or missing required parameters.
+
+    Conflict:
+      description: Conflict
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/Problem'
+          example:
+            type: https://example.com/errors/conflict
+            title: Conflict
+            status: 409
+            detail: There is a conflict with an existing resource.
+
+    Forbidden:
+      description: Forbidden
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/Problem'
+          example:
+            type: https://example.com/errors/forbidden
+            title: Forbidden
+            status: 403
+            detail: Access is forbidden with the provided credentials.
+
+    InternalServerError:
+      description: Internal Server Error
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/Problem'
+          example:
+            type: https://example.com/errors/internal-server-error
+            title: Internal Server Error
+            status: 500
+            detail: An unexpected error occurred.
+----
+
+Here the `application/problem+json` content type lets everyone know this is specifically using that RFC, the URIs replace both the status code and the link to documentation, and a title + detail allow room for a generic error message and instance specific details about the exact problem happening right now.
+
+==== JSON:API Errors
+
+Another popular format for API errors is the JSON:API errors format. This format provides a standardized structure for representing errors in JSON responses.
+
+The JSON:API errors format includes the following key components:
+
+* An array of error objects, each representing a specific error.
+* Each error object contains the following properties:
+ ** `id`: A unique identifier for the error.
+ ** `status`: The HTTP status code associated with the error.
+ ** `code`: An application-specific error code.
+ ** `title`: A short, human-readable summary of the error.
+ ** `detail`: A detailed description of the error.
+ ** `source`: Information about the source of the error, such as the field or parameter that caused the error.
+
+This is a little different as its an array of `errors`, but here's how we can handle that with OpenAPI:
+
+[,yaml]
+----
+components:
+  schema:
+    Problem:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+                format: uuid
+                description: A unique identifier for the error.
+                examples: ["2fe04316-9775-46af-987b-a12d8620d42e"]
+              status:
+                type: string
+                description: The HTTP status code associated with the error.
+                examples: ["404"]
+              code:
+                type: string
+                description: An application-specific error code.
+                examples: [ERR-NOT-FOUND]
+              title:
+                type: string
+                description: A short, human-readable summary of the error.
+                examples: [Resource Not Found]
+              detail:
+                type: string
+                description: A detailed description of the error.
+                examples: [The requested resource could not be found.]
+              source:
+                type: object
+                properties:
+                  pointer:
+                    type: string
+                    description: Information about the source of the error, such as the field or parameter that caused the error.
+                    examples: ["/data/id"]
+                  parameter:
+                    type: string
+                    description: Information about the source of the error, such as the field or parameter that caused the error.
+                    examples: [id]
+----
+
+The fact that the schema is an array does not change the previous approach for describing errors, we just move that into the example:
+
+[,yaml]
+----
+  responses:
+    BadRequest:
+      description: Bad Request
+      content:
+        application/vnd.api+json:
+          schema:
+            $ref: '#/components/schemas/Problem'
+          example:
+            errors:
+              - id: "2fe04316-9775-46af-987b-a12d8620d42e"
+                status: "400"
+                code: "ERR-BAD-REQUEST"
+                title: "Bad Request"
+                detail: "The request contained an id with an integer but its meant to be a UUID"
+                source:
+                  pointer: "/data/id"
+                  parameter: "id"
+
+    Conflict:
+      description: Conflict
+      content:
+        application/vnd.api+json:
+          schema:
+            $ref: '#/components/schemas/Problem'
+          example:
+            errors:
+              - id: "2fe04316-9775-46af-987b-a12d8620d42e"
+                status: "409"
+                code: "ERR-CONFLICT"
+                title: "Bad Request"
+                detail: >
+                  There is a conflict with an existing resource, the approved status
+                  cannot be changed back to pending.
+                source:
+                  pointer: "/data/status"
+                  parameter: "status"
+
+    Forbidden:
+      description: Forbidden
+      content:
+        application/vnd.api+json:
+          schema:
+            $ref: '#/components/schemas/Problem'
+          example:
+            errors:
+              - id: "2fe04316-9775-46af-987b-a12d8620d42e"
+                status: "403"
+                code: "ERR-FORBIDDEN"
+                title: "Access is forbidden with the provided credentials."
+                detail: >
+                  This action cannot be undertaken for this particular reason.
+                source:
+                  pointer: "/header/Authorization"
+                  parameter: "Authorization"
+----
+
+If you need to handle errors responses in multiple content types, you can learn about xref:_guides/openapi/specification/v3.1/advanced/multiple-content-types.adoc[Multiple Content Types] and it's all the same.
+
+== Security
+
+OpenAPI uses the term "security scheme" to cover both authentication and authorization schemes.
+
+* *Authentication:* Who is this user, are they who they say they are.
+* *Authorization:* What data can this user see, what actions can they take.
+
+OpenAPI v3.1 lets you describe APIs protected using the following security schemes:
+
+* HTTP authentication schemes (anything using the `Authorization` header)
+ ** Basic
+ ** Bearer
+ ** Digest
+ ** OAuth (1.0)
+ ** others defined in https://www.rfc-editor.org/rfc/rfc7235.html[RFC 7235] and https://www.iana.org/assignments/http-authschemes/http-authschemes.xhtml[HTTP Authentication Scheme Registry]
+* API keys in headers, query string or cookies
+* OAuth 2.x
+* OpenID Connect Discovery
+* Mutual TLS
+
+Some of these are very niche and specific forms of security scheme, so we won't get stuck into all of them. Let's look at the most common ones for now.
+
+[,yaml]
+----
+components:
+  securitySchemes:
+    # API Key Authentication
+    ApiKeyHeader:
+      type: apiKey
+      in: header
+      name: X-API-Key
+    ApiKeyQuery:
+      type: apiKey
+      in: query
+      name: key
+
+    # HTTP Authentication
+    HttpBasicAuth:
+      type: http
+      scheme: basic
+    HttpBearerToken:
+      type: http
+      scheme: bearer
+    JWT:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+    # OAuth 2.0 Authentication
+    OAuth2ReadWrite:
+      type: oauth2
+      flows:
+        authorizationCode:
+          scopes:
+            read: Grants read access
+            write: Grants write access
+          authorizationUrl: https://example.com/oauth/authorize
+          tokenUrl: https://example.com/oauth/token
+          refreshUrl: https://example.com/oauth/refresh
+----
+
+This is 90% of what you'll bump into in the wild when it comes to security schemes.
+
+=== API Keys
+
+*in: header*
+
+API Keys in headers are often stored in some arbitrary header name like `X-API-Key`, which is https://www.mnot.net/blog/2009/02/18/x-[frowned upon] but is still commonly used.
+
+[,yaml]
+----
+  ApiKeyHeader:
+    type: apiKey
+    in: header
+    name: X-API-Key
+----
+
+That would describe a request that looks like this:
+
+----
+GET /bookings
+Host: api.example.com
+X-API-Key: <your-api-key>
+----
+
+____
+Instead of specifically using `X-` headers, you can create custom headers with your company name at the start like `Stipe-API-Key` if something is specific to you. If it's not then it's better to use the standard HTTP headers so generic tooling knows how to work with them out of the box.
+____
+
+*in: query*
+
+API Keys in `query` are also common, but best avoided for other reasons: it's incredibly insecure.
+
+----
+GET /bookings?key=<your-api-key>
+Host: api.example.com
+----
+
+The https://owasp.org/API-Security/[OWASP API Security Top 10] lists https://owasp.org/API-Security/editions/2023/en/0xa2-broken-authentication/[Broken Authentication] as one of the top security issues for APIs, citing specifically "Sends sensitive authentication details, such as auth tokens and passwords in the URL."
+
+Generally the "API Key" scheme is best used for legacy API security schemes, which are being deprecated and replaced with better security schemes.
+
+=== HTTP Authentication
+
+HTTP Authentication is a widely used security scheme in OpenAPI. It allows you to authenticate and authorize users based on the `Authorization` header in the HTTP request.
+
+==== Basic Authentication
+
+One of the most common HTTP authentication schemes is Basic Authentication. It involves sending the username and password in the `Authorization` header, encoded in Base64. Here's an example:
+
+[,yaml]
+----
+HttpBasicAuth:
+  type: http
+  scheme: basic
+----
+
+To make a request using Basic Authentication, the `Authorization` header would look like this:
+
+----
+GET /bookings
+Host: api.example.com
+Authorization: Basic dXNlcm5hbWU6cGFzc3dvcmQ=
+----
+
+That `dXNlcm5hbWU6cGFzc3dvcmQ=` is base64 encoded `username:password`, which is exactly why this security scheme is considered unwise for sending long-lived credentials. Short-lived frequently changing tokens might be less problematic especially if being sent over TLS.
+
+==== Bearer Token Authentication
+
+Bearer Token Authentication is another popular HTTP authentication scheme. It involves sending a token in the `Authorization` header, prefixed with the word `Bearer`. Here's an example:
+
+[,yaml]
+----
+HttpBearerToken:
+  type: http
+  scheme: bearer
+----
+
+To make a request using Bearer Token Authentication, the `Authorization` header would look like this:
+
+----
+GET /bookings
+Host: api.example.com
+Authorization: Bearer <your-token-here>
+----
+
+This token is in plain text, but it's usually randomly generated and short lives so it's not so concerning if somebody nabs it, especially if you're using JWT or OAuth 2 which operates over bearer.
+
+==== JWT Authentication
+
+Using a JWT (JSON Web Token) allows for more advanced authentication scenarios and includes additional information in the token payload. Here's an example:
+
+[,yaml]
+----
+JWT:
+  type: http
+  scheme: bearer
+  bearerFormat: JWT
+----
+
+In OpenAPI a JWT security scheme is actually just Bearer Token Authentication again, with `bearerFormat: JWT` letting documentation tools know to mention that the token is a JWT. It doesn't make much difference, its just how the token was generated before it was passed to the API.
+
+To make a request using JWT Authentication, the `Authorization` header would look similar to Bearer Token Authentication:
+
+----
+GET /bookings
+Host: api.example.com
+Authorization: Bearer <your-jwt-here>
+----
+
+=== OAuth 2
+
+OAuth 2 is a widely used authorization framework that allows users to grant third-party applications access to their resources without sharing their credentials. In OpenAPI, you can describe OAuth 2 authentication using the following example:
+
+[,yaml]
+----
+OAuth2ReadWrite:
+  type: oauth2
+  flows:
+    authorizationCode:
+      scopes:
+        read: Grants read access
+        write: Grants write access
+      authorizationUrl: https://example.com/oauth/authorize
+      tokenUrl: https://example.com/oauth/token
+      refreshUrl: https://example.com/oauth/refresh
+----
+
+In this example, the `OAuth2ReadWrite` security scheme represents OAuth 2 authentication. It uses the `authorizationCode` flow, which is one of the most common flows in OAuth 2. The `scopes` section defines the available scopes for this security scheme, such as `read` and `write`. The `authorizationUrl` specifies the URL where users can authorize the application, the `tokenUrl` is used to obtain access tokens, and the `refreshUrl` is used to refresh expired tokens.
+
+To apply OAuth 2 authentication to a specific operation, you can use the `security` keyword and specify the security scheme and scopes:
+
+[,yaml]
+----
+paths:
+  /bookings:
+    get:
+      security:
+        - OAuth2ReadWrite: [read]
+----
+
+In this example, the `/bookings` path requires the `OAuth2ReadWrite` security scheme with the `read` scope for the `GET` operation.
+
+=== OpenID Connect
+
+OpenID Connect is an identity layer built on top of OAuth 2.0 that allows clients to verify the identity of end-users based on the authentication performed by an authorization server. It provides a standardized way to authenticate users and obtain their identity information, such as name, email, and profile picture.
+
+In OpenAPI v3.1, you can describe OpenID Connect authentication using the following example:
+
+[,yaml]
+----
+OpenIDConnect:
+  type: openIdConnect
+  openIdConnectUrl: https://example.com/.well-known/openid-configuration
+----
+
+In this example, the `OpenIDConnect` security scheme represents OpenID Connect authentication. The `openIdConnectUrl` specifies the URL where the OpenID Connect provider's configuration can be found. This configuration includes important information such as the authorization endpoint, token endpoint, and public keys used for verifying ID tokens.
+
+To apply OpenID Connect authentication to a specific operation, you can use the `security` keyword and specify the security scheme:
+
+[,yaml]
+----
+paths:
+  /bookings:
+    get:
+      security:
+        - OpenIDConnect: []
+----
+
+In this example, the `/bookings` path requires the `OpenIDConnect` security scheme for the `GET` operation.
+
+OpenID Connect is a powerful authentication mechanism that allows you to leverage existing identity providers and provide a seamless login experience for your users. It is widely adopted and supported by major identity providers such as Google, Microsoft, and Okta.
+
+=== Mutual TLS
+
+Mutual TLS (Transport Layer Security) is an authentication type in OpenAPI that provides a secure way to authenticate both the client and the server. It involves the exchange of digital certificates between the client and the server to establish a trusted connection, meaning it's commonly used in scenarios where strong authentication and secure communication are required: banking, healthcare, and other sensitive industries.
+
+With mutual TLS authentication, the client presents its own certificate to the server during the TLS handshake process. The server then verifies the client's certificate against its trusted certificate authority (CA) to ensure the client's identity. Similarly, the server presents its own certificate to the client, and the client verifies the server's certificate.
+
+There's not much to it in OpenAPI v3.1.
+
+[,yaml]
+----
+MutualTLS:
+  type: mutualTLS
+----
+
+This is basically just a flag to let clients know they'll need to set up Mutual TLS or no connections are going to work, but the specifics of that happen outside of OpenAPI. It takes a bit of work, but this authentication method adds an extra layer of security by ensuring that both the client and the server are authenticated before any data is exchanged. It helps prevent unauthorized access and protects against man-in-the-middle attacks.
+
+=== Applying Security to Paths
+
+The security schemes are just setting there until they are applied to paths in your OpenAPI document. You can use the `security` keyword at the path level to do this:
+
+[,yaml]
+----
+openapi: 3.1.0
+paths:
+  /bookings:
+    get:
+      security:
+        - HttpBearerToken: []
+----
+
+In this example, the `/bookings` path requires the `HttpBearerToken` security scheme for all requests.
+
+[,yaml]
+----
+openapi: 3.1.0
+paths:
+  /bookings:
+    get:
+      security:
+        - ApiKeyQuery: []
+        - HttpBearerToken: []
+----
+
+In this example either the `ApiKeyHeader` or `HttpBearerToken` security schemes, meaning a client could use either. This is great when one method is being deprecated.
+
+Security schemes can also be applied as an `AND`:
+
+[,yaml]
+----
+openapi: 3.1.0
+paths:
+  /bookings:
+    get:
+      security:
+        - ApiKeyHeader: []
+          HttpBearerToken: []
+----
+
+This example would only pass if *both* the `ApiKeyHeader` and `HttpBearerToken` are passed.
+
+=== Applying Security Globally
+
+To avoid needing to set similar `security` keywords on every path (and possibly missing a few) you can apply security globally.
+
+[,yaml]
+----
+openapi: 3.1.0
+security:
+  - HttpBearerToken: []
+paths:
+  /bookings:
+    get:
+      # ...
+----
+
+This will now be applied to all paths unless turned off.
+
+=== Overriding Path Security
+
+Globally applied rules can be overridden with a path-level security keyword.
+
+[,yaml]
+----
+openapi: 3.1.0
+security:
+  - HttpBearerToken: []
+paths:
+  /bookings:
+    get:
+      security: [] # no security
+----
+
+All other paths will continue to be secured regardless of what order they're in.
+
+=== Scopes
+
+You might have noticed the empty array showing up: `HttpBearerToken: []`. This empty array is where "scopes" go.
+
+Scopes allow you to define fine-grained permissions within some types of security schema that support them, and in OpenAPI v3.1 that means OAuth 2 and OpenID Connect.
+
+Each security scheme can have its own set of scopes, which can be used to control access to specific resources or actions.
+
+[,yaml]
+----
+OAuth2ReadWrite:
+  type: oauth2
+  flows:
+    authorizationCode:
+      scopes:
+        read: Grants read access
+        write: Grants write access
+----
+
+In this example, the `OAuth2ReadWrite` security scheme has two scopes: `read` and `write`, which can be used to check certain actions, maybe limiting `GET` to `read` and `POST`, `PUT`, `PATCH`, and `DELETE` to write.
+
+To apply scopes to specific operations, you can use the `security` keyword and fill in that array at the end with the relevant scopes.
+
+[,yaml]
+----
+paths:
+  /bookings:
+    get:
+      security:
+        - OAuth2ReadWrite: [read]
+    post:
+      security:
+        - OAuth2ReadWrite: [write]
+----
+
+You can get a lot more advanced with scopes than this, with some API developers breaking down the API into manageable chunks. Here are just a few from the Shopify API as an example:
+
+----
+read_orders
+write_orders
+
+read_content
+write_content
+
+read_customers
+write_customers
+
+read_customer_payment_methods
+write_customer_payment_methods
+----
+
+== Callbacks and Webhooks
+
+REST/HTTP APIs are often considered to be a simple request and response model, but they have always been a lot more asynchronous than that, and OpenAPI can capture two types of asynchronous HTTP event using `callbacks` and `webhooks`.
+
+Both of these types of events are basically a HTTP request being made by _your_ API, which is the opposite of all the other requests and responses being defined, but it works in a fairly familiar way.
+
+=== Backstory
+
+In traditional request/response API designs, the client makes a request and the server responds. This works well for many use cases, but sometimes you need the server to notify the client about certain events asynchronously. This is where `callbacks` and `webhooks` come into play:
+
+* `callbacks` Callbacks allow an API to send real-time data back to the client as soon as the event has completed, and without the client having to check for progress. This is often used in tandem with `202 Accepted` responses which defer the actually processing to a queue, promising to let you know when the work is complete.
+* `webhooks` Webhooks are similar to callbacks, but might not be happening in response to any one web request being made. It could be a generic "updates" integration point between multiple web services, with all sorts of events being transmitted as different happen throughout the system.
+
+In OpenAPI v3.0 you only had callbacks, but OpenAPI v3.1 added support for webhooks too.
+
+=== Callbacks
+
+Let's start by setting up a callback in OpenAPI. Suppose we have an API for creating orders, and we want to notify the client when the order status changes.
+
+[,yaml]
+----
+paths:
+  /orders:
+    post:
+      summary: Create a new order
+      operationId: createOrder
+      requestBody:
+        description: Order object that needs to be added
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id:
+                  type: string
+                item:
+                  type: string
+                quantity:
+                  type: integer
+                callbackUrl:
+                  type: string
+                  format: uri
+      responses:
+        '201':
+          description: Order created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                  status:
+                    type: string
+      callbacks:
+        onOrderStatusChange:
+          '{$request.body#/callbackUrl}':
+            post:
+              summary: Callback for order status change
+              requestBody:
+                description: Status update payload
+                required: true
+                content:
+                  application/json:
+                    schema:
+                      type: object
+                      properties:
+                        orderId:
+                          type: string
+                        status:
+                          type: string
+              responses:
+                '200':
+                  description: Callback processed successfully
+----
+
+This could be broken into two parts: creating a path for registering for the callbacks, in this case creating an order, then the definition of that `callbacks` themselves.
+
+Callbacks need a name, which is mainly used within OpenAPI and any tools which choose to find a use for it. This one is called `onOrderStatusChange` but you can use any naming convention you like.
+
+The next bit is `'{$request.body#/callbackUrl}'` which is a https://spec.openapis.org/oas/v3.1.0#runtime-expressions[runtime expression], that looks for a `callbackUrl` property in the HTTP request body.
+
+When the client sends a request to the API they need to let the API know the URL to send the callback to.
+
+[,http]
+----
+POST /orders HTTP/2
+Host: api.example.com
+Content-Type: application/json
+
+{
+  "id": "12345",
+  "item": "Widget",
+  "quantity": 1,
+  "callbackUrl": "https://example.com/callbacks/order-status-updates"
+}
+----
+
+The callbackURL could be in headers or could be composed of various other bits of data in the request, take a look at OpenAPI v3.1's https://spec.openapis.org/oas/v3.1.0#runtime-expressions[runtime expressions] syntax to get more advanced.
+
+Once you've got a callback named and figured out where the URL is going, the rest of the OpenAPI is going to feel very familiar, only it's backwards.
+
+You describe the request that _your API is going to send_, which is letting the client know what the HTTP request you're sending will look like.
+
+Then you describe a response that _your API is hoping to see their API return_. You can get really specific with this or just specify that a `200` or `2XX` is needed to let your API know the callback request is received properly. Most callback implementers will choose to retry these callbacks at a later date if the wrong status code appears, or if other success criteria fail errors can be sent to the authenticated users contact details.
+
+=== Webhooks
+
+Technically callbacks are actually https://www.redhat.com/en/topics/automation/what-is-a-webhook[HTTP Webhooks] in implementation, but in OpenAPI a "webhook" is specifically something named under the `webhooks` root of your OpenAPI document.
+
+They are defined in a similar way to paths, but with a name instead of a URL.
+
+[,yaml]
+----
+openapi: 3.1.0
+info:
+  title: Train Travel API
+  version: 1.0.0
+webhooks:
+  newBooking:
+    post:
+      summary: New Booking
+      description: Subscribe to new bookings being created, to update integrations for your users.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Booking'
+      responses:
+        '200':
+          description: Return a 200 status to indicate that the data was received successfully.
+----
+
+____
+This example has trimmed the `components` section out for brevity, but you can imagine any `schema` you like going in there.
+____
+
+Both webhooks and paths are lists of Path Item Objects, similarly to callbacks, they are all just HTTP requests, some coming in (paths to be called), some going out (webhooks to be sent).
+
+The key bits to notice here are:
+
+* `newBooking` is a unique nickname
+* Summary is a short title
+* Description is longer form documentation with Markdown covering context like "why" and edge cases to think of not covered elsewhere.
+* The `requestBody` is the request you're going to send.
+* The `responses` property is a map of responses you want the client to return.
+
+These then don't need to be tied to paths. In fact, you can have an OpenAPI document which has no paths. This could be because you're splitting your documents up in interesting reusable ways with these webhooks being shared across multiple APIs, or because your API is entirely asynchronous.
+
+=== Consider AsyncAPI
+
+If you are using a few webhooks in an API which is largely otherwise driven by request/response, OpenAPI will be just fine for you with callbacks and webhooks helping as needed.
+
+However if you are building an API that is entirely asynchronous, you are using technologies like WebSockets, or are working with any other event-driven API protocols, you should consider using xref:_guides/asyncapi/what-is-asyncapi.adoc[AsyncAPI] for describing those parts of the architecture.
+
+=== Examples
+
+There's a full example in either https://bump.sh/blog/modern-openapi-petstore-replacement[Bump.sh's Train Travel API], or OpenAPI v3.1 Specification has a https://github.com/OAI/OpenAPI-Specification/blob/main/examples/v3.1/webhook-example.yaml[Petstore example].
+
+== Splitting OpenAPI Documents with $ref
+
+After using OpenAPI for a while, you might notice your description documents have become a rather unwieldy mess of YAML and JSON. You end up with a whole lot of repetition, and this huge mess just loves to trigger merge conflicts as multiple developers change different things but Git seems none the wiser.
+
+You can avoid this pain by splitting description documents up with `$ref`, using various reusable components, but how exactly you go about doing that can be a tricky one to work out.
+
+=== OpenAPI Reusable Components
+
+The https://learn.openapis.org/[OpenAPI Documentation] includes a brilliant example of an API for playing the classic board game Tic Tac Toe.
+
+This has several parts that are used several times, so instead of copy-pasting everything they've defined reusable `components` for both `schemas` and `parameters`.
+
+[,yaml]
+----
+paths:
+  # Whole board operations
+  /board:
+    get:
+      summary: Get the whole board
+      description: Retrieves the current state of the board and the winner.
+      tags:
+        - Gameplay
+      operationId: get-board
+      responses:
+        "200":
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/status"
+  # Single square operations
+  /board/{row}/{column}:
+    parameters:
+      - $ref: "#/components/parameters/rowParam"
+      - $ref: "#/components/parameters/columnParam"
+    get:
+      # ... Hidden for readability...
+    put:
+      # ... Hidden for readability...
+
+components:
+  parameters:
+    rowParam:
+      description: Board row (vertical coordinate)
+      name: row
+      in: path
+      required: true
+      schema:
+        $ref: "#/components/schemas/coordinate"
+    columnParam:
+      description: Board column (horizontal coordinate)
+      name: column
+      in: path
+      required: true
+      schema:
+        $ref: "#/components/schemas/coordinate"
+  schemas:
+    errorMessage:
+      type: string
+      maxLength: 256
+      description: A text message describing an error
+    coordinate:
+      type: integer
+      minimum: 1
+      maximum: 3
+      example: 1
+    mark:
+      type: string
+      enum: [".", "X", "O"]
+      description: Possible values for a board square. `.` means empty square.
+      example: "."
+    board:
+      type: array
+      maxItems: 3
+      minItems: 3
+      items:
+        type: array
+        maxItems: 3
+        minItems: 3
+        items:
+          $ref: "#/components/schemas/mark"
+    winner:
+      type: string
+      enum: [".", "X", "O"]
+      description: Winner of the game. `.` means nobody has won yet.
+      example: "."
+    status:
+      type: object
+      properties:
+        winner:
+          $ref: "#/components/schemas/winner"
+        board:
+          $ref: "#/components/schemas/board"
+----
+
+This is not particularly unmanageable, but let's pretend there is 50 or more endpoints. You could imagine how this one file would be getting a bit much to handle.
+
+How people split up there files has been completely unique to the developer for a long time, but certain conventions are starting to emerge with tooling leading the way.
+
+----
+├── paths
+│   ├── board.yaml
+│   └── board_{row}_{column}.yaml
+├── components
+│   ├── schemas
+│   │   ├── errorMessage.yaml
+│   │   ├── board.yaml
+│   │   ├── coordinate.yaml
+│   │   ├── status.yaml
+│   │   ├── winner.yaml
+│   │   └── mark.yaml
+│   └── parameters
+│       ├── columnParam.yaml
+│       └── rowParam.yaml
+└── openapi.yaml
+----
+
+This convention splits each type of `components` into their own subdirectory, and then puts them into their own unique file.
+
+Now the `openapi.yaml` is a whole lot lighter.
+
+[,yaml]
+----
+openapi: 3.1.0
+info:
+  title: Tic Tac Toe
+  description: |
+    This API allows writing down marks on a Tic Tac Toe board
+    and requesting the state of the board or of individual squares.
+  version: 1.0.0
+tags:
+  - name: Gameplay
+paths:
+  /board:
+    $ref: paths/board.yaml
+  /board/{row}/{column}:
+    $ref: paths/board_{row}_{column}.yaml
+----
+
+The `paths/board.yaml` looks like this:
+
+[,yaml]
+----
+get:
+  summary: Get the whole board
+  description: Retrieves the current state of the board and the winner.
+  tags:
+    - Gameplay
+  operationId: get-board
+  responses:
+    '200':
+      description: OK
+      content:
+        application/json:
+          schema:
+            $ref: ../components/schemas/status.yaml
+----
+
+Finally, `components/schemas/status.yaml` looks like this:
+
+[,yaml]
+----
+type: object
+properties:
+  winner:
+    $ref: ./winner.yaml
+  board:
+    $ref: ./board.yaml
+----
+
+All the filepaths are relative to their current location, and can traverse up and down the filesystem, with the standard `../` to go up a directory.
+
+The chance of getting a Git conflict when two different developers add two different paths or expanding properties in a schema is now a fair bit smaller. If a conflict does occur, the diff will be a lot less confusing to work out.
+
+One downside of splitting up components into different documents like this is that it becomes harder to follow API changes, either directly or by looking at files in GitHub. Changing a schema in one document can effect how multiple different endpoints work, and that can caused a bit of confusion. API change management tools like https://bump.sh/api-change-management[Bump.sh] or https://www.useoptic.com/docs/diff-openapi[Optic] can help by spotting breaking changes and reporting them on PRs, so that you can easily see problems that could otherwise slip through.
+
+=== AsyncAPI Reusable Components
+
+AsyncAPI is thankfully the same when it comes to `$ref` and `components`, so if your event-driven API is struggling as much as your HTTP API then it's time to split things up.
+
+[,yaml]
+----
+  v0/rust/servers/{server_id}/players/{steam_id}/events/banned:
+    description: Channel for notifying a server banned a player
+    parameters:
+      server_id:
+        "$ref": "./components/parameters.json#/server_id"
+      steam_id:
+        "$ref": "./components/parameters.json#/steam_id"
+    subscribe:
+      operationId: ServerPlayerBanned
+      message:
+        "$ref": "./components/messages/ServerPlayerBanned.json"
+----
+
+This example is taken from the https://github.com/GamingAPI/definitions/[Gaming API] example projects, and highlights a slightly different approach of using a single `parameters.json` document and referencing a parameter within that file, instead of using a `parameters/` subdirectory with a file for each parameter. You could do either with either OpenAPI or AsyncAPI, it's a matter of personal preference.
+
+To learn more about the `components` keyword in AsyncAPI, head on over to https://www.asyncapi.com/docs/reference/specification/v2.6.0#componentsObject[their documentation].
+
+=== Using $ref with URLs
+
+Filepaths are not the only way to work with `$ref`, you can also use URLs.
+
+This is particularly helpful when you have a "data model" that is shared across multiple APIs or microservices. Perhaps you don't want each API to define a User, Company, or Payment separately, and get stuck with infinite different variant models.
+
+Simply publish those shared components as JSON, YAML, or both, on a static site or S3 bucket somewhere and let people $ref them into their API.
+
+[,yaml]
+----
+  responses:
+    '200':
+      description: OK
+      content:
+        application/json:
+          schema:
+            $ref: "https://schema.example.org/status.json"
+----
+
+==== Benefits of URL `$ref`
+
+Doing this has several benefits. Not only can other API teams all work together to make a single repository of all the most command/shared components, but API consumers can use them too.
+
+Perhaps clients want to implement some https://apisyouwonthate.com/blog/json-schema-client-side-validation/[client-side validation] to make sure form submissions are valid before they waste time and carbon emissions going over the wire talking to the API with an invalid request.
+
+Specifically splitting the "schemas" out is brilliant because its not just helpful for https://openapi.tools[OpenAPI tooling], but for https://json-schema.org/implementations[JSON Schema tooling] too. There's even more JSON Schema tooling than OpenAPI tooling so its handy to be able to use both.
+
+==== Downsides of URL `$ref`
+
+One downside you're probably already thinking of is that doing all of this requires a bit of work. This is jokingly called SpecOps (API descriptions are also known as "specifications"). Setting up deployment pipelines and hosting to make those reusable components available is a faff.
+
+Other complications can appear depending on which tools you're using. Some tools do not support URLs in `$ref`, either for security concerns or because the tool maintainers never got around to it. You need to programmatically replace all the $ref's with URLs to be local refs, and whilst there are tools which can "bundle" your API descriptions up for you, it's another bit of work, and adds another copy of the API description document to keep track of and keep updated.
+
+Finally there's authentication. Some people have their API descriptions in a private Git repositories and cannot access it with `+https://raw.githubusercontent.com/org/repo/main/content/schemas/foo.json+` because it would need some sort of access token and how's that going to work? Making a GitHub Action / Continuous Integration step that deploys the API descriptions or schemas to a public S3 bucket or other public static site is probably the best thing to do there.
+
+Others hide their OpenAPI and AsyncAPI by choice for security reasons, but that's never made much sense because Stripe, PayPal, Box, GitHub, and plenty of other massive API companies have their API descriptions out in public and nobody has hacked them. APIs should be protected with firewalls and API keys, but OpenAPI and AsyncAPI information can be plastered all over the place. Another vote for the public static site.
+
+There is an argument for making public APIs public and keeping internal API's private, and some hosted API documentation tools can help with that, or you can host internal API docs on a different static site that's only available on the company network. Either way you'll need to keep your public APIs public, and keep your shared components public, then hide the internal APIs that reference those. That gives you the best of both worlds.
+
+=== Propagating Changes
+
+Using tools like Bump.sh you get all the benefits of a tool that understands $ref, but without any of the hassle of needing to bundle documents up.
+
+Like any tool which uses a build step, this has the pro and the con of meaning that documentation is built at a certain point in time. Changes that happen to the $ref'ed resources - whether they're in another repository, or being pulled in via URL - will take some time to appear in your API.
+
+For example, if the Widget API is using a shared Company schema via `+$ref: https://widgets.com/schema/company.json+`, and company decides to add VAT number as a property, your Widget API documentation is not going to mention that property until your next build.
+
+Is that a good thing or a bad thing? It can be both depending on the scenario, but having changes appear in your API without your knowledge is probably not ideal.
+
+=== Tools for Bundling & Splitting
+
+Bundling is usually only needed if you are working with older or strange tools which do not support `$ref` properly (or at all). If you are working with Bump.sh CLI you won't need to bundle, but if a tool wants you to import a single `openapi.yaml` document you might need to bundle.
+
+ $ redocly bundle openapi.yaml -o openapi-bundled.yaml
+ bundling openapi.yaml...
+ 📦 Created a bundle for openapi.yaml at openapi-bundled.yaml 105ms.
+
+This will grab all of the ``$ref``'s that use "external files" or URLs and move the contents into the relevant subsection of `components` in the `openapi-bundled.yaml` document.
+
+Splitting does the opposite. If you have a massive painful document (maybe generated from HTTP or converted from Postman) you can split it down into multiple documents with a sensible folder structure, ditch the original, commit all that to Git, and push it up to Bump.sh with all the ``$ref``'s intact.
+
+----
+redocly split generated-openapi.json --outDir api/
+
+bump deploy api/openapi.json
+----
+
+To give Redocly CLI a try, in combination with the Bump CLI, install them both:
+
+----
+npm install -g @redocly/cli bump-cli
+----
+
+=== Further Reading
+
+If you'd like to learn more than you could ever possibly want to know about AsyncAPI `$ref` then head on over to https://www.asyncapi.com/blog/the-reference-rabbit-hole[The Reference Rabbit Hole] by https://github.com/jonaslagoni[Jonas Lagoni].
