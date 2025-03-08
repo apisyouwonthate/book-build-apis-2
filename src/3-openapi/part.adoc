@@ -1,0 +1,9 @@
+[part]
+= Part 3: OpenAPI
+
+include::1-introduction.adoc[]
+include::2-understanding-structure.adoc[]
+include::3-data-models.adoc[]
+include::4-advanced.adoc[]
+include::5-documentation.adoc[]
+include::6-extending.adoc[]

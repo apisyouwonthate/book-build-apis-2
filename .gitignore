@@ -1,4 +1,5 @@
 .DS_Store
 generated/
+potential-images/
 book.epub.d/
 book.xml

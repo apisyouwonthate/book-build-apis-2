@@ -1,3 +1,4 @@
+[#theory-errors]
 = Returning informative API Errors
 :description: Design useful API errors to save clients time.
 

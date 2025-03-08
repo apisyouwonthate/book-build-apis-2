@@ -1,2 +1,0 @@
-[part]
-= Part 3: Open API

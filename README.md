@@ -10,6 +10,8 @@ Support the development of this book, and [**pre-order on LeanPub!**](https://le
     - [ ] History of APIs
     - [x] APIs, Services, and Microservices
     - [x] Understanding Different Paradigms
+    - [ ] HTTP/1, HTTP/2 and HTTP/3
+    - [ ] Asynchronous Methodologies
 - [ ] Part 2: API Design Basics
     - [x] Structuring URLs
     - [x] HTTP Methods
@@ -30,62 +32,36 @@ Support the development of this book, and [**pre-order on LeanPub!**](https://le
 - [ ] Part 4: API Design First Workflow
   - [x] Intro to API Design First
   - [x] API Descriptions
-- [ ] Part 5: Design a new API
-- [ ] Part 6: Managing and Maintaining an API
-- [ ] Part 7: Taking APIs Further
-- [ ] Part 8: Testing APIs
-
-## Old Outline
-
-How the book was looking as Phils random braindumps.
-
-- [ ] Part 1: Theory
-  - [x] APIs, Services, and Microservices
-  - [x] Understanding Different Paradigms
-  - [ ] API Lifecycle
-  - [ ] Design Theory
-  - [x] API Descriptions
-  - [ ] Hypermedia Controls (HATEOAS)
-  - [ ] HTTP/1, HTTP/2 and HTTP/3
-  - [x] Asynchronous Methodologies
-
-- [ ] Part 2: Planning & Design
-  - [x] Editors
-  - [x] Mocking
-  - [x] Documentation
+  - [ ] Editors
+  - [ ] Mocking
+  - [ ] Documentation
+  - [ ] Contract Testing
+  - [ ] Design Reviews
   - [ ] Style Guides (#33)
-
-- [ ] Part 3: Building & Testing
-  - [ ] Building Blocks
+  - [ ] Automated SDKs
+- [ ] Part 5: Design a new API
   - [ ] Serialization
   - [ ] Deserialization
-  - [ ] Debugging
-  - [ ] Traffic Inspection
-  - [ ] Integration Testing
-  - [ ] Contract Testing
-  - [ ] End to End / Acceptance Testing
+- [ ] Part 6: Managing and Maintaining an API
   - [ ] Health Checks (#36)
-  - [ ] Load Testing
-  - [ ] Testing in Production
-  - [ ] Notes on Deployment
-
-- [ ] Part 4: Management & Experience
+  - [ ] Traffic Inspection
+  - [ ] Deprecation (#34)
   - [ ] Portals & Documentation
   - [ ] API Gateways
   - [ ] Gateway Validation
-  - [ ] Rate Limiting
   - [ ] Analytics
   - [ ] Governance
-  - [ ] Deprecation (#34)
-  - [ ] Versioning & Evolution (#35)
-
-- [ ] Part 5: Further Theory
+- [ ] Part 7: Taking APIs Further
   - [ ] Picking Paradigms (#37)
   - [ ] Common Architectures
     - [ ] GraphQL as a Monolith
     - [ ] REST wrapping Microservices
     - [ ] Backend for Frontends (BFFs)
-
-## Preview
-
-[PDF Preview](https://github.com/apisyouwonthate/book-build-apis-2/raw/master/generated/book.pdf)
+- [ ] Part 8: Testing APIs
+  - [ ] Poking it with an API Client
+  - [ ] Integration Testing
+  - [ ] Contract Testing
+  - [ ] End-to-End Testing
+  - [ ] Fuzz Testing
+  - [ ] Load Testing
+  - [ ] Security Testing

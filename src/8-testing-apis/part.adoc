@@ -1,2 +1,4 @@
 [part]
 = Part 8: Testing APIs
+
+include::1-introduction.adoc[]

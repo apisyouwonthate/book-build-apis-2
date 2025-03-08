@@ -32,6 +32,88 @@ Here's why design-first is worth the effort:
 . *Automation*: You can auto-generate documentation, code snippets, and even parts of the implementation using tools.
 . *Version control*: It's easier to track and manage changes to the API over time.
 
+
+== When Are Descriptions Written, And By Who?
+
+At what stage these descriptions are written, and by who, is very much up to the
+culture of the organization. In some organizations the culture is "We dont
+bother at all" and I've been there. I spent two years helping teams fix the
+issues that came up from being vague about this stuff, and witnessed a lot of my
+friends and colleagues waste time (and the companies time) guessing interfaces.
+
+When I first got to that company, the culture relating to API descriptions was:
+
+====
+That's the thing that Phil keeps going on about, I think? Just ignore him. We've got unstable, untested, undocumented APIs full of problems to try and sort out. They're being misused by clients who don't really know how they work, meaning we're busy answering all of their questions and demands for changes to the functionality because we built a useless API before talking about their needs. No time for any of that design-first planning, just type `rails new` and write code as fast as it pops into your head. GO!
+====
+
+Two years later and that culture had changed substantially, to the point where
+most older APIs had descriptions written down, and new ones invariably had
+descriptions written before the work was started. Don't make me come to your office
+and shout at you for two years, just start designing your APIs properly now.
+
+Who should create and maintain descriptions? Whoever is creating and maintaining
+the API. 
+
+If one person is tasked with developing an API, then that is the one person who
+should be writing the descriptions as part of the design phase, all of which 
+should happen long before they start writing any code.
+
+If a whole team is tasked with developing an API, then that team should split up
+the design work between them.
+
+When they should be created? As early as possible, in the repo that the code will 
+eventually be pushed to, and they should be updated as part of the normal pull-request 
+process as people work on code.
+
+The planning process involved getting out a whiteboard, getting a few of your
+clients in a room so you can listen to their needs (instead of just dictating
+to them), get somebody who knows a bit more about systems architecture than the
+average developer does (everyone thinks they're an expert), and hash out some
+ideas.
+
+When those ideas start to solidify, start writing things down, and turn those
+notes into API descriptions. When they're ready, get them into a GitHub pull
+request, or some other collaborative place, and folks on your team can start to
+review them.
+
+One of many benefits of creating descriptions before code is that they can be
+processed by a "mock server", a HTTP server which plays make believe, and
+emulates a theoretical future API by using the description documents. It knows what 
+URLs will exist, which data is expected, if it should be JSON or something else, 
+and what sort of responses should come back.
+
+This sounds a little funny to many people who are used to just using API
+descriptions to creating API reference documentation, but using descriptions just 
+for documentation is like flying to Italy and eating at the airport.
+
+At the previous job folks even started attaching service and data models to Jira
+tasks,footnote:[Jira is a 'popular' piece of project management software from
+Atlassian] meaning implementation was a lot easier as the "contract" was already
+agreed upon. People could take the description to make a contract test, and just
+write code to fill it in.
+
+=== Too Late, We Already Have Code
+
+Whenever the topic of API design-first comes up, somebody will say "Damn, that
+sounds pretty good, but we already have an API written, and we didn't write down
+the contract!"
+
+Fear not. Some more strict languages like Go and Java have annotation-based
+systems which can allow you to sprinkle some syntax around your applications to
+generate some API descriptions. This approach does not work so well for dynamic
+programming languages like Ruby because anything can be anything and you end up
+having to write so much into comments and annotations, that you might as well
+just be writing proper API descriptions.
+
+There are a few tools out there which will help you create descriptions by
+reading your HTTP traffic and inferring description from what it sees.
+
+Use these tools to play catchup, then you can get into planning new features,
+endpoints API versions, etc. with the design-first approach. Nobody will get mad
+at you for not having a time machine, just don't use that as an excuse to not
+bother designing things.
+
 == API Description Formats and How They Help
 
 Describing an API is the most important part of the API design-first workflow after planning is done, and for anyone building REST/RESTish APIs, the API description format of choice is OpenAPI. For anyone working with event-driven architectures the format of choice is AsyncAPI.

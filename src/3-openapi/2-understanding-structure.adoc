@@ -1,0 +1,1732 @@
+[#openapi-understanding-structure]
+== Basic Structure
+
+The OpenAPI Specification (OAS) is an "API Description Format", providing a standard format for describing REST APIs, making it easier to design, document, and consume them.
+
+In this tutorial we'll explore the structure of an OpenAPI document, focusing on the main sections and important elements, so that you can get a feel for where everything is, without having to scan through the whole OpenAPI Specification yourself.
+
+=== The OpenAPI Document
+
+An OpenAPI document is typically written in either YAML or JSON format, usually called `openapi.yaml` or `openapi.json`, but it could have any name.
+
+It consists of several key sections that describe the API's endpoints, requests, responses, data models, and more. Here is an outline of the main sections:
+
+. *OpenAPI Object*
+. *Info Object*
+. *Servers Object*
+. *Paths Object*
+. *Components Object*
+. *Security Object*
+. *Webhooks Object*
+. *Tags Object*
+
+Let's look at each of these objects to see what's going on.
+
+==== 1. OpenAPI Object
+
+The root of the OpenAPI document is the `openapi` object, which specifies the version of the OpenAPI Specification being used. For example:
+
+[,yaml]
+----
+openapi: 3.1.1
+----
+
+This is required, so that tooling knows which version you are working with. The `3.1` part is the important bit. The patch number (`3.1.1`) doesn't really matter as those "patch" versions only add clarifications to the specification and never change meaning, but it's helpful to know what version somebody was reading when they wrote the OpenAPI.
+
+==== 2. Info Object
+
+The `info` object holds general metadata about the API, such as the title, version, description, and contact information.
+
+[,yaml]
+----
+info:
+  title: Train Travel API
+  description: |
+    API for finding and booking train trips across Europe.
+  version: 1.0.0
+  contact:
+    name: Train Support
+    url: https://example.com/support
+    email: support@example.com
+  license:
+    name: Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International
+    identifier: CC-BY-NC-SA-4.0
+----
+
+Only the following fields are *required*:
+
+* `title` - Your API probably has a name, and if not perhaps now is a good time to think of one thats useful for public consumption.
+* `version` - The version of your OpenAPI document, which does not have to related to the API version, or the OpenAPI Specification version.
+
+Updating the version number when you make changes is pretty common, and keeping it seperate from the API version at first feels a little bit odd, but soon makes sense. After all, you can fix issues with the OpenAPI document that produce no change whatsoever in the API, and vice-versa.
+
+These other fields are *optional*:
+
+* `description` - A handy place to put general information, especially introductory topics like where to find access tokens or links to various Postman/Insomnia Collections, or SDKs. This can be done using CommonMark (Markdown) to get as advanced as you want.
+* `contact` - Help your APIs users find the help they need instead of wandering off to use another API.
+* `license` - A chance to explain the license details of your API description. Note, that is very different from the license you use for your API source code, which would be licensed through source control with a `LICENSE.txt` or similar.
+
+==== 3. Servers Object
+
+The `servers` object specifies one or more server URLs where the API is hosted. Each server can have a URL and optional description.
+
+[,yaml]
+----
+servers:
+  - url: https://api.example.com/v1
+    description: Production server
+  - url: https://staging-api.example.com/v1
+    description: Staging server
+----
+
+It's fine to put any development and testing servers in here because you can always flag them as internal or xref:_guides/openapi/specification/v3.1/extending/overlays.adoc[strip them out with overlays later].
+
+==== 4. Paths Object
+
+The `paths` object is probably the most important section for your API. It lists all the available API endpoints, with each path being a key in the object. Then the object is further broken down by the specific HTTP methods supported by each endpoint. The object in each of these HTTP methods is another object which describes the "operation", which is a term in OpenAPI to describe a specific combination of path and method.
+
+[,yaml]
+----
+paths:
+  /bookings:
+    get:
+      operationId: get-bookings
+      summary: List existing bookings
+      tags:
+      - Bookings
+      responses:
+        '200':
+          description: A list of bookings
+    post:
+      operationId: create-booking
+      summary: Create a booking
+      tags:
+      - Bookings
+      requestBody:
+        required: true
+      responses:
+        '201':
+          description: Booking successful
+----
+
+Here the `operationId` helps us spot the two different operations, and give them a unique name which can be useful for all sorts of tools. The `summary` gives a human readable title that will often be used in documentation tools.
+
+Any HTTP request which has a body (e.g.: `POST`, `PUT`, `PATCH`) can define a `requestBody`, and the responses are broken down by status code. This is a bit of a skeleton at the moment and ignores the media types and payloads.
+
+*Learn more about xref:_guides/openapi/specification/v3.1/understanding-structure/paths-operations.adoc[paths & operations].*
+
+==== 5. Components Object
+
+The `components` object is where various types of reusable objects live. The main thing people use here is `schemas`, which some people call "data models" but that doesn't exist anywhere in the specification, thats just a nickname.you might hear.
+
+[,yaml]
+----
+components:
+  schemas:
+    Trip:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier for the trip
+        origin:
+          type: string
+          description: The starting station of the trip
+        destination:
+          type: string
+          description: The destination station of the trip
+        departure_time:
+          type: string
+          format: date-time
+          description: The date and time when the trip departs
+        arrival_time:
+          type: string
+          format: date-time
+          description: The date and time when the trip arrives
+----
+
+The schemas defined in `components.schemas` let you describe common data structures used throughout your API, allowing them to be referenced via `$ref` whenever a `schema` is required: whether that is a request body, response body, parameter, or header.
+
+[,yaml]
+----
+components:
+  requestBodies:
+    TripRequest:
+      description: A request body for creating a new trip.
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Trip'
+
+  responses:
+    TripResponse:
+      description: A single Trip returned as a response.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Trip'
+----
+
+Components can also define parameters which can be used across multiple endpoints:
+
+[,yaml]
+----
+components:
+  parameters:
+    pageParam:
+      in: query
+      name: page
+      required: false
+      schema:
+        type: integer
+        default: 1
+        description: The page number for pagination.
+----
+
+Or common headers that can be returned across multiple endpoints:
+
+[,yaml]
+----
+components:
+  headers:
+    RateLimit:
+      description: |
+        The RateLimit header communicates quota policies. It contains a `limit` to
+        convey the expiring limit, `remaining` to convey the remaining quota units,
+        and `reset` to convey the time window reset time.
+      schema:
+        type: string
+        examples:
+          - limit=10, remaining=0, reset=10
+
+    Retry-After:
+      description: |
+        The Retry-After header indicates how long the user agent should wait before making a follow-up request.
+        The value is in seconds and can be an integer or a date in the future.
+        If the value is an integer, it indicates the number of seconds to wait.
+        If the value is a date, it indicates the time at which the user agent should make a follow-up request.
+      schema:
+        type: string
+      examples:
+        integer:
+          value: '120'
+          summary: Retry after 120 seconds
+        date:
+          value: 'Fri, 31 Dec 2021 23:59:59 GMT'
+          summary: Retry after the specified date
+----
+
+Or examples, so multiple requests, responses, or parameters could share one or more examples.
+
+[,yaml]
+----
+components:
+  examples:
+    Card:
+      summary: Card Payment
+      value:
+        amount: 49.99
+        currency: gbp
+        source:
+          object: card
+          name: J. Doe
+          number: '4242424242424242'
+          cvc: 123
+          exp_month: 12
+          exp_year: 2025
+          address_line1: 123 Fake Street
+          address_line2: 4th Floor
+          address_city: London
+          address_country: gb
+          address_post_code: N12 9XX
+    Bank:
+      summary: Bank Account Payment
+      value:
+        amount: 100.5
+        currency: gbp
+        source:
+          object: bank_account
+          name: J. Doe
+          number: '00012345'
+          sort_code: '000123'
+          account_type: individual
+          bank_name: Starling Bank
+          country: gb
+----
+
+Or `securitySchemes` which will be called with the `security` keyword. OpenAPI supports several authentication types, but here are a few examples:
+
+[,yaml]
+----
+components:
+  securitySchemes:
+    ApiKeyHeader:
+      type: apiKey
+      in: header
+      name: X-API-Key
+
+    BearerToken:
+      type: http
+      scheme: bearer
+
+    JWT:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+    OAuth2ReadWrite:
+      type: oauth2
+      flows:
+        authorizationCode:
+          scopes:
+            read: Grants read access
+            write: Grants write access
+          authorizationUrl: https://example.com/oauth/authorize
+          tokenUrl: https://example.com/oauth/token
+          refreshUrl: https://example.com/oauth/refresh
+----
+
+This is just a few of the many types of security schemes that can be defined, but defining them alone doesn't do anything. They need to be referenced by the `security` object.
+
+==== 6. Security Object
+
+The top-level `security` list specifies the security schemes that apply globally to the API, so if an entire API uses an API key or OAuth2 you might have:
+
+[,yaml]
+----
+security:
+  - apiKey: []
+  - oauth2:
+    - read
+    - write
+----
+
+You can get into path specific overrides and various complex "and" situations with more xref:_guides/openapi/specification/v3.1/advanced/security.adoc[advanced security functionality].
+
+==== 7. Webhooks Object
+
+[,yaml]
+----
+webhooks:
+  newBooking:
+    post:
+      operationId: new-booking
+      summary: New Booking
+      description: |
+        Subscribe to new bookings being created, to update integrations for your users.  Related data is available via the links provided in the request.
+      tags:
+        - Bookings
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Booking'
+      responses:
+        '200':
+          description: Return a 200 status to indicate that the data was received successfully.
+----
+
+==== 8. Tags Object
+
+You may have spotted the `tags` keyword in the paths and webhooks, and those are referencing tags defined in the top-level `tags` object. The tag name is used to group related operations together. Each tag has a name and an optional description.
+
+[,yaml]
+----
+tags:
+  - name: Bookings
+    description: |
+      Create and manage bookings for train trips, including passenger details
+      and optional extras.
+  - name: Payments
+    description: |
+      Pay for bookings using a card or bank account, and view payment
+      status and history.
+
+      > warn
+      > Bookings usually expire within 1 hour so you'll need to make your payment
+      > before the expiry date
+----
+
+The name is often displayed to users in human-readable documentation so its best to make it "Title Case", and the description can be quite long, think paragraphs not sentences, explaining what this concept is to the user as that will also show up in most documentation tools.
+
+=== Example OpenAPI Document
+
+Putting it all together, here is a simple example of an OpenAPI document:
+
+[,yaml]
+----
+openapi: 3.0.3
+info:
+  title: Sample API
+  description: A sample API to illustrate OpenAPI concepts.
+  version: 1.0.0
+  contact:
+    name: API Support
+    url: http://www.example.com/support
+    email: support@example.com
+servers:
+  - url: https://api.example.com/v1
+    description: Production
+paths:
+  /users:
+    get:
+      summary: List all users
+      responses:
+        '200':
+          description: A list of users
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/User'
+    post:
+      summary: Create a new user
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
+      responses:
+        '201':
+          description: User created
+components:
+  schemas:
+    User:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        username:
+          type: string
+        email:
+          type: string
+          format: email
+security:
+  - api_key: []
+tags:
+  - name: users
+    description: Operations related to users
+----
+
+For a more advanced example, take a look at the https://bump.sh/blog/modern-openapi-petstore-replacement[Train Travel API], the modern OpenAPI example from Bump.sh.
+
+== Defining API Servers
+
+The servers section in an OpenAPI specification serves as a roadmap, detailing the various environments your API is accessible from. It's a straightforward yet powerful way to communicate the base URLs of your API across different stages of its lifecycle, or in different environments the end-users might be interested in like a mocking server, or a sandbox for interacting with the API without real-world consequences.
+
+Here is an example of how you can define API servers in your OpenAPI specification:
+
+[,yaml]
+----
+openapi: 3.1.0
+info:
+  title: Example API
+  version: 1.0.0
+
+servers:
+  - url: http://localhost:8088/api
+    description: Development
+    x-internal: true
+
+  - url: https://staging.example.com/api
+    description: Staging
+    x-internal: true
+
+  - url: https://example.com/api
+    description: Production
+    x-internal: false
+----
+
+This example shows three API servers, for the common dev, staging, and production environments. Perhaps the local environment is on localhost and perhaps its a virtual machine on the cloud somewhere, but the idea is that same, you have all the different places an API might be.
+
+____
+The `x-internal` is not strictly part of the specification, but it is a popular xref:_guides/openapi/specification/v3.1/extending/extensions.adoc[extension]. Any tools that support it will hide these servers, removing them from user facing documentation for example. This lets you can keep handy development and testing information in OpenAPI, but avoid confusing end-users with details about your internal setup.
+____
+
+=== Server Variables
+
+Server variables offer a convenient way to modify server URLs, covering simple patterns such as environment names, geographical regions, or covering wildcards like user-generated subdomains. These variables are part of the server object, and allow for more flexible API configurations without hardcoding every possible server option.
+
+For instance, consider an API that is deployed across multiple regions, such as the United States, Europe, and Asia. Instead of listing each server URL separately, you can use a server variable to represent the region.
+
+[,yaml]
+----
+servers:
+  - url: "https://{region}.api.example.com"
+    description: Regional Production Server
+    variables:
+      region:
+        default: eu
+        description: Regions
+        enum:
+          - us
+          - eu
+          - asia
+----
+
+In this example, `+{region}+` is a server variable, and the `enum` restricts this to three possible values: `us`, `eu`, and `asia`. The default value is `eu`, which means if the region is not specified, tooling can know which value to use. This setup allows clients to dynamically select the appropriate regional server by substituting the `+{region}+` variable in the URL template, resulting in `+https://asia.api.example.com+`.
+
+____
+Some people try to use server variables for handling API Versions (v1, v2, v3) in a single OpenAPI document. This is a poor fit for server variables, because far more than the server URL will change between major versions. Server variables help when just the server is changing, but the other operations and components are the same.
+____
+
+== Paths and Operations
+
+OpenAPI has the concept of "paths" and "operations", which is two parts of what people would think of as an "endpoint". The path covers the URL and the operation covers the rest of it.
+
+Here are a list of paths in the https://bump.sh/blog/modern-openapi-petstore-replacement[Train Travel API example].
+
+[,yaml]
+----
+paths:
+  /stations:
+  /trips:
+  /bookings:
+  /bookings/{bookingId}:
+  /bookings/{bookingId}/payment:
+----
+
+The path defines the relative path of the API endpoint from wherever the server URL ends, which in this example is `+https://api.example.com+`, which together describe full URLs like this:
+
+* `+https://api.example.com/stations+`
+* `+https://api.example.com/trips+`
+* `+https://api.example.com/bookings+`
+* `+https://api.example.com/bookings/{bookingId}+`
+* `+https://api.example.com/bookings/{bookingId}/payment+`
+
+Paths can store variables, a little bit like the concept of xref:_guides/openapi/specification/v3.1/understanding-structure/api-servers.adoc[server variables], using curly braces `{}` as a placeholder for a parameter which will be defined within the operation.
+
+=== Defining Paths
+
+Each path can then define one or more operations, using HTTP methods like `get`, `post`, `put`, `patch`, or `delete` as a key and the operation as an object inside that.
+
+[,yaml]
+----
+  /bookings:
+    get:
+      operationId: get-bookings
+      summary: List existing bookings
+      description: Returns a list of all trip bookings by the authenticated user.
+      responses:
+        '200':
+          description: A list of bookings
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Booking'
+
+    post:
+      operationId: create-booking
+      summary: Create a booking
+      description: A booking is a temporary hold on a trip. It is not confirmed until the payment is processed.
+      security:
+        - OAuth2:
+            - write
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Booking'
+      responses:
+        '201':
+          description: Booking successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Booking'
+----
+
+Each operation should have an `operationId` which is really useful for all sorts of automated tooling, and a summary which is more human-readable and helps the operation show up nicely in documentation tools.
+
+The description can then be as long and complex as you want, using CommonMark (standardized Markdown) and multi-line YAML syntax to place all the context which cannot be picked up from just looking at variable names.
+
+Any HTTP request which has a body (e.g.: `POST`, `PUT`, `PATCH`) can define a `requestBody`, which can be marked as required or not. Each request can have multiple content types, supporting JSON, XML, CSV, images, whatever you need to define.
+
+A common example would be supporting XML and JSON, but is really helpful for APIs which support image uploads being supported simultaneously via a direct `Content-Type: image/*` upload, whilst also supporting JSON sending the URL (e.g.: `+"image_url": "http://..."+`). It's also handy for  "import spreadsheet" type functionality.
+
+[,yaml]
+----
+paths:
+  /bookings:
+    post:
+      summary: Create a new booking
+      operationId: create-booking
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Booking'
+          text/csv:
+            schema:
+              type: string
+            example: |
+              departureTime,arrivalTime,operator,price
+              2023-04-01T10:00:00Z,2023-04-01T15:00:00Z,TrainCo,59.99
+      responses:
+        '200':
+          description: Booking created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Booking'
+            text/csv:
+              schema:
+                type: string
+              example: |
+                bookingId,departureTime,arrivalTime,operator,price
+                123,2023-04-01T10:00:00Z,2023-04-01T15:00:00Z,TrainCo,59.99
+----
+
+The responses are then broken down by status code, and again all the responses can have xref:_guides/openapi/specification/v3.1/advanced/multiple-content-types.adoc[multiple content types]. Then the content can be further described by a `schema`, and an `example` (or `examples`).
+
+For both request and response, `schema` is optional, but is massively helpful and worth putting in the work to define, because this is where all of the HTTP body information exists, which can contain validation rules, potential values, examples, and useful context like "why" and "how" instead of just "what".
+
+* Learn more about defining xref:_guides/openapi/specification/v3.1/understanding-structure/http-requests.adoc[HTTP requests] and xref:_guides/openapi/specification/v3.1/understanding-structure/http-responses.adoc[HTTP responses].
+* Learn more about xref:_guides/openapi/specification/v3.1/data-models/schema-and-data-types.adoc[schemas and data types].
+
+== Defining Parameters
+
+Parameters in OpenAPI v3.1 are a fundamental part of creating an API specification, allowing you to define the inputs your API can accept.
+
+Parameters fall into one of a few types:
+
+* *Path Parameters:* Variables within the path, e.g., `+/bookings/{bookingId}+`.
+* *Query Parameters:* Appended to the URL, e.g., `/bookings?date=2024-05-01`.
+* *Header Parameters:* Included in the request header, e.g., `Acme-Custom-Header: Value`.
+* *Cookie Parameters:* Passed in the request cookies.
+
+____
+In previous versions of OpenAPI the entire request body and form data would all be sent as parameters, but since OpenAPI v3.0 this has been moved to the content object. Learn more in xref:_guides/openapi/specification/v3.1/understanding-structure/http-requests.adoc[HTTP Requests].
+____
+
+Each parameter in OpenAPI is defined with specific attributes such as `name`, `in` (location), `required`, `description`, and `schema` (for defining data types and validation rules). Defining parameters with these keywords allows documentation to show example how HTTP requests should be constructed making life easier for the client, but also make sure machines know what to do with it, making SDKs and server-side validation a whole lot more powerful.
+
+=== Parameter Types
+
+==== Path Parameters
+
+The first type of parameter to get the hang of is path parameters.
+
+[,yaml]
+----
+  /bookings/{bookingId}:
+    get:
+      parameters:
+        - name: bookingId
+          in: path
+          required: true
+          description: The ID of the booking to retrieve.
+          schema:
+            type: string
+            format: uuid
+          example: 1725ff48-ab45-4bb5-9d02-88745177dedb
+----
+
+Here is one required path parameter, `bookingId`, with its `name` matching `+{bookingId}+`. The `schema` can contain anything you'd xref:_guides/openapi/specification/v3.1/data-models/schema-and-data-types.adoc[expect to find in schema], from data types to other validations.
+
+____
+Path parameters have to be marked as `required: true` because they're in the path, and if its missing it would break especially if the variable was between two other segments, e.g: `+/bookings/{bookingId}/payment+` would become `/bookings//payment` if the value was empty and that's going to be confusing.
+____
+
+OpenAPI v3.1 is very particular about allowed characters:
+
+____
+The value for these path parameters MUST NOT contain any unescaped "generic syntax" characters described by RFC3986: forward slashes (/), question marks (?), or hashes (#).
+____
+
+This means it's best to just use normal A-Z and 0-9 characters in the names for your path parameters.
+
+==== Query Parameters
+
+[,yaml]
+----
+  /trips:
+    get:
+      parameters:
+        - name: origin
+          in: query
+          description: The ID of the origin station
+          required: true
+          schema:
+            type: string
+            format: uuid
+          example: efdbb9d1-02c2-4bc3-afb7-6788d8782b1e
+        - name: destination
+          in: query
+          description: The ID of the destination station
+          required: true
+          schema:
+            type: string
+            format: uuid
+          example: b2e783e1-c824-4d63-b37a-d8d698862f1d
+        - name: date
+          in: query
+          description: The date and time of the trip in ISO 8601 format in origin station's timezone.
+          schema:
+            type: string
+            format: date-time
+          example: '2024-02-01T09:00:00Z'
+----
+
+In this example `origin`, `destination`, and `date` are query parameters. The first two are defined as required, because it's important to know where you're going from and to when buying a ticket, but the date is optional at this point because a customer might be looking for the cheapest day.
+
+Query parameters are appended to the URL when a client actually makes the request, e.g., `/trips?origin=efdbb9d1-02c2-4bc3-afb7-6788d8782b1e&destination=destination&date=2024-05-01T10:00:00`.
+
+==== Header Parameters
+
+Header parameters are sent in the HTTP request as a HTTP header. HTTP headers are often are often used for passing authorization tokens, specifying content types being sent, requesting the types being received, and directing the behavior of cache mechanisms. Some of this is already covered by other OpenAPI functionality so you don't need to manually re-define `Content-Type` or `Accept`, but anything else will need to be defined.
+
+For example, if you'd like to let API users know they can ask for fresh (uncached) data on a certain endpoint, you can advertise the API respects the `If-Modified-Since` header like this:
+
+[,yaml]
+----
+paths:
+  /trips:
+    get:
+      summary: Get train trips
+      parameters:
+        - in: header
+          name: If-Modified-Since
+          schema:
+            type: string
+            format: date-time
+          required: false
+          description: >
+            Allows the client to request the resource only if it has been modified after the specified date and time.
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Trips'
+        '304':
+          description: The data has not been modified since the date and time specified in the `If-Modified-Since` header.
+----
+
+Try to clearly explain not just what the header does, but in what scenarios a client might want to use it, and focus on how it helps them.
+
+==== Cookie Parameters
+
+Cookie parameters are sent in the HTTP request through the https://developer.mozilla.org/en-US/docs/Web/HTTP/Cookies[Cookies] functionality available in all web browsers and some HTTP clients.
+
+Cookie parameters can be any primitive values, arrays and objects. Arrays and objects are serialized using the form style. For more information, see xref:_guides/openapi/specification/v3.1/understanding-structure/parameter-serialization.adoc[Parameter Serialization].
+
+The first thought might be to use cookie for authentication, but for that you would be better off using xref:_guides/openapi/specification/v3.1/advanced/security.adoc[API keys]. Cookie parameters are reserved for other things, like tracking and analytics, locale preferences, or other session related information which does not fit into the HTTP specification with dedicated headers.
+
+[,yaml]
+----
+paths:
+  /analytics/visit:
+    get:
+      summary: Track user visit
+      description: Records user visit for analytics purposes.
+      parameters:
+        - name: UserId
+          in: cookie
+          required: false
+          description: Unique user identifier
+          schema:
+            type: string
+            example: "abc123"
+        - name: VisitCount
+          in: cookie
+          required: false
+          description: Number of visits by the user
+          schema:
+            type: integer
+            example: 5
+----
+
+=== Defining Parameters for Multiple Operations
+
+All these examples show parameters being defined at the operation level, but they can also be defined at the path level to avoid repetition. This is especially useful for path parameters, but works for all types of parameters.
+
+[,yaml]
+----
+  /bookings/{bookingId}:
+    parameters:
+      - name: bookingId
+        in: path
+        required: true
+        description: The ID of the booking to retrieve.
+        schema:
+          type: string
+          format: uuid
+        example: 1725ff48-ab45-4bb5-9d02-88745177dedb
+    get:
+      ...
+    delete:
+      ...
+----
+
+By defining the `bookingId` parameter at the path level, it will be automatically applied to all operations under the `+/bookings/{bookingId}+` path.
+
+=== Defining Shared Parameters in Components
+
+Alternatively, you can define shared parameters in the `components` section of your OpenAPI specification. This allows you to reuse the parameters across different paths and operations. Here's an example:
+
+[,yaml]
+----
+components:
+  parameters:
+    bookingId:
+      name: bookingId
+      in: path
+      required: true
+      description: The ID of the booking to retrieve.
+      schema:
+        type: string
+        format: uuid
+      example: 1725ff48-ab45-4bb5-9d02-88745177dedb
+----
+
+To use the shared parameter, you can reference it in your path or operation like this:
+
+[,yaml]
+----
+  /bookings/{bookingId}:
+    get:
+      parameters:
+        - $ref: '#/components/parameters/bookingId'
+    delete:
+      parameters:
+        - $ref: '#/components/parameters/bookingId'
+----
+
+This way, you can maintain consistency and avoid duplicating parameter definitions across your API description.
+
+== Parameter Serialization
+
+_This section was kindly contributed by John Charman_.
+
+xref:_guides/openapi/specification/v3.1/understanding-structure/parameters.adoc[Parameters] not only define what inputs your API accepts, they also define the format your API expects to receive them in, i.e. how you would like it serialized.
+
+There are two keywords concerning serialization:
+
+=== Explode
+
+`explode` defines whether parameters should be broken into logical components.
+
+It takes a boolean value:
+
+* If `true`; a parameter with multiple values will be serialized as if each of its values were separate parameters.
+ ** What separates each parameter is determined by the `style`.
+* If `false`; a parameter is a single parameter, regardless of how many values it has.
+
+In practice, this means only parameters of `type:array` or `type:object` are affected by `explode`.
+
+* For an array, each value becomes its own parameter.
+* For an object, each key-value pair is concatenated into its own parameter as "key=value".
+ ** For any `style` other than `form`, if the value is an empty string, then it drops the equals and becomes "key"
+
+For a more verbose description of `explode`, refer to https://datatracker.ietf.org/doc/html/rfc6570#section-3.2.1[RFC6750's Variable Expansion].
+
+Its default value depends on the `style` of serialization:
+
+* `explode:true` is the default for `style:form`
+* `explode:false` for anything else.
+
+=== Style
+
+`style` defines how your API expects the parameter to be serialized.
+
+It takes a string value: The options defined depend on the location your parameter is `in`:
+
+* <<path-parameters,`in:path`>> defaults to <<simple,`simple`>> but can also be <<label,`label`>> or <<matrix,`matrix`>>.
+* <<query-parameters,`in:query`>> defaults to <<form,`form`>> but can also be <<space-delimited,`spaceDelimited`>>, <<pipe-delimited,`pipeDelimited`>> or <<deep-object,`deepObject`>>.
+* <<header-parameters,`in:header`>> defaults to <<simple,`simple`>>.
+* <<cookie-parameters,`in:cookie`>> defaults to <<form,`form`>>.
+
+Each `style` will be explained in more depth per location; examples will make use of the following two parameters.
+
+"pets" which depending on its `type` has one of the following values:
+
+----
+bool   -> true
+int    -> 2
+string -> "dog"
+array  -> ["cat","dog"]
+object -> {"age":2,"type":"dog"}
+----
+
+"hats" which depending on its `type` has one of the following values:
+
+----
+bool   -> false
+int    -> 1,
+string -> "fedora"
+array  -> ["fedora"]
+object -> {"type":"fedora"}
+----
+
+=== Path Parameters
+
+For parameters `in:path` there are three defined values for `style`:
+
+* `simple`: defined by https://datatracker.ietf.org/doc/html/rfc6570#section-3.2.2[RFC6750's Simple String Expansion].
+* `label`: defined by https://datatracker.ietf.org/doc/html/rfc6570#section-3.2.5[RFC6750's Label Expansion with Dot-Prefix].
+* `matrix`: defined by https://datatracker.ietf.org/doc/html/rfc6570#section-3.2.7[RFC6750's Path-Style Parameter Expansion].
+
+The defaults `in:path` are:
+
+* `style:simple`
+* `explode:false`
+
+Every `style` `in:path` follows https://datatracker.ietf.org/doc/html/rfc6750[RFC6750] so the effects of `explode` are well-defined by https://datatracker.ietf.org/doc/html/rfc6570#section-3.2.1[RFC6570's Variable Expansion].
+
+==== Simple
+
+`style:simple` with its default of `explode:false`, would serialize your parameters like this:
+
+|===
+| `empty` | `bool` | `int` | `string` | `array` | `object`
+
+|
+| true
+| 2
+| dog
+| cat,dog
+| age,2,type,dog
+|===
+
+* Single values are unchanged.
+* An `array` with multiple values is concatenated into a comma-delimited list.
+* An ``object``has its key-value pairs concatenated into comma-delimited pairs, then each pair is concatenated into a comma-delimited list.
+
+If you set `explode:true`, then the seperator used is also a comma: ",":
+
+|===
+| `empty` | `bool` | `int` | `string` | `array` | `object`
+
+|
+| true
+| 2
+| dog
+| cat,dog
+| age=2,type=dog
+|===
+
+* Single values remain unchanged.
+* Surprisingly, an `array` with multiple values seems unchanged. Though it treated each value as a separate parameter, it still had to separate them with a comma. So it still ends up as a comma-delimited list.
+* To understand what happened for an `object` looking back at the rules on <<explode,`explode`>> we see it concatenates key-value pairs into their own parameters as "key=value". Then it has to separate each parameter with a comma.
+
+==== Label
+
+`style:label` with its default of `explode:false`, would  serialize your parameters like this:
+
+|===
+| `empty` | `bool` | `int` | `string` | `array` | `object`
+
+|
+| .true
+| .2
+| .dog
+| .cat,dog
+| .age,2,type,dog
+|===
+
+Everything is the same as `style:simple` except all parameters were prefixed with ".".
+
+If you set `explode:true`, then the seperator used is a period: ".":
+
+|===
+| `empty` | `bool` | `int` | `string` | `array` | `object`
+
+|
+| .true
+| .2
+| .dog
+| .cat.dog
+| .age=2.type=dog
+|===
+
+* Single values remain unchanged.
+* An `array` becomes a period-delimited list.
+* An `object` concatenates key-value pairs into their own parameters as "key=value". Then it separates each parameter with a period.
+
+==== Matrix
+
+`style:matrix` with its default of `explode:false`, would  serialize your parameters like this:
+
+|===
+| `empty` | `bool` | `int` | `string` | `array` | `object`
+
+|
+| ;pets=true
+| ;pets=2
+| ;pets=dog
+| ;pets=cat,dog
+| ;pets=age,2,type,dog
+|===
+
+Everything is the same as `style:simple` except all parameters were prefixed with a semicolon: ";pets=" where "pets" is the parameter's name.
+
+If you set `explode:true`, then the seperator used is a semicolon: ";".
+
+|===
+| `empty` | `bool` | `int` | `string` | `array` | `object`
+
+|
+| ;pets=true
+| ;pets=2
+| ;pets=dog
+| ;pets=cat;pets=dog
+| ;age=2;type=dog
+|===
+
+* Single values remain unchanged.
+* An `array` has its values treated as separate parameters. Because they're now treated separately, every value is prefixed with ";pets="
+* An `object` is the exception, it does not get prefixed with "pets=", but it still has to separated by a semicolon: ";".
+
+=== Query Parameters
+
+For parameters `in:query` there are four defined values for `style`.
+
+* `form`: It is defined by https://datatracker.ietf.org/doc/html/rfc6570#section-3.2.8[RFC6750's Form-Style Query Expansion], if there are multiple
+* `spaceDelimited`: An addition by popular demand.
+* `pipeDelimited`: An addition by popular demand.
+* `deepObject`: An addition by popular demand.
+
+The defaults `in:query` are:
+
+* `style:form`
+* `explode:true`
+
+Only `style:form` follows https://datatracker.ietf.org/doc/html/rfc6750[RFC6750] so the effects of `explode` are only well-defined by https://datatracker.ietf.org/doc/html/rfc6570#section-3.2.1[RFC6570's Variable Expansion] for `style:form`.
+
+An informal, general rule of thumb is:
+
+* Query strings start with a question-mark, this is how you separate the first `query` parameter from the rest of the URI.
+* Subsequent parameters `in:query` are separated by an ampersand "&".
+
+Just be aware that `spaceDelimited`, `pipeDelimited` and `deepObject` are not defined by https://datatracker.ietf.org/doc/html/rfc6750[RFC6750].
+There are caveats to their usage, if you intend to use them, make sure you read their sections carefully.
+
+==== Form
+
+With `style:form`, if you set `explode:false`, would serialize your parameters like this:
+
+|===
+| `empty` | `bool` | `int` | `string` | `array` | `object`
+
+|
+| ?pets=true
+| ?pets=2
+| ?pets=dog
+| ?pets=cat,dog
+| ?pets=age,2,type,dog
+
+|
+| ?pets=true&hats=false
+| ?pets=2&hats=1
+| ?pets=dog&hats=fedora
+| ?pets=cat,dog&hats=fedora
+| ?pets=age,2,type,dog&hats=type,fedora
+|===
+
+You'll notice this looks almost identical to <<matrix,`style:matrix`>>.
+There's only one difference to be
+
+* If it's the first parameter, the separator from the rest of the URI by a question-mark like above `?pets=true`
+* If it's the second parameter, the separator is an ampersand, you might have a query string like this `?hats=false&pets=true`
+
+If you stick with the default of `explode:true`, then the seperator used is also a comma: ",":
+
+|===
+| `empty` | `bool` | `int` | `string` | `array` | `object`
+
+|
+| ?pets=true
+| ?pets=2
+| ?pets=dog
+| ?pets=cat&pets=dog
+| ?age=2&type=dog
+
+|
+| ?pets=true&hats=false
+| ?pets=2&hats=1
+| ?pets=dog&hats=fedora
+| ?pets=cat&pets=dog&hats=fedora
+| ?age=2&type=dog&type=fedora
+|===
+
+Notice one example is highlighted in red. The OpenAPI Specification states that https://spec.openapis.org/oas/latest.html#parameter-object[A Unique Parameter] is a combination of `name` and (`in`).
+Both "pets" and "hats" would be considered unique parameters, but they both have the property "type". When `explode` is `true` their properties are serialized as if they were separate parameters. It is as if we have two different parameters both with `name:type`, `in:query`, they are no longer unique and one cannot be unambiguously distinguished from the other.
+
+This conflict is entirely avoided if you explicitly set `explode:false` on parameters of `type:object`, but if that's not an option, remain vigil for possible conflicts.
+
+==== Space Delimited
+
+`style:spaceDelimited` with its default of `explode:false`, would  serialize your parameters like this:
+
+|===
+| `array` | `object`
+
+| ?pets=cat%20dog
+| ?pets=age%202%20type%20dog
+
+| ?pets=cat%20dog&hats=fedora
+| ?pets=age%202%20type%20dog&hats=type%20fedora
+|===
+
+It's basically identical to `style:form` with `explode:false`. The difference being, the separator used is not a comma, but a percent-encoded space "%20".
+
+You'll notice there are no examples for any `type` that would be a single value. This is because its behaviour is undefined for single values. One could assume it would be identical to `style:form`, but if your parameter is going to be a single value, there is no need to explicitly define it as `spaceDelimited`.
+
+`style:spaceDelimited` is not defined by https://datatracker.ietf.org/doc/html/rfc6750[RFC6750] and there is no defined behaviour for `explode:true`. You could assume it would be identical to the well-defined `in:query` default of `style:form` with `explode:true`. That said, if you're making that assumption, you're better off leaving it on the well-defined default.
+
+==== Pipe Delimited
+
+`style:pipeDelimited` with its default of `explode:false`, would  serialize your parameters like this:
+
+|===
+| `array` | `object`
+
+| ?pets=cat%7Cdog
+| ?pets=age%7C2%7Ctype%7Cdog
+
+| ?pets=cat%7Cdog&hats=fedora
+| ?pets=age%7C2%7Ctype%7Cdog&hats=type%7Cfedora
+|===
+
+It's basically identical to `style:form` with `explode:false`. The difference being, the separator used is not a comma, but a percent-encoded pipe "%7C".
+
+You may be able to use a normal pipe "|" but it is not in the list of https://datatracker.ietf.org/doc/html/rfc3986#section-2.3[RFC3986's Unreserved Characters]. As such, it may work in some environments, and not in others. +
+If you still choose to use non-percent-encoded pipes, it would look like this:
+
+|===
+| `array` | `object`
+
+| ?pets=cat\|dog
+| ?pets=age\|2\|type\|dog
+
+| ?pets=cat\|dog&hats=fedora
+| ?pets=age\|2\|type\|dog&hats=type\|fedora
+|===
+
+You'll notice there are no examples for any `type` that would be a single value. This is because its behaviour is undefined for single values. One could assume it would be identical to `style:form`, but if your parameter is going to be a single value, there is no need to explicitly define it as `spaceDelimited`.
+
+`style:pipeDelimited` is not defined by https://datatracker.ietf.org/doc/html/rfc6750[RFC6750] and there is no defined behaviour for `explode:true`. You could assume it would be identical to the well-defined `in:query` default of `style:form` with `explode:true`. That said, if you're making that assumption, you're better off leaving it on the well-defined default.
+
+==== Deep Object
+
+`style:deepObject` is undefined for its default of `explode:false`. You must explicitly specify `explode:true` for any defined behaviour.
+
+You may be able to use a normal square brackets "[" and "]" but they are in the list of https://datatracker.ietf.org/doc/html/rfc3986#section-2.2[RFC3986's Reserved Characters]. As such, it may not work in some environments.
+
+|===
+| `object`
+
+| ?pets[age]=2&pets[type]=dog
+| ?pets[age]=2&pets[type]=dog&hats[type]=fedora
+|===
+
+For maximum interoperability it is safer to have them percent-encoded:
+
+* "%5B" for "["
+* "%5D" for "]".
+
+|===
+| `object`
+
+| ?pets%5Bage%5D=2&pets%5Btype%5D=dog
+| ?pets%5Bage%5D=2&pets%5Btype%5D=dog&hats%5Btype%5D=fedora
+|===
+
+Unsurprisingly, it only has defined behaviour for an `object`. This `style` is quite different from any other, even with `explode:true` the `name`, key and value are all specified. This makes it useful for avoiding the potential name conflicts objects could cause with `style:form`, `explode:true`.
+
+Just bear in mind the name is misleading, despite being called a `deepObject`, there is no defined behaviour for nested arrays or objects. This is the same for every `style` `in:query`.
+
+=== Header Parameters
+
+For parameters `in:header` there is only one defined value for `style`: `simple`.
+
+Naturally, the default value is `style:simple`, with `explode:false`.
+
+It is the <<simple,same definition as it would be `in:path`>> except there is a major caveat to be aware of:
+
+* Headers do not require any percent encoding in the same way a URI string would, so it cannot follow the same definitions laid out by https://datatracker.ietf.org/doc/html/rfc6750[RFC6750].
+
+For this reason it is not recommended to rely on `style`, `explode` and `schema`.
+
+For parameters `in:header` it is recommended to make use of the parameter's `content` field instead of `schema`. Then use a media type such as `text/plain` and require the application to assemble the correct string. This will be the recommended approach as of OpenAPI Version 3.1.1, with more detail available in Appendix D: Serializing Headers and Cookies.
+
+=== Cookie Parameters
+
+For parameters `in:cookie` there is only one defined value for `style`: `form`.
+
+Naturally, the default value is `style:form`, with `explode:true`.
+
+It is the <<form,same definition as it would be `in:query`>> except there are several major caveats to be aware of:
+
+* Cookies do not require any percent encoding in the same way a URI string would, so it cannot follow the same definitions laid out by https://datatracker.ietf.org/doc/html/rfc6750[RFC6750].
+* The first parameter is not prefixed with a question-mark "?" like it would `in:query`.
+* Any subsequent parameters are not separated by an ampersand "&" like they would `in:query`.
+ ** Subsequent parameters `in:cookie` are separated by a semicolon followed by a space "; ".
+
+As such `style:form` `in:cookie` is somewhat confusing, and less accurate the more parameters you have to serialize. For this reason it is not recommended to rely on `style`, `explode` and `schema`.
+
+For parameters `in:cookie` it is recommended to make use of the parameter's `content` field instead of `schema`. Then use a media type such as `text/plain` and require the application to assemble the correct string. This will be the recommended approach as of OpenAPI Version 3.1.1, with more detail available in Appendix D: Serializing Headers and Cookies.
+
+=== Examples and Recommendations
+
+==== General Guide Lines
+
+===== Location
+
+If a parameter is needed across many `paths`, or contains sensitive information; it may be sensible to include `in:header` or `in:cookie`.
+
+* If the parameter needs to persist across sessions, keep it `in:cookie`.
+
+If a parameter is only needed in specific `paths`, it may be sensible include `in:path` or `in:query`.
+
+It is easier to provide parameters in a URL. Requiring `headers`, `cookies` or a `requestBody` generally make requests more difficult. +
+Keep it simple; if it's sensible to include a parameter `in:path` or `in:query`, do so.
+
+===== Style
+
+For parameters `in:path` or `in:query`; the defaults exist for a reason, they're well-defined, versatile and simple.
+
+For parameters `in:header` or `in:cookie`; the defaults work to an extent, but the variations on their syntax are beyond the scope of the OpenAPI Specification and what can be described through `style`. The recommended approach is to forgo `style` and `schema` in favour of using `content` with a media type such as `text/plain`.
+
+==== Optional Boolean
+
+Looking at the https://bump.sh/bump-examples/doc/train-travel-api[Train Travel API], we can make a `GET` request to find available trips, based on our criteria:
+
+[,yaml]
+----
+/trips:
+  get:
+  ...
+  parameters:
+    ...
+    - name: dogs
+    in: query
+    description: Only return trips where dogs are known to be allowed
+    required: false
+    schema:
+      type: boolean
+      default: false
+----
+
+The parameter is simple, it could be formatted anywhere without issue.
+
+It doesn't need to persist between sessions, so it doesn't need to be `in:cookie`. +
+It's specific to this path, so there's not much benefit in sticking it `in:header`. +
+It's optional, so it cannot be `in:path`.
+
+No `style` has been mentioned, nor `explode`. But the parameter is `in:query` so we know the default is `style:form` and `explode:true`. We would expect a URLs like this:
+
+User without a dog: `/trips` +
+User with a dog: `/trips?dogs=true`
+
+We could set `explode:false` but <<explode,Explode>> has no effect on parameters that are not arrays or objects. This would be extra documentation with no gain, leaving it as the default keeps your specification concise.
+
+We could not use any other `style` available to <<query-parameters,Query Parameters>> as only `style:form` can be used with parameters that are not arrays or objects.
+
+==== Required String
+
+Looking at the https://bump.sh/bump-examples/doc/train-travel-api[Train Travel API] once more, we can get the details of specific bookings:
+
+[,yaml]
+----
+/bookings/{bookingId}:
+  parameters:
+    - name: bookingId
+      in: path
+      required: true
+      description: The ID of the booking to retrieve.
+      schema:
+        type: string
+        format: uuid
+        example: 1725ff48-ab45-4bb5-9d02-88745177dedb
+  get:
+    ...
+----
+
+Again the parameter is simple, it could be formatted anywhere without issue.
+
+It doesn't need to persist between sessions, so it doesn't need to be `in:cookie`. +
+It's specific to this path, so there's not much benefit in sticking it `in:header`. +
+It's required, so it could be `in:path` or `in:query`.
+
+Because parameters `in:path` are always `required:true`, it is the most intuitive place to stick a `required` parameter.
+
+By default this be `style:simple` and `explode:false`, looking like this: `/bookings/1725ff48-ab45-4bb5-9d02-88745177dedb`
+
+It could have a different `style` like so:
+
+* `style:label` : `bookings/.1725ff48-ab45-4bb5-9d02-88745177dedb`
+* `style:matrix` : `bookings/;bookingId=1725ff48-ab45-4bb5-9d02-88745177dedb`
+
+==== List of Strings
+
+What if we could filter trips that stop at a specified list of stations?
+
+It's specific to this path, so we should keep it in the URL for simplicity. That means `in:path` or `in:query`.
+Not every user knows the station they want, they may simply be looking for the closest stop to their actual destination. This parameter should be optional, so it cannot be `in:path`.
+
+We could put it `in:path` and it would look like so:
+
+[,yaml]
+----
+/trips:
+  get:
+  ...
+    parameters:
+      ...
+      - name: stations
+        in: query
+        description: Only return trips that stop at these stations
+        required: false,
+        schema:
+          type: array
+          items:
+            type: string
+----
+
+Now our URL will look like this:
+
+* Users with specific station in mind: `/trips?stations=gatwick&stations=london`
+* Users with only one station in mind: `/trips?stations=london`
+
+==== AnyOf Object or String
+
+[,yaml]
+----
+/trips:
+  get:
+  ...
+    parameters:
+      ...
+      - name: station
+        description: Only return trips that stop at your preferred station, if none, use to fallback if provided.
+        in: query
+      style: deepObject
+      explode: true
+      required: false
+      schema:
+        anyOf:
+          - type: object
+            required:
+              - preferred
+            properties:
+              preferred:
+                type: string
+              fallback:
+                type: string
+          - type: string
+----
+
+Here I've stated that my `schema` can be `anyOf` the following: an object or a string, in `style:deepObject`. You may have spotted the problem already:
+
+* If our user specifies an object, this works as expected: `/trips?station[preferred]=gatwick&station[fallback]=london`.
+* What if our user specifies a string? It's undefined, `deepObject` only has defined behaviour for objects.
+
+You cannot apply `style` on a per-`schema` basis. Your `style` needs to work for all possible variations of your parameter. +
+If you intend to use `anyOf`, `allOf` or `oneOf` make doubly sure your choice of `style` works for every option. +
+As always, the best option is to minimise your use of complex parameters, keep it simple.
+
+== HTTP Requests
+
+Any API handling use-cases more advanced that purely fetching data will need to define a HTTP request body. `POST`, `PATCH`, `PUT`, all allow a HTTP client to send a body: often JSON or XML. This allows for more information to be sent rather than just query parameters, which have limits.
+
+The request body can be used for:
+
+* Creating new resources (e.g.: booking a train ticket)
+* Updating existing resources (e.g.: updating that booking)
+* Uploading files (e.g.: uploading an image to your railcard)
+
+=== Structure of Request Bodies
+
+In OpenAPI 3.x, the request body is defined using the `requestBody` object. This object allows you to specify:
+
+* The content type (e.g.: `application/json`, `application/xml`).
+* The schema that defines the structure of the request body.
+* Whether the request body is required or optional.
+* Descriptions for these requests to add context to API documentation.
+
+Let's consider the https://bump.sh/blog/modern-openapi-petstore-replacement[Train Travel API], which allows users to book train tickets.
+
+==== Creating a Resource
+
+When a user wants to book a train ticket, they need to send details like the passenger's name, trip ID, date of travel, and seat preference, which would look a bit like this:
+
+[,yaml]
+----
+paths:
+  /bookings:
+    post:
+      summary: Book a train ticket
+      description: Endpoint to book a train ticket
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                passenger_name:
+                  type: string
+                  example: "John Doe"
+                trip_id:
+                  type: string
+                  example: "1234"
+                date:
+                  type: string
+                  format: date
+                  example: "2024-08-15"
+                seat_preference:
+                  type: string
+                  enum: [window, aisle, any]
+                  example: "window"
+----
+
+Here the `requestBody` object defines two important properties:
+
+* `required: true` - indicates that the request body is mandatory for this operation.
+* `content` - specifies that the request body should be in `application/json` format with the following `schema`.
+
+The schema defines the structure of the request body, including properties like `passenger_name`, `train_id`, `date`, and `seat_preference`. This can be defined inline like this, or it can use `components` to share an xref:_guides/openapi/specification/v3.1/data-models/schema-and-data-types.adoc[existing schema] and reduce repetition.
+
+==== Updating a Resource
+
+If a user wants to update their booking (e.g.: change the seat preference), the API can define a `PUT` or `PATCH` operation, to allow updating the entire booking, or part of the booking respectively. Either way, they need to send the updated data in the request body. Here's how to define it:
+
+[,yaml]
+----
+paths:
+  /bookings/{bookingId}:
+    patch:
+      summary: Update a booking
+      description: Endpoint to update an existing booking
+      parameters:
+        - name: bookingId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                seat_preference:
+                  type: string
+                  enum: [window, aisle, any]
+                  examples:
+                  - aisle
+----
+
+Here the `PATCH` method is used to describe an operation that can update one specific field from an existing booking. The `required: true` says the `requestBody` is mandatory, and the only media type defined is `application/json` so that says the request must be in that format.
+
+The `schema` then defines the structure of the request body, which demonstrates that only the `seat_preference` property can be updated.
+
+If multiple properties could be updated, you would define all the properties that could be updated, then show off some xref:_guides/openapi/specification/v3.1/data-models/examples.adoc[examples] for common use-cases of things users might want to do.
+
+=== File Uploads & Multipart Forms
+
+HTTP requests can also cover more advanced scenarios like xref:_guides/openapi/specification/v3.1/advanced/file-uploads.adoc[file uploads] and xref:_guides/openapi/specification/v3.1/advanced/multipart-form-data.adoc[multipart form data], which have their own guides in the advanced section.
+
+== HTTP Responses
+
+HTTP responses outline what an API user could expect to receive in response to a HTTP request. In OpenAPI responses described in the `responses` object, broken down by expected media-types and status codes.
+
+[,yaml]
+----
+paths:
+  /health:
+    get:
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  healthy:
+                    type: boolean
+----
+
+Here's an example from the https://bump.sh/blog/modern-openapi-petstore-replacement[Train Travel API], showing two responses for the same operation, one success and one failure, both defining a JSON response:
+
+[,yaml]
+----
+  responses:
+
+    '200':
+      description: A list of train stations
+      headers:
+        RateLimit:
+          description: The RateLimit header communicates quota policies.
+          schema:
+            type: string
+            examples:
+              - limit=10, remaining=0, reset=10
+      content:
+        application/json:
+          schema:
+            properties:
+              $ref: '#/components/schemas/Stations'
+
+    '400':
+      description: Bad Request
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/Problem'
+----
+
+____
+These responses contain shared schemas which are referenced via the xref:_guides/openapi/specification/v3.1/understanding-structure/components.adoc[components section] to keep the relevant parts of the example clear, but you can xref:_guides/openapi/specification/v3.1/data-models/schema-and-data-types.adoc[learn more about schemas] to see what else could go in there.
+____
+
+The key parts that define a response:
+
+*description*: A short, descriptive text about the response which is mandatory. It explains the meaning of the response in the context of the API operation. This is often just the status code text, so 200 would be "Ok", 201 would be "Success", but it can be anything you think makes sense.
+
+*headers*: An optional map of headers that can be sent by the response. Each header is itself described by an object, which defines the name as a key, then has an object with a description of its own and a schema to describe the header. then `Cache-Controls`, RFC headers like `RateLimit` or custom headers like `'X-Rate-Limit'`.
+
+*content*: An optional field that describes the content of the response body. It allows for different media types to be documented, specifying how the body of the response should be formatted. For each media type, you can define a schema and examples, making it clear what the response will look like.
+
+*links*: An optional section that can define hypermedia relations associated with the response. Links can show clients what operations might be related or available to them after receiving the response, essentially guiding them on what they can do next.
+
+The HTTP response object in OpenAPI allows for detailed documentation of each possible outcome of an API operation, making it easier for developers to understand and handle those responses correctly in their applications.
+
+=== HTTP Status Codes
+
+HTTP status codes are essential for defining the responses of API operations. Each response in an API operation must include at least one HTTP status code, such as `200` for success or `404` for not found. Typically an operation specifies one successful status code for the "happy path", and one or more error statuses describing the variety of things that can go wrong.
+
+[,yaml]
+----
+  responses:
+    '200':
+      description: OK
+    '304':
+      description: Not Modified
+    '400':
+      description: Bad Request
+    '401':
+      description: Unauthorized
+    '403':
+      description: Forbidden
+    '429':
+      description: Too Many Requests
+    '500':
+      description: Internal Server Error
+----
+
+How many status codes you choose to describe is up to you. There is a balance to be found between "only the status codes the API is programmed to emit" and "everything that could possibly ever come out of the API, server, and network components involved" which is going to be different for everyone.
+
+==== Status Ranges
+
+OpenAPI allows defining a range of response codes to simplify documentation:
+
+* 1XX for informational responses
+* 2XX for successful responses
+* 3XX for redirection messages
+* 4XX for client errors
+* 5XX for server errors
+
+If a specific code is detailed within a range, that code's definition takes precedence over the general range definition. Each status code in the documentation requires a description, explaining under what conditions it is returned. Markdown (CommonMark) can be used for these descriptions to include rich text formatting.
+
+==== More about HTTP Status Codes
+
+For more detailed information on HTTP status codes, the OpenAPI Specification defers to https://httpwg.org/specs/rfc7231.html[RFC 7231] and the https://www.iana.org/assignments/http-status-codes/http-status-codes.xhtml[IANA Status Code Registry]. If a code is defined there, it's valid to use in your OpenAPI.
+
+If you're struggling to remember which HTTP status codes to use for any scenario, https://http.cat/[HTTP Cats] will help you visualize the right choice.
+
+=== Empty status body
+
+Some HTTP responses will not have a body. For example 204 No Content is often used after something has been deleted and therefore there is nothing to return. Another common one is 304 Not Modified, which lets clients know they can https://apisyouwonthate.com/blog/http-client-response-caching/[reuse previous cached responses] because nothing has changed on the server.
+
+To describe HTTP responses with no body in OpenAPI you simply leave the `content` object out.
+
+[,yaml]
+----
+paths:
+  /example:
+    get:
+      summary: "Endpoint with no response body"
+      responses:
+        '204':
+          description: "No content to return"
+          ## No 'content' field here
+----
+
+____
+If you are using OpenAPI for contract testing then most tools will understand this, but they will get confused if you are omitting content for responses which do actually return content. Make your OpenAPI be more accurate by describing the return body content of anything which does return, and only omitting content for responses which legitimately do not return content.
+____
+
+== OpenAPI Components
+
+The Components object in OpenAPI allows you to create reusable bits of OpenAPI that can then be pieced together like Lego blocks to build a better API description. This keeps things nice and tidy, and you can even spread them across multiple documents to share components between multiple APIs, or at least just keep your file sizes down.
+
+[,yaml]
+----
+components:
+  schemas:
+    User:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        email:
+          type: string
+          format: email
+  parameters:
+    userId:
+      name: id
+      in: path
+      description: ID of the user
+      required: true
+      schema:
+        type: integer
+  responses:
+    NotFound:
+      description: User not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+  requestBodies:
+    User:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/User'
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+----
+
+The full list of objects which can be defined in components is:
+
+* `callbacks` - Define callback objects that send outgoing requests.
+* `examples` - Define reusable examples for whole media types.
+* `headers` - Define reusable HTTP header objects to be included in responses.
+* `links` - Define reusable links between operations.
+* `parameters` - Define reusable parameters that can be used in requests.
+* `pathItems` - Define reusable path items which can go into paths and webhooks.
+* `requestBodies` - Define reusable request body objects for operations.
+* `responses` - Define reusable response objects for operations.
+* `schemas` - Define reusable schemas for media types and any other object which accepts schemas.
+* `securitySchemes` - Define reusable security schemes for API authentication and authorization.
+
+=== Using $ref with Components
+
+Once components have been defined they can be referenced with `$ref`. This is mostly the same definition of https://www.learnjsonschema.com/2020-12/core/ref/[$ref in JSON Schema] so it can help to learn how that works, but there are a few caveats to keep in mind.
+
+The https://learn.openapis.org/[OpenAPI Documentation] from the OpenAPI Initiative includes a brilliant example of an API for playing the classic board game Tic Tac Toe, and it demonstrates `$ref` nicely.
+
+This has several parts that are used several times, so instead of copy-pasting everything they've defined reusable `components` for both `schemas` and `parameters`.
+
+[,yaml]
+----
+paths:
+  # Whole board operations
+  /board:
+    get:
+      summary: Get the whole board
+      description: Retrieves the current state of the board and the winner.
+      tags:
+        - Gameplay
+      operationId: get-board
+      responses:
+        "200":
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/status"
+  # Single square operations
+  /board/{row}/{column}:
+    parameters:
+      - $ref: "#/components/parameters/rowParam"
+      - $ref: "#/components/parameters/columnParam"
+    get:
+      # ... Hidden for readability...
+    put:
+      # ... Hidden for readability...
+
+components:
+  parameters:
+    rowParam:
+      description: Board row (vertical coordinate)
+      name: row
+      in: path
+      required: true
+      schema:
+        $ref: "#/components/schemas/coordinate"
+    columnParam:
+      description: Board column (horizontal coordinate)
+      name: column
+      in: path
+      required: true
+      schema:
+        $ref: "#/components/schemas/coordinate"
+  schemas:
+    errorMessage:
+      type: string
+      maxLength: 256
+      description: A text message describing an error
+    coordinate:
+      type: integer
+      minimum: 1
+      maximum: 3
+      example: 1
+    mark:
+      type: string
+      enum: [".", "X", "O"]
+      description: Possible values for a board square. `.` means empty square.
+      example: "."
+    board:
+      type: array
+      maxItems: 3
+      minItems: 3
+      items:
+        type: array
+        maxItems: 3
+        minItems: 3
+        items:
+          $ref: "#/components/schemas/mark"
+    winner:
+      type: string
+      enum: [".", "X", "O"]
+      description: Winner of the game. `.` means nobody has won yet.
+      example: "."
+    status:
+      type: object
+      properties:
+        winner:
+          $ref: "#/components/schemas/winner"
+        board:
+          $ref: "#/components/schemas/board"
+----
+
+Hopefully this gives an idea of how `$ref` can be used, and if you'd like to learn more check out our advanced guide: xref:_guides/openapi/specification/v3.1/advanced/splitting-documents-with-ref.adoc[Splitting Documents with $ref].
+
+=== Create "Design Libraries" of Shared Components
+
+An OpenAPI document does not need to contain `paths` or `webhooks`, it could be just a `components` object with nothing else.
+
+One of more of these "components only" documents could then be shared around forming a rudimentary "design library", helping teams reuse data models and various other bits across multiple APIs, multiple departments, or even externally to your organization.
+
+There are various proprietary tools out there to help with this, but the concept can be achieved by just sharing these `openapi-components.yaml` or similar on your network drive, Git repository, intranet, or public website.
