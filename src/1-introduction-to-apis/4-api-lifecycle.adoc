@@ -25,9 +25,9 @@ and could include people from marketing, sales, customer support, and more. The
 worst APIs are built in a vacuum, where the developers were told to build
 something and then left to their own devices.
 
-- "Marketing said we need to tack an API on." - "The CEO said we need to open up
-our data to third-party developers." - "A major partner wants to integrate our
-services into their platform."
+- "Marketing said we need to tack an API on." 
+- "The CEO said we need to open up our data to third-party developers."
+- "A major partner wants to integrate our services into their platform."
 
 If one one of these requests is being used as the entirety of the strategy input
 then the API will likely be very specific to that purpose. Maybe that's ok,
@@ -36,12 +36,13 @@ of potential stakeholders can help flesh out what the needs really are.
 
 Start by asking: 
 
-- Who are your target users? Internal teams, third-party developers, or both? -
-What are the business goals this API will help achieve? - What existing systems
-or data will the API interact with? - Which customers will be using this, and
-what are their needs? - If there is only one customer right now, can I find some
-other potential customers to talk to? - What sort of traffic can be expected?
-Will this be a few dozen users or millions worldwide?
+- Who are your target users? Internal teams, third-party developers, or both? 
+- What are the business goals this API will help achieve?
+- What existing systems or data will the API interact with?
+- Which customers will be using this, and
+what are their needs? 
+- If there is only one customer right now, can I find some other potential customers to talk to?
+- What sort of traffic can be expected? Will this be a few dozen users or millions worldwide?
 
 All of this can drastically shape the decisions made throughout the planning and
 development of the API, and could even suggest that you don't need a real-time
@@ -236,3 +237,28 @@ encourage adoption while generating revenue.
 
 With these steps, your API can evolve from an idea to a well-managed,
 developer-loved product that generates real value.
+
+== Summary
+
+Building an API is not just writing a bunch of code and hoping for the best, it's 
+an ongoing process that requires careful planning, design, testing, and management.
+This is a continuous cycle that adapts to changing requirements, technologies, and
+user needs over time.
+
+Some phases of the lifecycle will involve teams and stakeholders from other
+parts of the business, all of whom have different needs and expectations, so
+things can get a bit political. That's all very different skills required to
+more technical phases which are handled by developers, testers, and operations,
+but all are equally important to the success of the API.
+
+Of course people will try to skip a bunch of this and just get on with their one
+favourite step: Code. That's a bit like trying to build a house without a
+plan, or a recipe without ingredients. It might work, but it's not going to be
+pretty. You'll end up wasting a lot more time and money building useless things
+than you do building the right thing, but building the right thing requires a
+lot of work, and some decision makers "cut cost" by "reducing investment" like a
+UK Labour/Conservative government.
+
+We'll go through most of this in more detail in the following chapters, but
+hopefully this gives you a good overview of what to expect when building an API,
+and sets expectations for the challenge ahead.
