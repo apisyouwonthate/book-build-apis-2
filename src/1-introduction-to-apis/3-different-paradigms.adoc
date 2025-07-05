@@ -1,9 +1,8 @@
-[#theory-paradigms]
 = Understanding Different Paradigms
 
 If APIs are the interface for some sort of service, it should not come as a surprise that not all the interfaces in the world are going to have the same needs and requirements. Most of them are a case of "execute a command", "interact with data", or a combination of both.
 
-There are three distinct types of Web API which handles these common needs, and these different types are known as paradigms. To oversimplify things a bit, it’s reasonably fair to say that all APIs conform to one of these paradigms:
+There are three distinct types of Web API which handles these common needs, and these different types are known as paradigms. To oversimplify things a bit, it's reasonably fair to say that all APIs conform to one of these paradigms:
 
 - RPC (Remote Procedure Call)
 - REST (Representational State Transfer)
@@ -13,7 +12,7 @@ These paradigms are general approaches to building APIs, not a specific tool or 
 
 *Implementations* are something you can actually download, install, and use to build an API, that conforms to whatever rules the implementors picked, from whichever paradigm (or paradigms) they were interested in at the time.
 
-*Specifications* (or standards, recommendations, etc.) are often drafted up by various working groups, to help implementations share functionality in the same way. An API and a client in different languages can work together perfectly if they’re all following the specification correctly. The difference between a standard and a specification is usually just down to who made it. When a working group like the IETF or W3C create something, it's a standard, but when Google knock something out on their own, it's a specification.
+*Specifications* (or standards, recommendations, etc.) are often drafted up by various working groups, to help implementations share functionality in the same way. An API and a client in different languages can work together perfectly if they're all following the specification correctly. The difference between a standard and a specification is usually just down to who made it. When a working group like the IETF or W3C create something, it's a standard, but when Google knock something out on their own, it's a specification.
 
 For example:
 
@@ -126,15 +125,15 @@ REST, however, presents you with the next available options:
 
 *Client:* Hi, I would like to speak to Dr Watson, is he there?
 
-*REST:* Doctor Watson is not currently in the office, he’ll be back tomorrow, but you have a few options. If it’s not urgent you could leave a message and I’ll get it to him tomorrow, or I can book you with another doctor, would you like to hear who is available today?
+*REST:* Doctor Watson is not currently in the office, he'll be back tomorrow, but you have a few options. If it's not urgent you could leave a message and I'll get it to him tomorrow, or I can book you with another doctor, would you like to hear who is available today?
 
 *Client:* Yes, please let me know who is there!
 
 *REST:* Doctors Smith and Jones, here are links to their profiles.
 
-*Client:* Ok, Doctor Jones looks like my sort of Doctor, I would like to see them, let’s make that appointment.
+*Client:* Ok, Doctor Jones looks like my sort of Doctor, I would like to see them, let's make that appointment.
 
-*REST:* Appointment created, here’s a link to the appointment details.
+*REST:* Appointment created, here's a link to the appointment details.
 
 REST provided all of the relevant information with the response, and the client was able to pick through the options to resolve the situation.
 
@@ -146,7 +145,7 @@ This book will get more in-depth on hypermedia controls later. There are a few o
 
 - REST must be stateless: not persisting sessions between requests
 - Responses should declare cacheablility: helps your API scale if clients respect the rules
-- REST focuses on uniformity: if you’re using HTTP you should utilize HTTP features whenever possible, instead of inventing conventions
+- REST focuses on uniformity: if you're using HTTP you should utilize HTTP features whenever possible, instead of inventing conventions
 
 These constraints of REST when applied to HTTP APIs can help the API last for decades, which is a whole lot more complex without these concepts. What does that mean? Well, REST is often described as a series of layers of abstraction on top of RPC, with all relevant instructions related to the handling of that message being baked into the message itself, to avoid having to tell a human about specific ways to handle things. As things change throughout the entire ecosystem, a well trained REST API and client should be able to handle those changes seamlessly, because the REST API is describing itself well and the client is listening. This loosens the coupling found in other paradigms, where a lot of that is baked into the client itself.
 
@@ -236,7 +235,7 @@ All of this has the advertised benefit of making GraphQL portable enough that it
 
 GraphQL has many fantastic features and benefits, which are all bundled in one package, with a nice marketing site. If you are trying to learn how to make calls to a GraphQL API, the http://graphql.org/learn/[Learn GraphQL] documentation will help, and their site has a bunch of other resources.
 
-Seeing as GraphQL was built by Facebook, who had previously built a REST__ish__ API, they’re familiar with various REST/HTTP API concepts. Many of those existing concepts were used as inspiration for GraphQL functionality, or carbon copied straight into GraphQL.
+Seeing as GraphQL was built by Facebook, who had previously built a REST__ish__ API, they're familiar with various REST/HTTP API concepts. Many of those existing concepts were used as inspiration for GraphQL functionality, or carbon copied straight into GraphQL.
 
 The main selling point of GraphQL is that it defaults to providing the very smallest response from an API, as you are requesting only the specific bits of data that you want, which minimizes the Content Download portion of the HTTP request.
 

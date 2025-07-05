@@ -4,3 +4,4 @@
 include::1-history-of-apis.adoc[]
 include::2-apis-services-microservices.adoc[]
 include::3-different-paradigms.adoc[]
+include::4-api-lifecycle.adoc[]
