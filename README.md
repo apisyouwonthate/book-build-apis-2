@@ -26,6 +26,8 @@ Support the development of this book, and [**pre-order on LeanPub!**](https://le
     - [x] Errors
     - [ ] Authentication
     - [x] Caching
+    - [ ] File Uploads
+    - [ ] Hypermedia Controls
     - [x] Security
     - [x] Versioning
 - [ ] Part 3: OpenAPI
