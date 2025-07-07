@@ -1,0 +1,66 @@
+## Authentication
+
+1. What is auth
+    1. Why you need it (it's really not optional)     
+2. So if that’s getting auth wrong, why do we even need auth in the first place?  
+   1. Why ip addresses don’t work  
+   2. What you are trying to protect against  
+   3. Why you always need it  
+3. Adding login: your options \- pros and cons, How do I even?  
+   1. SDKs  
+   2. Open Source  
+   3. Third parties  
+   4. Do it my self…Oh that’s easy to get right, right?  
+4. Picking the right solution \=\> What are the User Stories  
+   1. Right person right access (what’s in our blog on the reasons why?)  
+   2. Now share the different kinds of access  
+      1. User auth \- Social/Federated Auth  
+      2. Businesses and corporate IdP source of truth  
+      3. Machine to Machine authentication \- Microservices  
+      4. Users have different access permissions to the same resource  
+5. Getting technical \- API Design in practice  
+   1. Authentication is what happens in your UI \- There is no backend component  
+   2. App redirects  
+   3. Access tokens, refresh tokens, API keys  
+   4. Verifying tokens  
+   5. Sessions  
+   6. Offline Silent Authentication  
+6. Risks and common pitfalls: What we can’t do  
+   1. OWASP  
+      1. Getting Auth wrong biggest two problems  
+      2. The top two OWASP security vulnerabilities are Broken Authentication and Broken Object Level Authorization. OWASP is…  
+   2. Things that shouldn’t be done:  
+      1. Passwords are dead  
+      2. MFA over SMS (show AiTM attacks)  
+      3. MFA over TOTP is dead (show AiTM attacks)  
+      4. Magic Links are dead  
+      5. Captua is dead  
+      6. Session Based Auth  
+      7. Backend Authentication flow  
+7. Technology deep dive  
+   1. Authentication Server  
+      1. Called OAuth Authorization Server  
+      2. Types of Signatures Algorithms  
+      3. SAML  
+      4. OpenID  
+      5. AD, LDAP, Keberos  
+   2. Yubikeys  
+      1. Passkeys  
+      2. FIDO2  
+      3. WebAuthn  
+   3. Token Types  
+      1. Access Token  
+      2. Identity Token  
+      3. Refresh Tokens  
+8. Interacting with user data owned in other services  
+   1. Credential Management  
+   2. Consent Screen  
+9. Closing statement: login is the first step. Next \- permissions.  
+   1. Do I include this here if so how deep should I go?  
+   2. Roles, Resources, types of access control  
+   3. When to access control  
+   4. etc….
+
+Research:
+
+* MFA works? https://edition.cnn.com/2025/03/05/politics/us-charges-chinese-hackers/index.html
