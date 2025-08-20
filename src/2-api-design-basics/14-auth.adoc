@@ -1,0 +1,85 @@
+## Introduction
+
+Here, I'm going to be discussing everything you wanted to know about Auth, and probably some things that you didn’t want to know. I’m Warren and the CTO at Authress, and you’ll have the benefit of my two decades of experience in distributed systems, REST APIs, and most importantly my work with OAuth and application security.
+
+You might have heard words before such as OAuth, SAML, OpenID, or SCIM. And if you’ve been especially unlucky, you might have also heard things like Kerberos, oracles, SPIFFE, or Macaroons. But for the rest of this chapter I want you to forget all that, I'm not going into those, because they are just protocols. And there are many protocols out there. Protocols just assign arbitrary words to the fundamental Auth constructs in an attempt to explain one specific implementation.
+
+Instead, I'm going to speak directly about the core concepts, so that no matter which system, paradigm, or technology you might be thrown into, you'll be able to quickly adapt this knowledge to be able to work effectively within that architecture. And to do that, the primary term you need to remember is **Token**, and you will be using tokens everywhere.
+
+![Tokens are everywhere](./images/14-auth/image1-tokens-are-everywhere.png)
+
+This a json web token (JWT):  
+![Encoded JWT](./images/14-auth/image2-encoded-jwt.png)
+
+And it is going to be our fundamental unit of auth. No action can be performed anywhere in your system without one. Async tasks, user verification, message queue processing, and most importantly of all our API requests will use these tokens.
+
+A JWT is made up of at least three components, the header or metadata, the body or payload that contains user identity information, and a signature for validating token authenticity. It’s worth mentioning that JWTs are not encrypted. From the above JWT you might notice that it is a set of base64 encoded strings.
+
+A JWT can be opened and if we open it we can see the following properties:
+
+{  
+	"identityProviderId": "https://authress.io",  
+  	"userId": "test-user-001",  
+  	"expires": 1761483600,  
+  	"signatureKeyId": "example-key",  
+  	"signature": "SflKxwRJSMeKKF2Qt4fwpMeJf36P0k6yJV\_adQssw5C"  
+}
+
+This is the decoded JWT. It is JSON, and in there we have:
+
+* The identity provider — who created the token  
+* The user the token represents, if you are the holder of this token then you are effectively that user  
+* A token expiry — It expires at some point  
+* Signature and signature metadata — To help verify the authenticity of the token
+
+Nearly every system out there in the world is generating and using JWTs. And that means you need to figure out which tokens are relevant for you to trust, and which ones are fabricated for a different system or by a malicious attacker. You do this by verifying the token signature.
+
+## The Login Flow
+
+Before I get to that, I want to start with a clear goal that will explain how we even got a JWT in the first place, and why verifying the token signature is even something we can do. The goal I’m picking for this chapter is:
+
+**Identity users so we can ensure only authorized users can access data The users will prove their identity, and once they prove themselves, they’ll be allowed access to their associated data. We’ll verify that proof.**
+
+This is actually the core of Authentication. And authentication is always required because, if we don't know who the user is then we don't have a good way of identifying if they are a potential malicious attacker. We can try to utilize ip addresses, VPNs, or other types of inefficient fingerprinting, but none of them are as effective as just requiring identification. JWTs serve this exact purpose.
+
+The followup here is how to get from an anonymous user sitting on a site connected to your API to a logged in user with a JWT. For that I’ll dive into the Auth flow. *A user wants to access some data, that data is stored in an API, API says you need to be authenticated and provide me a JWT.*  
+
+![The full authentication flow](./images/14-auth/image3-auth-flow.png)
+
+1. So, the user clicks on login button, selects an identity provider  
+2. They prove themselves to that provider using their credentials  
+3. That provider generates a JWT, and that JWT is returned to their user agent  
+4. Then the JWT can be sent on all requests to the API  
+5. API verifies the token using the signature
+
+And at this point the API will now return the data back to the user agent.
+
+Part of this flow requires the user agent persisting that returned JWT so that the user will not need to log in every time an API request is necessary. When the token is received by a device, such as the browser, it can be stored in many locations, once possible location is localStorage. And contrary to what you might have already read on the internet, there are no security issues with that, it isn’t now exposed to XSS or CSRF attacks. Use localStorage unless for some reason unrelated to security you are forced to put it elsewhere.
+
+This is just the client side, we also need to send the token to the service API.
+
+## JWT Verification
+
+Tokens should be sent in HTTP requests in the standardized **authorization header** in the appropriate format. The format is–the header name Authorization, the word bearer then the token. The word bearer is specified as part of the JWT specification to indicate the token type is a jwt and not a different kind. You can read more about why in [RFC 7523](https://www.rfc-editor.org/rfc/rfc7523.html).
+
+Do not accept it in the url, do not accept it in the body, do not accept it in a made up header like x-api-key, it does not belong in any of those places. APIs should only ever accept the token in the **authorization header** and nowhere else. And of course this means that all clients should send the token in the same header.
+
+Once the token is received by an API in the expected location, it can be verified. To do that, we open the token, look at where it came from, download the public key associated with the token, cache the key, and then use it to verify the signature matches.
+
+![Sending the token in the correct location]()
+
+## Login Antipatterns
+
+The one thing that is unavoidable in this flow is­­­—verifying that the user is who they say they are.  
+And they do that by providing some credentials to an authentication service. That authentication service could be something you run or a third party. Regardless of what you are using, this interaction happens through your login page. It might help to look at an example of a well made login screen:
+
+![Example login screen](./images/14-auth/image4-login-screen.png)
+
+The required components of this are:
+
+* **Federation**—to support Corporate Identity Providers and business users  
+* **Social Logins**—for commercial users  
+* **Passkeys, WebAuthn, biometrics**—for the security conscious  
+* And now they will also need to support **FedCM**.
+
+If your service doesn’t support passkeys yet, I’m here to tell you unfortunately the next great thing, FedCM, is already here, and so that’s two huge auth features you might be behind on.
