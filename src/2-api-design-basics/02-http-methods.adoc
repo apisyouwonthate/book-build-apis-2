@@ -296,6 +296,74 @@ Both clients were trying to update a single instance of a resource, but little d
 
 Oftentimes an API will only support one of these methods. We *strongly* recommend supporting both, unless you have a very specific reason not to. `PUT` is great for full updates, but `PATCH` is more flexible and can be more efficient for partial updates.
 
+== QUERY: The new kid on the block
+
+The `QUERY` method is a newer addition to HTTP that addresses a specific gap: the need for a safe, idempotent method that can carry a request body.
+
+The problem QUERY solves is straightforward: sometimes you need to send complex query parameters - like filtering criteria, search specifications, or data selection logic - that are too large or complex for a URL query string. Using GET means everything goes in the URL, which suits most cases but does have practical size limits. Using POST works but signals the wrong intent and prevents caching.
+
+QUERY requests are both safe and idempotent, meaning they don't modify server state and can be safely retried or cached.
+
+=== QUERY Examples
+
+Filtering a large dataset with complex criteria:
+
+[source,http]
+----
+QUERY /animals HTTP/1.1
+Host: api.example.org
+Content-Type: application/json
+Accept: application/json
+
+{
+  "knownIdentifiers": ["id1", "id2", "id3"],
+  "filters": {
+    "healthTreatment": {
+      "condition": "mastitis",
+      "dateRange": {
+        "start": "2024-01-01",
+        "end": "2024-12-31"
+      }
+    }
+  }
+}
+----
+
+=== Accept-Query Header
+
+Servers can advertise support for QUERY using the `Accept-Query` response header, which specifies the query format media types the server accepts.
+
+[source,http]
+----
+OPTIONS /contacts HTTP/1.1
+Host: api.example.org
+
+HTTP/1.1 200 OK
+Accept-Query: application/sql, application/json
+Allow: GET, POST, QUERY, OPTIONS
+----
+
+=== Best Practices for QUERY requests
+
+* Safe and idempotent: Like GET, but with a request body
+* Cacheable: Responses can and should be cached when appropriate
+* Query in body: The request body contains the query specification, not the URL
+* Flexible formats: Supports any query format (SQL, JSONPath, GraphQL, custom DSL, etc.)
+* Use Accept-Query: Advertise supported query formats to clients
+* Conditional queries: Supports conditional execution with If-Modified-Since and related headers
+
+=== When to Use QUERY
+
+QUERY is ideal when you need to:
+
+* Send complex extremely complex filtering or search criteria that don't fit cleanly in URL parameters
+* Query collections with sophisticated selection logic
+* Enable caching of query results (unlike POST)
+* Signal that the operation is safe and won't modify data
+* Support multiple query formats or languages
+
+Note that QUERY is a relatively new addition to HTTP and may not yet be widely supported by all frameworks and infrastructure. Check compatibility before adopting it in production systems.
+
 == Remember
 
 HTTP methods aren't just syntax - they're core to how the web works. Using them correctly makes your API:
@@ -306,3 +374,5 @@ HTTP methods aren't just syntax - they're core to how the web works. Using them 
 * Easier to maintain and scale
 
 Your choice of HTTP method communicates intent and behavior to both developers and tools, so choose wisely and consistently.
+
+
