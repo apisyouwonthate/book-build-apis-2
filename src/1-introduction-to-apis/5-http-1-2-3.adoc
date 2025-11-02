@@ -27,10 +27,7 @@ The official RFC for 1.1 was released in January 1997 only six-ish months after 
 [Example Here of 1.1]
 
 
-
-
-
-From this period of rapid experimentation, a set of best practices and common patterns began to emerge, and in May 1996 the HTTP Working Group (HTTP-WG) published RFC 1945, which documented the "common usage" of the many HTTP/1.0 implementations found in the wild. Note that this was only an informational RFC: HTTP/1.0 as we know it is not a formal specification or an Internet standard!
+--- --- ---
 
 Http 0.9 pretty much just static docs
 Http 1.0 what did it improve I guess Ajax now
