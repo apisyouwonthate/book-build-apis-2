@@ -8,6 +8,30 @@ The first version of the protocol 0.9 actually landed without a version number t
 
 Version 0.9 was pretty much static docs and only supported HTML. No status codes, even on error. Wait what even on error, what do you do if the there is something wrong I hear you cry? Its up to the server to serve specific HTML files based on the error. Thankfully things have progressed a lot since then.
 
+== 2. HTTP 1.0
+
+Spurred on by the creation of the web browser and the growth of consumer internet infrastructure the HTTP protocol start evolve. Version 0.9 is hit by many limitation we need to server more than HTML, content negotiation and provider more detailed metadata on requests and responses.
+
+There is never a formal specification for version 1.0. The spec but together by the HTTP Working Groups RFC in 1996 documents common usage of the of the many 1.0 experimental HTTP server and client implementations released into the wild.This is not a formal spec or internet standard.
+
+So what did version 1.0 include? We expanded the HTTP methods available to include `POST`, `HEAD` and `OPTIONS`. We also get status codes to indicate success or failure, no more sending custom HTML for an error. We also get content type so we can send more than text files and the updates to the headers make caching possible.
+
+HTTP 1.0 does not last for long though. While most web servers can still make HTTP 1.0 request today this is not a good idea as 1.0 requires an new TCP connection on every request which has some serious performance issues.
+
+== 3. HTTP 1.1
+
+The official RFC for 1.1 was released in January 1997 only six-ish months after 1.0 dropped. The work on 1.1 happened in parallel to 1.0 but became the official standard. It worth mention if you not used to the open source or standard boards when you put in an RFC it takes time for companies, organisations and other software to implement them.
+
+1.1 is still used on the web today and 
+
+[Example Here of 1.1]
+
+
+
+
+
+From this period of rapid experimentation, a set of best practices and common patterns began to emerge, and in May 1996 the HTTP Working Group (HTTP-WG) published RFC 1945, which documented the "common usage" of the many HTTP/1.0 implementations found in the wild. Note that this was only an informational RFC: HTTP/1.0 as we know it is not a formal specification or an Internet standard!
+
 Http 0.9 pretty much just static docs
 Http 1.0 what did it improve I guess Ajax now
 Http 1.1 keep alive 10% improvement, lots of clients don’t use it, Wework graph, the gold standard until spa meant lots of connections, browser limitations
