@@ -1,1 +1,24 @@
 = HTTP 1 2 and 3
+
+HTTP or Hypertext Transfer Protocol has gone through many iterations since it introduction in 1991 with HTTP 0.9. The protocol itself the method that all computers use to request and send information over the internet. When you head to `www.apisyouwonthate.com` its server responds with HTTP responds with text, images and more that the browser will display to you
+
+== 1. HTTP 0.9
+
+The first version of the protocol 0.9 actually landed without a version number this was only added in later to help distinguish it from future versions. There was only one HTTP method available in this version `GET` (more about those in API Design Basics).
+
+Version 0.9 was pretty much static docs and only supported HTML. No status codes, even on error. Wait what even on error, what do you do if the there is something wrong I hear you cry? Its up to the server to serve specific HTML files based on the error. Thankfully things have progressed a lot since then.
+
+Http 0.9 pretty much just static docs
+Http 1.0 what did it improve I guess Ajax now
+Http 1.1 keep alive 10% improvement, lots of clients don’t use it, Wework graph, the gold standard until spa meant lots of connections, browser limitations
+Lack of knowledge about keep alive has lead to folks batching requests to avoid “handshakes” which is often actually slower
+
+Let’s stop building to take into to http2, leave model design until later
+
+H2 allows multiplexing so lots of requests made over same connection and responses are mixed together, browser solves max connections from hard set 6- to confugurable 100
+
+H2 hpack means headers are squashed (handy if you have big JWT and other session data, but try to avoid that anyway), and server push is awesome. Please push mention.
+
+Http 0.9 going away
+
+curl/curl#4191
