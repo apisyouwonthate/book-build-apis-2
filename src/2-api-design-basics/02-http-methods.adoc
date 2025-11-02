@@ -310,22 +310,33 @@ Filtering a large dataset with complex criteria:
 
 [source,http]
 ----
-QUERY /animals HTTP/1.1
+QUERY /feed 
 Host: api.example.org
 Content-Type: application/json
 Accept: application/json
 
-{
-  "knownIdentifiers": ["id1", "id2", "id3"],
-  "filters": {
-    "healthTreatment": {
-      "condition": "mastitis",
-      "dateRange": {
-        "start": "2024-01-01",
-        "end": "2024-12-31"
-      }
+{ 
+  "search-query": "foo", 
+  "limit": 10, 
+  "sort": {
+    "price": "desc",
+    "published": "asc"
+  }, 
+   "filter": [
+    {
+      "field": "origin",
+      "value": "london"
+    },
+    { 
+      "field": "destination",
+      "value": "paris"
+    },
+    {
+      "field": "price",
+      "value": "60.00",
+      "operator": "<="
     }
-  }
+  ]
 }
 ----
 
