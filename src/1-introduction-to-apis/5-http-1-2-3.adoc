@@ -16,30 +16,79 @@ There is never a formal specification for version 1.0. The spec but together by 
 
 So what did version 1.0 include? We expanded the HTTP methods available to include `POST`, `HEAD` and `OPTIONS`. We also get status codes to indicate success or failure, no more sending custom HTML for an error. We also get content type so we can send more than text files and the updates to the headers make caching possible.
 
+So what does a HTTP request and response look like?
+
+[source,http]
+----
+GET /index.html HTTP/1.0
+User-Agent: Mozilla/5.0
+Accept: text/html
+
+HTTP/1.0 200 OK
+Date: Sat, 08 Nov 2025 10:30:00 GMT
+Server: Apache/2.4.41
+Content-Type: text/html
+Content-Length: 245
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Welcome Page</title>
+</head>
+<body>
+    <h1>Hello World</h1>
+    <p>This is a simple HTML page.</p>
+    <a href="/about.html">About Us</a>
+</body>
+</html>
+----
+
 HTTP 1.0 does not last for long though. While most web servers can still make HTTP 1.0 request today this is not a good idea as 1.0 requires an new TCP connection on every request which has some serious performance issues.
 
 == 3. HTTP 1.1
 
-The official RFC for 1.1 was released in January 1997 only six-ish months after 1.0 dropped. The work on 1.1 happened in parallel to 1.0 but became the official standard. It worth mention if you not used to the open source or standard boards when you put in an RFC it takes time for companies, organisations and other software to implement them.
+The official RFC for 1.1 was released in January 1997 only six-ish months after 1.0 dropped. The work on 1.1 happened in parallel to 1.0 but became the official standard and was adopted quickly by browsers and end users. As adoption grew more revisions were made to the protocol to handle the requirements of new services. 
 
-1.1 is still used on the web today and 
+A new RFC was released in June 1999 (RFC 2616 if your interested) including more of these new features. This standard would eventually be replaced by a six part specification from the HTTP Working Group formed in 2007.
 
-[Example Here of 1.1]
+So what features did 1.1 include, to be honest there is a big enough difference we could spend most of the book talking about them. However lets focus on the most important. Let take another look at that request from 1.0 but using 1.1.
+
+[source,http]
+----
+GET /index.html HTTP/1.1
+Host: www.example.com
+User-Agent: Mozilla/5.0
+Accept: text/html
+Connection: keep-alive
+
+HTTP/1.1 200 OK
+Date: Sat, 08 Nov 2025 10:30:00 GMT
+Server: Apache/2.4.41
+Content-Type: text/html
+Content-Length: 245
+Connection: keep-alive
+Keep-Alive: timeout=5, max=100
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Welcome Page</title>
+</head>
+<body>
+    <h1>Hello World</h1>
+    <p>This is a simple HTML page.</p>
+    <a href="/about.html">About Us</a>
+</body>
+</html>
+----
+
+You may be wondering what that `keep-alive` header is. Well HTTP 1.1 introduced a new header that allowed you to re-use the same HTTP connection for multiple request to the same host. For example I could pull a web page and then download a linked image from the same web server delivering a faster end user experience. 
+
+Re-using the same connection great however does come with some flaws. If a client does not close the connection the resources used to keep the connection open on the server will be unusable for other clients however the impact of this varies on how the server is built.
+
+HTTP 1.0 came with a host of other new features cache controls, content encoding and my personal favourite pipelining which allowed a second HTTP requests to be sent before the first was even finishing.
+
+== 4. HTTP 2.0
 
 
---- --- ---
-
-Http 0.9 pretty much just static docs
-Http 1.0 what did it improve I guess Ajax now
-Http 1.1 keep alive 10% improvement, lots of clients don’t use it, Wework graph, the gold standard until spa meant lots of connections, browser limitations
-Lack of knowledge about keep alive has lead to folks batching requests to avoid “handshakes” which is often actually slower
-
-Let’s stop building to take into to http2, leave model design until later
-
-H2 allows multiplexing so lots of requests made over same connection and responses are mixed together, browser solves max connections from hard set 6- to confugurable 100
-
-H2 hpack means headers are squashed (handy if you have big JWT and other session data, but try to avoid that anyway), and server push is awesome. Please push mention.
-
-Http 0.9 going away
-
-curl/curl#4191
+== 5. HTTP 3.0
